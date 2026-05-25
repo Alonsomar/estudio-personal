@@ -1,0 +1,457 @@
+{
+  "metadata": {
+    "name": "Golden dataset RAG fiscal chileno",
+    "version": 1,
+    "created_at": "2026-05-25",
+    "total_items": 30,
+    "description": "Dataset de evaluación para sistema RAG sobre corpus regulatorio y fiscal chileno."
+  },
+  "items": [
+    {
+      "id": "gd-001",
+      "query": "¿Qué ley introdujo el IVA a los servicios digitales en Chile?",
+      "expected_answer": "La Ley Nº 21.210, publicada el 24 de febrero de 2020, modificó el DL 825 para gravar servicios digitales de proveedores extranjeros.",
+      "expected_docs": [
+        "circular-01-sii-iva-digital.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "factual",
+      "doc_type": "circular",
+      "requires_abstention": false,
+      "reasoning": "Respuesta directa en sección I de la Circular 42.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-002",
+      "query": "¿Cuál es la tasa de IVA para servicios digitales de proveedores extranjeros en Chile?",
+      "expected_answer": "19%, según la sección II de la Circular Nº 42 del SII (2020).",
+      "expected_docs": [
+        "circular-01-sii-iva-digital.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "numerico",
+      "doc_type": "circular",
+      "requires_abstention": false,
+      "reasoning": "Tasa explícita en sección II.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-003",
+      "query": "¿Qué indicios se usan para determinar si un servicio digital se utiliza en Chile?",
+      "expected_answer": "En orden de prelación: (1) dirección IP o geolocalización del dispositivo, (2) dirección del medio de pago, (3) dirección de facturación o contrato, (4) SIM del teléfono móvil.",
+      "expected_docs": [
+        "circular-01-sii-iva-digital.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "factual",
+      "doc_type": "circular",
+      "requires_abstention": false,
+      "reasoning": "Requiere listar los 4 indicios en orden. Sección III.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-004",
+      "query": "¿Quién es responsable del IVA cuando un servicio digital se contrata a través de una plataforma de intermediación?",
+      "expected_answer": "La plataforma de intermediación, en calidad de agente retenedor, sin perjuicio de su derecho a repetir contra el prestador efectivo.",
+      "expected_docs": [
+        "circular-01-sii-iva-digital.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "entidad",
+      "doc_type": "circular",
+      "requires_abstention": false,
+      "reasoning": "Sección V de la Circular. Concepto de responsabilidad sustituta.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-005",
+      "query": "Un proveedor de SaaS con sede en Irlanda vende a empresas chilenas. ¿Debe registrarse ante el SII? ¿Cada cuánto declara?",
+      "expected_answer": "Sí, debe registrarse en el portal simplificado del SII (sección IV.a). Declara y paga trimestralmente, dentro de los primeros 20 días del mes siguiente al término del trimestre (sección IV.b).",
+      "expected_docs": [
+        "circular-01-sii-iva-digital.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "factual",
+      "doc_type": "circular",
+      "requires_abstention": false,
+      "reasoning": "Requiere sintetizar dos obligaciones de sección IV.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-006",
+      "query": "¿Cuántas USE recibe un alumno prioritario de 3º básico por subvención escolar preferencial?",
+      "expected_answer": "1,694 USE mensuales, según el Decreto Exento Nº 1.423 (literal a: alumnos de 1º a 6º básico).",
+      "expected_docs": [
+        "decreto-01-subvencion-escolar.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "numerico",
+      "doc_type": "decreto",
+      "requires_abstention": false,
+      "reasoning": "3º básico cae en el rango 1º-6º del literal a).",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-007",
+      "query": "¿Cuál es la diferencia en USE entre un alumno prioritario de 5º básico y uno de 7º básico?",
+      "expected_answer": "0,564 USE. El alumno de 5º básico recibe 1,694 USE (literal a), el de 7º básico recibe 1,130 USE (literal b). Diferencia: 1,694 - 1,130 = 0,564 USE.",
+      "expected_docs": [
+        "decreto-01-subvencion-escolar.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "numerico",
+      "doc_type": "decreto",
+      "requires_abstention": false,
+      "reasoning": "Requiere identificar los dos tramos y calcular la diferencia.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-008",
+      "query": "¿Qué organismo determina anualmente la calidad de alumno prioritario?",
+      "expected_answer": "La Junta Nacional de Auxilio Escolar y Becas (JUNAEB), según el Artículo 2º del Decreto.",
+      "expected_docs": [
+        "decreto-01-subvencion-escolar.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "entidad",
+      "doc_type": "decreto",
+      "requires_abstention": false,
+      "reasoning": "Mención directa en Art. 2.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-009",
+      "query": "¿Qué consecuencia enfrenta un establecimiento clasificado En Recuperación que no mejora sus resultados?",
+      "expected_answer": "Pierde el reconocimiento oficial del Estado si no mejora dentro de un plazo de cuatro años (Art. 5).",
+      "expected_docs": [
+        "decreto-01-subvencion-escolar.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "factual",
+      "doc_type": "decreto",
+      "requires_abstention": false,
+      "reasoning": "Requiere conectar clasificación (Art. 4) con consecuencia (Art. 5).",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-010",
+      "query": "¿Qué porcentaje mínimo de matrícula prioritaria necesita un establecimiento para acceder a la SEP?",
+      "expected_answer": "Al menos el 15% de su matrícula debe corresponder a alumnos prioritarios (Art. 1).",
+      "expected_docs": [
+        "decreto-01-subvencion-escolar.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "factual",
+      "doc_type": "decreto",
+      "requires_abstention": false,
+      "reasoning": "Art. 1 del Decreto.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-011",
+      "query": "¿Cuánto presupuesto se asigna al Programa Nacional de Inmunizaciones en 2024?",
+      "expected_answer": "$198.547.320 miles, según la Glosa 05, Asignación 104, Subtítulo 24 de la Partida 16.",
+      "expected_docs": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "numerico",
+      "doc_type": "glosa",
+      "requires_abstention": false,
+      "reasoning": "Monto explícito antes de la Glosa 05.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-012",
+      "query": "¿Cuánto es el Aporte Fiscal Libre de FONASA para 2024?",
+      "expected_answer": "$4.892.157.000 miles, según la Glosa 09, Capítulo 02, Programa 01 de la Partida 16.",
+      "expected_docs": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "numerico",
+      "doc_type": "glosa",
+      "requires_abstention": false,
+      "reasoning": "Requiere navegar hasta Capítulo 02 del documento.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-013",
+      "query": "¿Qué información debe reportar trimestralmente el Ministerio de Salud sobre inmunizaciones?",
+      "expected_answer": "Debe informar a la Comisión Especial Mixta de Presupuestos: (i) dosis adquiridas por tipo, (ii) costo unitario promedio, (iii) cobertura por grupo etario, (iv) inventario en stock.",
+      "expected_docs": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "factual",
+      "doc_type": "glosa",
+      "requires_abstention": false,
+      "reasoning": "Glosa 05, 4 ítems de reporte.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-014",
+      "query": "¿Cuál es la razón máxima de beneficiarios por cama para que una comuna no sea considerada en déficit de oferta?",
+      "expected_answer": "1.000 personas por cama hospitalaria pública. Comunas que superan esa razón se consideran en déficit (Glosa 09).",
+      "expected_docs": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "numerico",
+      "doc_type": "glosa",
+      "requires_abstention": false,
+      "reasoning": "Dato anidado dentro de la definición de déficit en Glosa 09.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-015",
+      "query": "¿Qué criterios definen equipamiento crítico según la Glosa 12 de Salud?",
+      "expected_answer": "Equipamiento con vida útil residual inferior a 2 años o con tasa de falla superior al 15% mensual.",
+      "expected_docs": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "factual",
+      "doc_type": "glosa",
+      "requires_abstention": false,
+      "reasoning": "Definición técnica dentro de Glosa 12.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-016",
+      "query": "¿A qué programa corresponde el PRAIS en el presupuesto de Salud?",
+      "expected_answer": "Al Programa 01 de la Subsecretaría de Salud Pública, Asignación 112, con un presupuesto de $27.834.560 miles.",
+      "expected_docs": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "factual",
+      "doc_type": "glosa",
+      "requires_abstention": false,
+      "reasoning": "Mención directa antes de Glosa 06.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-017",
+      "query": "¿Son sumables los presupuestos de inmunizaciones y equipamiento hospitalario en una misma cifra?",
+      "expected_answer": "No directamente. Son asignaciones diferentes: inmunizaciones ($198.547.320 miles) es transferencia corriente al sector privado (Subtítulo 24), mientras que equipamiento ($156.789.000 miles) es transferencia de capital (Subtítulo 25). Corresponden a diferentes clasificaciones presupuestarias.",
+      "expected_docs": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "multi-doc",
+      "doc_type": "glosa",
+      "requires_abstention": false,
+      "reasoning": "Requiere entender clasificación presupuestaria. Subtítulos diferentes.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-018",
+      "query": "¿Cuál es la diferencia entre lobby y gestión de intereses particulares según la Ley 20.730?",
+      "expected_answer": "El lobby es remunerado; la gestión de intereses particulares no es remunerada. Ambas buscan influir en decisiones de sujetos pasivos (Art. 2).",
+      "expected_docs": [
+        "norma-01-ley-lobby.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "factual",
+      "doc_type": "norma",
+      "requires_abstention": false,
+      "reasoning": "Definiciones 1) y 2) del Art. 2.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-019",
+      "query": "¿Qué autoridades son sujetos pasivos de la Ley de Lobby?",
+      "expected_answer": "Presidente, ministros, subsecretarios, jefes de servicio, directores regionales, intendentes, gobernadores, embajadores, consejeros de órganos constitucionales, diputados, senadores, alcaldes y concejales (Art. 3).",
+      "expected_docs": [
+        "norma-01-ley-lobby.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "entidad",
+      "doc_type": "norma",
+      "requires_abstention": false,
+      "reasoning": "Lista directa del Art. 3.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-020",
+      "query": "¿Cuál es el rango de multas por infracción a la Ley de Lobby?",
+      "expected_answer": "10 a 50 UTM. En caso de reincidencia, hasta 100 UTM (Art. 11).",
+      "expected_docs": [
+        "norma-01-ley-lobby.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "numerico",
+      "doc_type": "norma",
+      "requires_abstention": false,
+      "reasoning": "Art. 11, dos tramos según reincidencia.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-021",
+      "query": "¿Qué debe publicar mensualmente un sujeto pasivo en el Registro de Agenda Pública?",
+      "expected_answer": "Dentro de los primeros 10 días de cada mes: (a) audiencias de lobby o gestión de intereses, (b) viajes en ejercicio de funciones, (c) donativos oficiales y protocolares (Art. 5).",
+      "expected_docs": [
+        "norma-01-ley-lobby.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "factual",
+      "doc_type": "norma",
+      "requires_abstention": false,
+      "reasoning": "Art. 5, 3 ítems con plazo.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-022",
+      "query": "¿Quién administra el registro público de lobbistas y qué información debe contener la inscripción?",
+      "expected_answer": "El Consejo para la Transparencia. La inscripción debe contener: individualización del lobbista, domicilio y contacto, e individualización de los representados. Se renueva anualmente (Art. 8).",
+      "expected_docs": [
+        "norma-01-ley-lobby.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "entidad",
+      "doc_type": "norma",
+      "requires_abstention": false,
+      "reasoning": "Art. 8. Requiere sintetizar administrador + contenido + renovación.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-023",
+      "query": "¿Un concejal que recibe una invitación de un proveedor de software educacional debe registrarla? ¿Bajo qué norma?",
+      "expected_answer": "Sí. Los concejales son sujetos pasivos de la Ley de Lobby (Art. 3.e, Ley 20.730) y deben registrar audiencias de lobby en el Registro de Agenda Pública (Art. 5). Si el proveedor es remunerado por un tercero para gestionar, es lobby; si actúa por cuenta propia, es gestión de intereses particulares.",
+      "expected_docs": [
+        "norma-01-ley-lobby.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "multi-doc",
+      "doc_type": "norma",
+      "requires_abstention": false,
+      "reasoning": "Requiere aplicar definiciones del Art. 2 al caso concreto.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-024",
+      "query": "¿Qué obligación trimestral comparten los prestadores de servicios digitales extranjeros y el Ministerio de Salud respecto a inmunizaciones?",
+      "expected_answer": "Ambos tienen obligaciones de reporte trimestral: los prestadores de servicios digitales deben declarar y pagar IVA trimestralmente (Circular 42, sección IV.b), y el Ministerio debe informar trimestralmente sobre el programa de inmunizaciones (Glosa 05, Partida 16). Son obligaciones independientes bajo normativas distintas.",
+      "expected_docs": [
+        "circular-01-sii-iva-digital.txt",
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "multi-doc",
+      "doc_type": "circular",
+      "requires_abstention": false,
+      "reasoning": "Cruza dos documentos para encontrar un patrón común.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-025",
+      "query": "¿Cuál es la multa por infracción a la Ley de Transparencia de 2022?",
+      "expected_answer": "No es posible responder. El corpus no contiene la Ley de Transparencia. La Ley de Lobby (20.730) tiene multas de 10-50 UTM, pero es una norma distinta.",
+      "expected_docs": [],
+      "difficulty": "hard",
+      "query_type": "scope",
+      "doc_type": "ninguno",
+      "requires_abstention": true,
+      "reasoning": "La query mezcla dos leyes. El sistema debe identificar que no tiene la fuente.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-026",
+      "query": "¿Qué dice el DFL 3 sobre subvenciones especiales para educación rural?",
+      "expected_answer": "No es posible responder. El corpus contiene el Decreto Exento Nº 1.423 sobre subvención escolar preferencial (Ley 20.248), pero no el DFL 3.",
+      "expected_docs": [],
+      "difficulty": "medium",
+      "query_type": "scope",
+      "doc_type": "ninguno",
+      "requires_abstention": true,
+      "reasoning": "Documento fuera del corpus. El sistema debe abstenerse.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-027",
+      "query": "¿Cuál será el presupuesto de Salud para 2025?",
+      "expected_answer": "No es posible responder. El corpus solo contiene la Ley de Presupuestos 2024. No se dispone de información sobre el presupuesto 2025.",
+      "expected_docs": [],
+      "difficulty": "easy",
+      "query_type": "scope",
+      "doc_type": "ninguno",
+      "requires_abstention": true,
+      "reasoning": "Pregunta temporal fuera del alcance del corpus.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-028",
+      "query": "¿Las subvenciones escolares están afectas a IVA?",
+      "expected_answer": "La subvención escolar preferencial es una transferencia del Estado (DL 825 exime transferencias fiscales). Los servicios digitales sí están afectos a IVA al 19% (Circular 42). Son regímenes tributarios distintos.",
+      "expected_docs": [
+        "decreto-01-subvencion-escolar.txt",
+        "circular-01-sii-iva-digital.txt"
+      ],
+      "difficulty": "hard",
+      "query_type": "multi-doc",
+      "doc_type": "decreto",
+      "requires_abstention": false,
+      "reasoning": "Requiere conocimiento implícito de régimen tributario + cruce de documentos.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-029",
+      "query": "¿En qué plazo debe un sujeto pasivo registrar sus actuaciones en la Agenda Pública?",
+      "expected_answer": "Dentro de los primeros 10 días de cada mes, respecto de las actuaciones del mes inmediatamente anterior (Art. 5, Ley 20.730).",
+      "expected_docs": [
+        "norma-01-ley-lobby.txt"
+      ],
+      "difficulty": "easy",
+      "query_type": "numerico",
+      "doc_type": "norma",
+      "requires_abstention": false,
+      "reasoning": "Plazo explícito en Art. 5.",
+      "created_by": "alonso",
+      "version": 1
+    },
+    {
+      "id": "gd-030",
+      "query": "¿Qué organismo elabora el ranking de priorización de equipamiento hospitalario?",
+      "expected_answer": "La Subsecretaría de Redes Asistenciales, debiendo informar a la Dirección de Presupuestos (Glosa 12).",
+      "expected_docs": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "difficulty": "medium",
+      "query_type": "entidad",
+      "doc_type": "glosa",
+      "requires_abstention": false,
+      "reasoning": "Dos entidades mencionadas en Glosa 12.",
+      "created_by": "alonso",
+      "version": 1
+    }
+  ]
+}
