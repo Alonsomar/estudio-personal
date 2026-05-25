@@ -12,7 +12,7 @@ y fiscal chileno.
 |----|---------------------------------------|---------------------------------------------|-----------------------------------------|------------|
 | 00 | Plan maestro                          | [theory/00-plan.md](theory/00-plan.md)      | —                                       | Terminado  |
 | 01 | Por qué evals                         | [theory/01-por-que-evals.md](theory/01-por-que-evals.md) | [code/demo-fallos-silenciosos.py](code/demo-fallos-silenciosos.py) | Terminado  |
-| 02 | Taxonomía                             | theory/02-taxonomia.md                      | —                                       | Pendiente  |
+| 02 | Taxonomía                             | [theory/02-taxonomia.md](theory/02-taxonomia.md) | [code/taxonomia-evals.py](code/taxonomia-evals.py) | Terminado  |
 | 03 | Análisis de errores                   | theory/03-analisis-errores.md               | —                                       | Pendiente  |
 | 04 | Golden datasets                       | theory/04-golden-datasets.md                | code/eval-golden-dataset.py             | Pendiente  |
 | 05 | Métricas de retrieval                 | theory/05-metricas-retrieval.md             | code/eval-metricas-retrieval.py         | Pendiente  |
