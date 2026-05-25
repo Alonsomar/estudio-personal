@@ -1,0 +1,77 @@
+SERVICIO DE IMPUESTOS INTERNOS
+SUBDIRECCIÓN NORMATIVA
+DEPARTAMENTO DE IMPUESTOS INDIRECTOS
+
+CIRCULAR Nº 42, DE 2020
+
+MATERIA: Instruye sobre la aplicación del Impuesto al Valor Agregado
+(IVA) a los servicios digitales prestados por proveedores no
+domiciliados ni residentes en Chile, conforme a las modificaciones
+introducidas por la Ley Nº 21.210 a la Ley sobre Impuesto a las
+Ventas y Servicios.
+
+I. INTRODUCCIÓN
+
+La Ley Nº 21.210, publicada en el Diario Oficial el 24 de febrero
+de 2020, introdujo modificaciones al Decreto Ley Nº 825, de 1974
+(Ley sobre Impuesto a las Ventas y Servicios), estableciendo la
+obligación de gravar con IVA los servicios prestados por medio
+electrónico por parte de prestadores domiciliados o residentes en
+el extranjero, cuando sean utilizados en el territorio nacional.
+
+II. SERVICIOS GRAVADOS
+
+Quedan afectos a IVA, con tasa del 19%, los siguientes servicios
+cuando sean prestados de manera remota por proveedores extranjeros:
+
+   a) Intermediación de servicios prestados en Chile, cualquiera
+      sea su naturaleza, o de ventas realizadas en Chile o en el
+      extranjero siempre que estas últimas den origen a una
+      importación.
+   b) Suministro o entrega de contenido de entretenimiento digital,
+      tal como videos, música, juegos u otros análogos.
+   c) Puesta a disposición de software, almacenamiento, plataformas
+      o infraestructura informática.
+   d) Publicidad, con independencia del soporte o medio a través
+      del cual sea entregada, difundida o desplegada.
+
+III. DETERMINACIÓN DEL LUGAR DE UTILIZACIÓN
+
+Para efectos de determinar si un servicio es utilizado en Chile,
+se atenderá a los siguientes indicios, en el orden de prelación
+que se indica:
+
+   1) La dirección IP del dispositivo utilizado por el usuario, o
+      la geolocalización del dispositivo.
+   2) La dirección de la tarjeta de débito, crédito u otro medio
+      de pago utilizado en la transacción.
+   3) La dirección de facturación o la del contrato de prestación
+      de servicios.
+   4) La tarjeta SIM del teléfono móvil utilizado.
+
+IV. OBLIGACIONES DEL PRESTADOR EXTRANJERO
+
+Los prestadores de servicios digitales domiciliados o residentes
+en el extranjero deberán:
+
+   a) Registrarse ante el Servicio de Impuestos Internos a través
+      del portal simplificado habilitado al efecto.
+   b) Declarar y pagar trimestralmente el IVA devengado, dentro
+      de los primeros 20 días del mes siguiente al término del
+      trimestre respectivo.
+   c) Emitir un comprobante de pago al usuario por cada transacción,
+      el cual deberá contener, al menos: la individualización del
+      prestador, la fecha de la transacción, el monto total y el
+      impuesto recargado.
+
+V. RESPONSABILIDAD SUSTITUTA
+
+En caso de que el servicio digital sea contratado a través de una
+plataforma de intermediación, esta última será responsable del
+entero del impuesto en arcas fiscales, en calidad de agente
+retenedor, sin perjuicio de su derecho a repetir contra el
+prestador efectivo del servicio.
+
+FERNANDO BARRAZA LUENGO
+Director
+Servicio de Impuestos Internos
