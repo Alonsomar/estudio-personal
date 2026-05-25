@@ -1,0 +1,74 @@
+[
+  {
+    "query": "¿Cuál es la tasa de IVA para servicios digitales de proveedores extranjeros en Chile?",
+    "generated_answer": "La tasa de IVA aplicable a los servicios digitales prestados por proveedores extranjeros en Chile es del 19%, según la Circular Nº 42 del SII de 2020.",
+    "correct_answer": "19%, según Circular Nº 42 del SII (2020), que implementa modificaciones de la Ley Nº 21.210.",
+    "correct_doc": "circular-01-sii-iva-digital.txt",
+    "failure_type": "ok",
+    "retrieved_docs": [
+      "circular-01-sii-iva-digital.txt",
+      "circular-01-sii-iva-digital.txt",
+      "circular-01-sii-iva-digital.txt"
+    ]
+  },
+  {
+    "query": "¿Qué monto recibe un alumno prioritario de 7º básico por subvención escolar preferencial?",
+    "generated_answer": "Los alumnos prioritarios de 7º básico reciben una subvención de 1,694 USE mensuales.",
+    "correct_answer": "1,130 USE (no 1,694 — esa es la tasa de 1º a 6º básico).",
+    "correct_doc": "decreto-01-subvencion-escolar.txt",
+    "failure_type": "wrong_chunk",
+    "retrieved_docs": [
+      "decreto-01-subvencion-escolar.txt",
+      "decreto-01-subvencion-escolar.txt",
+      "decreto-01-subvencion-escolar.txt"
+    ]
+  },
+  {
+    "query": "¿Cuánto presupuesto se asigna al Programa Nacional de Inmunizaciones en 2024?",
+    "generated_answer": "El presupuesto asignado al Programa Nacional de Inmunizaciones para 2024 es de aproximadamente $150.000.000 miles, destinados a la adquisición de vacunas.",
+    "correct_answer": "$198.547.320 miles, según Glosa 05 de la Partida 16, Capítulo 01.",
+    "correct_doc": "glosa-01-presupuesto-salud.txt",
+    "failure_type": "retrieval_miss",
+    "retrieved_docs": [
+      "norma-01-ley-lobby.txt",
+      "norma-01-ley-lobby.txt",
+      "norma-01-ley-lobby.txt"
+    ]
+  },
+  {
+    "query": "¿Quiénes son sujetos pasivos de la Ley de Lobby?",
+    "generated_answer": "Según el Artículo 3º de la Ley Nº 20.730, son sujetos pasivos: el Presidente de la República, ministros, subsecretarios, jefes de servicio, directores regionales, intendentes, gobernadores, embajadores, consejeros de diversos órganos, diputados, senadores, alcaldes y concejales.",
+    "correct_answer": "Los listados en Art. 3º de la Ley 20.730 (la respuesta es correcta).",
+    "correct_doc": "norma-01-ley-lobby.txt",
+    "failure_type": "ok",
+    "retrieved_docs": [
+      "norma-01-ley-lobby.txt",
+      "norma-01-ley-lobby.txt",
+      "norma-01-ley-lobby.txt"
+    ]
+  },
+  {
+    "query": "¿Cuál es la multa por infracción a la Ley de Transparencia de 2022?",
+    "generated_answer": "Según la Ley de Transparencia, las infracciones se sancionan con multas de 20 a 100 UTM, pudiendo duplicarse en caso de reincidencia.",
+    "correct_answer": "La query mezcla dos leyes distintas. La Ley de Lobby (20.730) tiene multas de 10 a 50 UTM (Art. 11). El sistema no debería responder sobre una 'Ley de Transparencia de 2022' que no está en el corpus.",
+    "correct_doc": "ninguno — la pregunta es sobre un documento fuera del corpus",
+    "failure_type": "false_confidence",
+    "retrieved_docs": [
+      "norma-01-ley-lobby.txt",
+      "norma-01-ley-lobby.txt",
+      "norma-01-ley-lobby.txt"
+    ]
+  },
+  {
+    "query": "¿Qué porcentaje del Aporte Fiscal Libre debe FONASA destinar a libre elección?",
+    "generated_answer": "FONASA debe destinar al menos el 5% de los recursos del Aporte Fiscal Libre a financiar la modalidad de libre elección para prestaciones de baja complejidad en comunas con déficit de oferta pública.",
+    "correct_answer": "Al menos 5%, según Glosa 09 del Capítulo 02 de la Partida 16.",
+    "correct_doc": "glosa-01-presupuesto-salud.txt",
+    "failure_type": "ok",
+    "retrieved_docs": [
+      "glosa-01-presupuesto-salud.txt",
+      "glosa-01-presupuesto-salud.txt",
+      "glosa-01-presupuesto-salud.txt"
+    ]
+  }
+]
