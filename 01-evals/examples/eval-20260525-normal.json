@@ -1,0 +1,68 @@
+{
+  "run_id": "eval-20260525-normal",
+  "commit": "d415070",
+  "timestamp": "2026-05-25T17:25:45.041224+00:00",
+  "tier": "nightly",
+  "overall": "WARN",
+  "metrics": {
+    "recall_at_5": {
+      "mean": 0.8833,
+      "ci_lower": 0.7667,
+      "ci_upper": 0.9667,
+      "baseline": 0.68
+    },
+    "faithfulness": {
+      "mean": 0.7952,
+      "ci_lower": 0.7424,
+      "ci_upper": 0.8433,
+      "baseline": 0.78
+    },
+    "answer_relevance": {
+      "mean": 0.825,
+      "ci_lower": 0.7895,
+      "ci_upper": 0.8606,
+      "baseline": 0.82
+    }
+  },
+  "gates": {
+    "Recall@5 mínimo": {
+      "condition": "Recall@5 ≥ 0.60",
+      "passed": true,
+      "value": 0.8833,
+      "threshold": 0.6,
+      "severity": "critical"
+    },
+    "Faithfulness mínimo": {
+      "condition": "Faithfulness ≥ 0.50",
+      "passed": true,
+      "value": 0.7952,
+      "threshold": 0.5,
+      "severity": "critical"
+    },
+    "Citas fantasma": {
+      "condition": "Ghost citations = 0",
+      "passed": true,
+      "value": 0.0,
+      "threshold": 0.0,
+      "severity": "critical"
+    },
+    "No regresión Recall": {
+      "condition": "CI95(Recall_new - baseline) > -0.05",
+      "passed": true,
+      "value": 0.0867,
+      "threshold": -0.05,
+      "severity": "high"
+    },
+    "Latencia p95": {
+      "condition": "Latencia p95 < 4000ms",
+      "passed": false,
+      "value": 4012.1604,
+      "threshold": 4000.0,
+      "severity": "warn"
+    }
+  },
+  "queries_failed": [
+    "q-006",
+    "q-022"
+  ]
+}
