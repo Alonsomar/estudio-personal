@@ -16,7 +16,7 @@ y fiscal chileno.
 | 03 | Análisis de errores                   | [theory/03-analisis-errores.md](theory/03-analisis-errores.md) | [code/analisis-errores.py](code/analisis-errores.py) | Terminado  |
 | 04 | Golden datasets                       | [theory/04-golden-datasets.md](theory/04-golden-datasets.md) | [code/eval-golden-dataset.py](code/eval-golden-dataset.py) | Terminado  |
 | 05 | Métricas de retrieval                 | [theory/05-metricas-retrieval.md](theory/05-metricas-retrieval.md) | [code/eval-metricas-retrieval.py](code/eval-metricas-retrieval.py) | Terminado  |
-| 06 | Métricas de generación                | theory/06-metricas-generacion.md            | code/eval-metricas-generacion.py        | Pendiente  |
+| 06 | Métricas de generación                | [theory/06-metricas-generacion.md](theory/06-metricas-generacion.md) | [code/eval-metricas-generacion.py](code/eval-metricas-generacion.py) | Terminado  |
 | 07 | LLM-as-judge                          | theory/07-llm-as-judge.md                   | code/eval-judge-sesgos.py               | Pendiente  |
 | 08 | Estadística para sistemas estocásticos | theory/08-estadistica-estocastica.md       | code/eval-bootstrap.py                  | Pendiente  |
 | 09 | Regresiones y CI                      | theory/09-regresiones-ci.md                 | code/eval-harness.py                    | Pendiente  |
