@@ -16,7 +16,7 @@ cp .env.example .env   # completar con API keys reales
 
 | #  | Tema                        | Carpeta          | Estado    |
 |----|-----------------------------|------------------|-----------|
-| 01 | Evaluación de sistemas IA   | [01-evals/](01-evals/README.md)         | En progreso |
+| 01 | Evaluación de sistemas IA   | [01-evals/](01-evals/README.md)         | Terminado |
 | 02 | Information Retrieval       | [02-retrieval/](02-retrieval/README.md) | Pendiente |
 | 03 | Patrones de producción      | [03-produccion/](03-produccion/README.md) | Pendiente |
 | 04 | Economía de inferencia      | [04-economia/](04-economia/README.md)   | Pendiente |
