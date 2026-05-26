@@ -21,7 +21,7 @@ y fiscal chileno.
 | 08 | Estadística para sistemas estocásticos | [theory/08-estadistica-estocastica.md](theory/08-estadistica-estocastica.md) | [code/eval-bootstrap.py](code/eval-bootstrap.py) | Terminado  |
 | 09 | Regresiones y CI                      | [theory/09-regresiones-ci.md](theory/09-regresiones-ci.md) | [code/eval-harness.py](code/eval-harness.py) | Terminado  |
 | 10 | Costo, latencia y frontera de Pareto  | [theory/10-costo-pareto.md](theory/10-costo-pareto.md) | [code/eval-costo-pareto.py](code/eval-costo-pareto.py) | Terminado  |
-| 11 | Online evals                          | theory/11-online-evals.md                   | —                                       | Pendiente  |
+| 11 | Online evals                          | [theory/11-online-evals.md](theory/11-online-evals.md) | [code/eval-online.py](code/eval-online.py) | Terminado  |
 | 12 | Bonus: dominios alto-stake            | theory/12-dominios-alto-stake.md            | —                                       | Pendiente  |
 
 ## Cómo ejecutar código
