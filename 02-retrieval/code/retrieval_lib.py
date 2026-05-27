@@ -388,3 +388,89 @@ def pca_2d(matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     proj = X @ Vt[:2].T
     explained = (S**2) / (S**2).sum()
     return proj, explained[:2]
+
+
+# --------------------------------------------------------------------------- #
+# Hybrid search: fusión de rankings sparse + dense (RRF y ponderada).
+# --------------------------------------------------------------------------- #
+def rrf_fuse(
+    rankings: list[list[ScoredDoc]], k: int = 60, top_k: int = 10
+) -> list[ScoredDoc]:
+    """Reciprocal Rank Fusion, desde cero.
+
+    score_RRF(d) = Σ_r 1 / (k + rank_r(d))
+
+    Fusiona *rankings*, no scores: solo importa la posición de cada doc en cada
+    lista, no su score crudo (que entre BM25 y coseno es incomparable). La
+    constante k amortigua el peso de las primeras posiciones; el estándar es 60.
+    Un doc ausente de un ranking simplemente no suma por esa vía.
+    """
+    scores: dict[int, float] = {}
+    ref: dict[int, ScoredDoc] = {}
+    for ranking in rankings:
+        for rank, sd in enumerate(ranking, start=1):
+            scores[sd.index] = scores.get(sd.index, 0.0) + 1.0 / (k + rank)
+            ref[sd.index] = sd
+    fused = [ScoredDoc(index=i, score=s, chunk=ref[i].chunk) for i, s in scores.items()]
+    fused.sort(key=lambda s: s.score, reverse=True)
+    return fused[:top_k]
+
+
+def weighted_fuse(
+    rankings: list[list[ScoredDoc]], weights: list[float], top_k: int = 10
+) -> list[ScoredDoc]:
+    """Fusión por combinación convexa de scores normalizados (min-max) a [0,1].
+
+    score(d) = Σ_r w_r · normalizado_r(score_r(d))
+
+    A diferencia de RRF, sí usa los scores, así que exige normalizarlos a una
+    escala común. Su talón de Aquiles: el min-max hace que el PEOR resultado de
+    cada lista valga 0 sin importar su calidad absoluta, y requiere elegir los
+    pesos (hiperparámetro). Por eso RRF suele ser el default robusto.
+    """
+    refs: dict[int, ScoredDoc] = {}
+    combined: dict[int, float] = {}
+    for w, ranking in zip(weights, rankings):
+        if not ranking:
+            continue
+        ss = [sd.score for sd in ranking]
+        lo, hi = min(ss), max(ss)
+        rng = (hi - lo) or 1.0
+        for sd in ranking:
+            refs[sd.index] = sd
+            combined[sd.index] = combined.get(sd.index, 0.0) + w * (sd.score - lo) / rng
+    fused = [ScoredDoc(index=i, score=s, chunk=refs[i].chunk) for i, s in combined.items()]
+    fused.sort(key=lambda s: s.score, reverse=True)
+    return fused[:top_k]
+
+
+class HybridRetriever:
+    """Combina varios retrievers fusionando sus rankings (RRF o ponderada).
+
+    Recupera un pool de cada retriever base y fusiona. `method="rrf"` no tiene
+    hiperparámetros relevantes; `method="weighted"` requiere `weights`.
+    """
+
+    def __init__(
+        self,
+        retrievers: list,
+        method: str = "rrf",
+        weights: list[float] | None = None,
+        rrf_k: int = 60,
+        pool: int = 20,
+    ) -> None:
+        self.retrievers = retrievers
+        self.method = method
+        self.weights = weights
+        self.rrf_k = rrf_k
+        self.pool = pool
+
+    def search(self, query: str, k: int = 5) -> list[ScoredDoc]:
+        rankings = [r.search(query, k=self.pool) for r in self.retrievers]
+        if self.method == "rrf":
+            return rrf_fuse(rankings, k=self.rrf_k, top_k=k)
+        if self.method == "weighted":
+            if self.weights is None:
+                raise ValueError("method='weighted' requiere weights")
+            return weighted_fuse(rankings, self.weights, top_k=k)
+        raise ValueError(f"método de fusión desconocido: {self.method}")

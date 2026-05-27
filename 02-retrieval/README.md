@@ -7,7 +7,7 @@ rewriting, reranking, retrieval estructurado y evaluación aislada de retrieval.
 
 ## Estado: En progreso
 
-Estructura completa definida; secciones 1 y 2 terminadas. Ver
+Estructura completa definida; secciones 1 a 3 terminadas. Ver
 [theory/00-plan.md](theory/00-plan.md) para el plan maestro, el árbol propuesto y
 las decisiones técnicas pendientes (stack de embeddings, expansión del corpus).
 
@@ -18,7 +18,7 @@ las decisiones técnicas pendientes (stack de embeddings, expansión del corpus)
 | 00 | Plan maestro                            | [theory/00-plan.md](theory/00-plan.md)                    | —                                             | Terminado  |
 | 01 | IR pre-LLM: BM25 y TF-IDF               | [theory/01-ir-pre-llm.md](theory/01-ir-pre-llm.md)        | [code/01-ir-clasico.py](code/01-ir-clasico.py) | Terminado  |
 | 02 | Embeddings densos: geometría y fallos   | [theory/02-embeddings-densos.md](theory/02-embeddings-densos.md) | [code/02-embeddings-geometria.py](code/02-embeddings-geometria.py) | Terminado  |
-| 03 | Hybrid search: sparse + dense (RRF)     | —                                                         | —                                             | Pendiente  |
+| 03 | Hybrid search: sparse + dense (RRF)     | [theory/03-hybrid-search.md](theory/03-hybrid-search.md)  | [code/03-hybrid-rrf.py](code/03-hybrid-rrf.py) | Terminado  |
 | 04 | Chunking serio para documentos legales  | —                                                         | —                                             | Pendiente  |
 | 05 | Query rewriting (HyDE, multi-query…)    | —                                                         | —                                             | Pendiente  |
 | 06 | Reranking (cross-encoders, ColBERT)     | —                                                         | —                                             | Pendiente  |
