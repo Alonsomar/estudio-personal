@@ -33,6 +33,9 @@ from retrieval_lib import BM25Retriever, Chunk, TfidfRetriever, tokenize  # noqa
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from shared.utils import get_project_root  # noqa: E402
 
+# Sección 1 usa SOLO los 4 documentos núcleo, a propósito: es el baseline de IR
+# clásico. El corpus completo (16 docs, con distractores) se incorpora desde la
+# sección 2, donde las diferencias denso/sparse sí se vuelven medibles.
 CORPUS_FILES = [
     "circular-01-sii-iva-digital.txt",
     "decreto-01-subvencion-escolar.txt",

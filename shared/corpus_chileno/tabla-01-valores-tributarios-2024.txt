@@ -1,0 +1,45 @@
+SERVICIO DE IMPUESTOS INTERNOS
+VALORES Y FECHAS — UNIDADES TRIBUTARIAS Y DE FOMENTO
+EJERCICIO 2024
+
+I. UNIDAD TRIBUTARIA MENSUAL (UTM) Y ANUAL (UTA), AÑO 2024
+
+   Mes          UTM ($)      Variación mensual (%)
+   -----------  -----------  ---------------------
+   Enero         64.216             0,4
+   Febrero       64.666             0,7
+   Marzo         64.343            -0,5
+   Abril         64.343             0,0
+   Mayo          64.666             0,5
+   Junio         65.052             0,6
+   Julio         65.443             0,6
+   Agosto        65.967             0,8
+   Septiembre    66.362             0,6
+   Octubre       66.561             0,3
+   Noviembre     66.628             0,1
+   Diciembre     66.628             0,0
+
+   Unidad Tributaria Anual (UTA) diciembre 2024: $799.536
+   (equivale a 12 veces la UTM de diciembre).
+
+II. UNIDAD DE FOMENTO (UF) — VALORES DE REFERENCIA 2024
+
+   Fecha            UF ($)
+   ---------------  -----------
+   01-01-2024       36.789,36
+   31-03-2024       37.290,15
+   30-06-2024       37.546,49
+   30-09-2024       37.844,52
+   31-12-2024       38.398,57
+
+III. NOTAS
+
+   1. La UTM se reajusta mensualmente según la variación del Índice de
+      Precios al Consumidor (IPC) del mes anterior.
+   2. Para la conversión de multas expresadas en UTM, se utilizará el
+      valor de la UTM vigente al momento del pago efectivo.
+   3. Los límites de ingresos del Régimen Pro Pyme se expresan en UF;
+      para 2024, el límite de 75.000 UF equivale aproximadamente a
+      $2.879 millones al valor de la UF al 31 de diciembre.
+   4. La conversión referencial de tramos expresados en UTA (impuestos
+      anuales) se realiza con la UTA de diciembre del ejercicio.
