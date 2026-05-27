@@ -17,11 +17,15 @@ del script queda en sys.path, así que el import funciona sin instalación).
 
 from __future__ import annotations
 
+import hashlib
 import math
 import re
 import unicodedata
 from collections import Counter
 from dataclasses import dataclass, field
+from pathlib import Path
+
+import numpy as np
 
 # Stopwords del español. Lista deliberadamente conservadora: en dominio legal,
 # palabras como "no", "sin" o "menor" cambian el sentido, así que NO se filtran.
@@ -240,3 +244,147 @@ class BM25Retriever:
             contribs.append((term, idf * (f * (self.k1 + 1)) / (f + denom_norm)))
         contribs.sort(key=lambda x: x[1], reverse=True)
         return contribs
+
+
+# --------------------------------------------------------------------------- #
+# Carga y chunking del corpus (compartido entre demos desde la sección 2).
+# --------------------------------------------------------------------------- #
+def simple_chunk(text: str, doc_id: str) -> list[Chunk]:
+    """Chunking por bloques separados por línea en blanco.
+
+    Deliberadamente ingenuo: el chunking serio es la sección 4. Sirve como
+    unidad indexable uniforme para comparar retrievers en las secciones 1-3.
+    """
+    blocks = [b.strip() for b in re.split(r"\n\s*\n", text) if b.strip()]
+    return [
+        Chunk(chunk_id=f"{doc_id}#{i}", doc_id=doc_id, text=block)
+        for i, block in enumerate(blocks)
+    ]
+
+
+def load_corpus_chunks(
+    corpus_dir: Path, filenames: list[str] | None = None
+) -> list[Chunk]:
+    """Carga y chunkea los .txt del corpus. Si filenames es None, carga todos."""
+    files = (
+        sorted(corpus_dir.glob("*.txt"))
+        if filenames is None
+        else [corpus_dir / f for f in filenames]
+    )
+    chunks: list[Chunk] = []
+    for path in files:
+        chunks.extend(simple_chunk(path.read_text(encoding="utf-8"), doc_id=path.name))
+    return chunks
+
+
+# --------------------------------------------------------------------------- #
+# Retrieval denso: embeddings vía OpenAI con caché en disco + similitud coseno.
+# --------------------------------------------------------------------------- #
+class OpenAIEmbedder:
+    """Embeddings de OpenAI con caché en disco (.npz).
+
+    La caché hace que las corridas sean gratis y reproducibles tras la primera:
+    cada texto se indexa por hash(modelo + texto), así que cambiar el corpus solo
+    re-embeddea lo nuevo. Si la caché se versiona, el repo corre sin API key.
+    """
+
+    def __init__(
+        self,
+        model: str = "text-embedding-3-small",
+        cache_path: Path | None = None,
+        batch_size: int = 256,
+    ) -> None:
+        self.model = model
+        self.cache_path = Path(cache_path) if cache_path else None
+        self.batch_size = batch_size
+        self._keys: dict[str, int] = {}
+        self._matrix: np.ndarray | None = None
+        self.api_calls = 0  # para reportar cuántas llamadas reales se hicieron
+        self._load()
+
+    def _key(self, text: str) -> str:
+        return hashlib.sha1(f"{self.model}\n{text}".encode("utf-8")).hexdigest()
+
+    def _load(self) -> None:
+        if self.cache_path and self.cache_path.exists():
+            data = np.load(self.cache_path, allow_pickle=True)
+            self._matrix = data["matrix"]
+            self._keys = {k: i for i, k in enumerate(data["keys"].tolist())}
+
+    def _save(self) -> None:
+        if not self.cache_path:
+            return
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        keys = [""] * len(self._keys)
+        for k, i in self._keys.items():
+            keys[i] = k
+        np.savez_compressed(
+            self.cache_path, keys=np.array(keys, dtype=object), matrix=self._matrix
+        )
+
+    def embed(self, texts: list[str]) -> np.ndarray:
+        """Devuelve una matriz (len(texts), dim) alineada al orden de entrada."""
+        missing = list(dict.fromkeys(t for t in texts if self._key(t) not in self._keys))
+        if missing:
+            from dotenv import load_dotenv
+
+            load_dotenv()  # toma OPENAI_API_KEY del .env del proyecto
+            from openai import OpenAI
+
+            client = OpenAI()
+            vecs: list[list[float]] = []
+            for i in range(0, len(missing), self.batch_size):
+                batch = missing[i : i + self.batch_size]
+                resp = client.embeddings.create(model=self.model, input=batch)
+                self.api_calls += 1
+                vecs.extend(d.embedding for d in resp.data)
+            new = np.array(vecs, dtype=np.float32)
+            start = 0 if self._matrix is None else self._matrix.shape[0]
+            self._matrix = new if self._matrix is None else np.vstack([self._matrix, new])
+            for j, t in enumerate(missing):
+                self._keys[self._key(t)] = start + j
+            self._save()
+        idx = [self._keys[self._key(t)] for t in texts]
+        return self._matrix[idx]
+
+
+def _l2_normalize(matrix: np.ndarray) -> np.ndarray:
+    norms = np.linalg.norm(matrix, axis=-1, keepdims=True)
+    return matrix / (norms + 1e-12)
+
+
+class DenseRetriever:
+    """Retriever denso: coseno entre el embedding de la query y los del corpus."""
+
+    def __init__(self, embedder: OpenAIEmbedder) -> None:
+        self.embedder = embedder
+        self.chunks: list[Chunk] = []
+        self.matrix: np.ndarray | None = None  # (n, dim), normalizada L2
+
+    def fit(self, chunks: list[Chunk]) -> "DenseRetriever":
+        self.chunks = chunks
+        self.matrix = _l2_normalize(self.embedder.embed([c.text for c in chunks]))
+        return self
+
+    def search(self, query: str, k: int = 5) -> list[ScoredDoc]:
+        q = _l2_normalize(self.embedder.embed([query]))[0]
+        sims = self.matrix @ q  # coseno (vectores normalizados)
+        order = np.argsort(-sims)[:k]
+        return [
+            ScoredDoc(index=int(i), score=float(sims[i]), chunk=self.chunks[int(i)])
+            for i in order
+        ]
+
+
+def pca_2d(matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Proyección PCA a 2D desde cero, vía SVD.
+
+    Devuelve (proyección (n, 2), varianza explicada de las 2 componentes).
+    PCA = centrar los datos y quedarse con las direcciones de máxima varianza,
+    que son los primeros vectores singulares por la derecha (Vt) de X centrada.
+    """
+    X = matrix - matrix.mean(axis=0, keepdims=True)
+    _, S, Vt = np.linalg.svd(X, full_matrices=False)
+    proj = X @ Vt[:2].T
+    explained = (S**2) / (S**2).sum()
+    return proj, explained[:2]
