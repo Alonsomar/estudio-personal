@@ -263,9 +263,11 @@ def simple_chunk(text: str, doc_id: str) -> list[Chunk]:
 
 
 def load_corpus_chunks(
-    corpus_dir: Path, filenames: list[str] | None = None
+    corpus_dir: Path,
+    filenames: list[str] | None = None,
+    chunker=simple_chunk,
 ) -> list[Chunk]:
-    """Carga y chunkea los .txt del corpus. Si filenames es None, carga todos."""
+    """Carga el corpus y lo chunkea con la estrategia indicada (por defecto, simple)."""
     files = (
         sorted(corpus_dir.glob("*.txt"))
         if filenames is None
@@ -273,8 +275,196 @@ def load_corpus_chunks(
     )
     chunks: list[Chunk] = []
     for path in files:
-        chunks.extend(simple_chunk(path.read_text(encoding="utf-8"), doc_id=path.name))
+        chunks.extend(chunker(path.read_text(encoding="utf-8"), doc_id=path.name))
     return chunks
+
+
+def fixed_chunk(
+    text: str, doc_id: str, size: int = 400, overlap: int = 50
+) -> list[Chunk]:
+    """Chunking de tamaño fijo en caracteres, con ventana deslizante.
+
+    El más ingenuo. Útil como baseline y cuando no hay estructura confiable. Las
+    fronteras caen donde caigan: a media frase, a medio artículo, a media tabla.
+    """
+    if size <= 0 or overlap < 0 or overlap >= size:
+        raise ValueError("size > 0 y 0 <= overlap < size")
+    step = size - overlap
+    out: list[Chunk] = []
+    i = 0
+    j = 0
+    n = len(text)
+    while i < n:
+        block = text[i : i + size].strip()
+        if block:
+            out.append(Chunk(chunk_id=f"{doc_id}#f{j}", doc_id=doc_id, text=block))
+            j += 1
+        i += step
+    return out
+
+
+# Encabezados típicos del español jurídico chileno: artículos, glosas, títulos,
+# párrafos, capítulos romanos, y numerales tipo "I.", "II.", "III.", "IV.".
+_LEGAL_HEADER = re.compile(
+    r"(?m)^(?:"
+    r"Artículo\s+\d+[ºo]?\.?-?|"
+    r"Glosa\s+\d+:|"
+    r"TÍTULO\s+[IVXLCDM]+|"
+    r"CAPÍTULO\s+\d+|"
+    r"PÁRRAFO\s+\d+[ºo]?|"
+    r"PROGRAMA\s+\d+|"
+    r"[IVX]+\.\s+[A-ZÁÉÍÓÚÑ]"
+    r")"
+)
+
+
+def structural_chunk(text: str, doc_id: str) -> list[Chunk]:
+    """Chunking por encabezados del dominio (Artículo, Glosa, Título, etc.).
+
+    Respeta las unidades semánticas del documento legal: un artículo entero queda
+    en un solo chunk, una glosa entera también. Resultados: chunks más largos y
+    menos fragmentados que la división por línea en blanco.
+    """
+    matches = list(_LEGAL_HEADER.finditer(text))
+    if not matches:
+        return simple_chunk(text, doc_id)
+    boundaries = [m.start() for m in matches] + [len(text)]
+    out: list[Chunk] = []
+    # Preámbulo antes del primer encabezado, si existe.
+    pre = text[: boundaries[0]].strip()
+    if pre:
+        out.append(Chunk(chunk_id=f"{doc_id}#st0", doc_id=doc_id, text=pre))
+    for k in range(len(matches)):
+        block = text[boundaries[k] : boundaries[k + 1]].strip()
+        if block:
+            out.append(
+                Chunk(chunk_id=f"{doc_id}#st{k + 1}", doc_id=doc_id, text=block)
+            )
+    return out
+
+
+# Segmentador de oraciones razonable para español jurídico: corta tras '.', '?',
+# '!' seguidos de espacio + mayúscula o salto de línea. Evita partir referencias
+# numéricas tipo "21.210" porque exige espacio antes de la mayúscula.
+_SENT_END = re.compile(r"(?<=[\.\?\!])\s+(?=[A-ZÁÉÍÓÚÑ])|\n+")
+
+
+def sentence_split(text: str) -> list[str]:
+    return [s.strip() for s in _SENT_END.split(text) if s.strip()]
+
+
+def semantic_chunk(
+    text: str,
+    doc_id: str,
+    embedder: "OpenAIEmbedder",
+    threshold: float = 0.55,
+) -> list[Chunk]:
+    """Chunking semántico: corta donde la similitud entre oraciones consecutivas cae.
+
+    Cada oración se embebe; al recorrer en orden, se inicia un nuevo chunk
+    cuando cos(oración_i, oración_i-1) < threshold. Idea: mantener juntas las
+    oraciones que hablan de lo mismo, separar cambios de tema.
+    """
+    sents = sentence_split(text)
+    if len(sents) <= 1:
+        return [Chunk(chunk_id=f"{doc_id}#sm0", doc_id=doc_id, text=text.strip())]
+    vecs = _l2_normalize(embedder.embed(sents))
+    out: list[Chunk] = []
+    current: list[str] = [sents[0]]
+    cidx = 0
+    for i in range(1, len(sents)):
+        sim = float(vecs[i] @ vecs[i - 1])
+        if sim < threshold and current:
+            out.append(
+                Chunk(
+                    chunk_id=f"{doc_id}#sm{cidx}",
+                    doc_id=doc_id,
+                    text=" ".join(current),
+                )
+            )
+            cidx += 1
+            current = [sents[i]]
+        else:
+            current.append(sents[i])
+    if current:
+        out.append(
+            Chunk(chunk_id=f"{doc_id}#sm{cidx}", doc_id=doc_id, text=" ".join(current))
+        )
+    return out
+
+
+def hierarchical_chunk(text: str, doc_id: str) -> list[Chunk]:
+    """Chunking jerárquico parent/child para retrieval con expansión a contexto.
+
+    Padre = bloque estructural (Artículo, Glosa, sección). Hijo = una oración del
+    padre. Los hijos son lo que se indexa/recupera; el campo meta['parent_text']
+    se entrega al generador. Combinas precisión de recuperación (chunks chicos)
+    con contexto suficiente (devolver el padre).
+    """
+    parents = structural_chunk(text, doc_id)
+    children: list[Chunk] = []
+    for p_idx, parent in enumerate(parents):
+        sents = sentence_split(parent.text)
+        if not sents:
+            sents = [parent.text]
+        for c_idx, sent in enumerate(sents):
+            children.append(
+                Chunk(
+                    chunk_id=f"{doc_id}#h{p_idx}.{c_idx}",
+                    doc_id=doc_id,
+                    text=sent,
+                    meta={"parent_id": parent.chunk_id, "parent_text": parent.text},
+                )
+            )
+    return children
+
+
+# Mapa doc_id -> contexto breve, para la aproximación a "late chunking" (ver §4).
+# La verdadera late chunking exige acceso a embeddings token-level (no expuestos
+# por la API de OpenAI); aquí simulamos el espíritu prependiendo contexto del
+# documento a cada chunk antes de embeberlo (aka contextual chunking).
+DOC_CONTEXT: dict[str, str] = {
+    "circular-01-sii-iva-digital.txt": "Circular SII 42/2020 sobre IVA a servicios digitales extranjeros (Ley 21.210).",
+    "circular-02-sii-renta-propyme.txt": "Circular SII 62/2020 sobre el Régimen Pro Pyme de Impuesto a la Renta.",
+    "circular-03-sii-ppm-honorarios.txt": "Circular SII 50/2022 sobre retención y PPM de boletas de honorarios.",
+    "circular-04-sii-iva-exenciones.txt": "Circular SII 17/2021 sobre exenciones de IVA en salud y educación.",
+    "decreto-01-subvencion-escolar.txt": "Decreto Exento 1.423 reglamenta la Ley 20.248 de Subvención Escolar Preferencial.",
+    "decreto-02-reglamento-ley-lobby.txt": "Decreto Supremo 71/2014, reglamento de la Ley 20.730 de Lobby.",
+    "do-01-extracto-decreto-aranceles.txt": "Diario Oficial: aduanas, valor de la USE 2024 y toma de razón.",
+    "glosa-01-presupuesto-salud.txt": "Ley de Presupuestos 2024 Partida 16 Ministerio de Salud (inmunizaciones, PRAIS, FONASA).",
+    "glosa-02-presupuesto-educacion.txt": "Ley de Presupuestos 2024 Partida 09 Ministerio de Educación (SEP, JUNAEB).",
+    "glosa-03-presupuesto-trabajo.txt": "Ley de Presupuestos 2024 Partida 15 Trabajo (Subsidios al Empleo Joven y de la Mujer).",
+    "ley-01-dl-825-iva-base.txt": "DL 825 Ley sobre Impuesto a las Ventas y Servicios, texto previo a la Ley 21.210.",
+    "ley-02-ley-21210-modernizacion.txt": "Ley 21.210 de Modernización Tributaria (IVA digital, Pro Pyme, boleta electrónica).",
+    "norma-01-ley-lobby.txt": "Ley 20.730 que regula el Lobby y las gestiones de intereses particulares.",
+    "norma-02-ley-20880-probidad.txt": "Ley 20.880 sobre Probidad y declaración de intereses y patrimonio.",
+    "oficio-01-contraloria-subvenciones.txt": "Dictamen Contraloría 8.452/2023 sobre rendición de la Subvención Escolar Preferencial.",
+    "tabla-01-valores-tributarios-2024.txt": "Tabla de valores UTM, UTA y UF mensuales para el año 2024.",
+}
+
+
+def contextual_chunk(text: str, doc_id: str, base_chunker=structural_chunk) -> list[Chunk]:
+    """Aproximación a 'late chunking': cada chunk lleva al inicio una breve
+    descripción del documento, para que su embedding 'sepa' de qué doc viene.
+
+    No es late chunking real (eso exige token embeddings del doc completo, no
+    disponibles en la API de OpenAI). Es la técnica de 'contextual chunking'
+    (Anthropic, 2024), que aborda el mismo problema (chunks descontextualizados)
+    desde otro ángulo y se puede aplicar sobre cualquier embedder.
+    """
+    base = base_chunker(text, doc_id)
+    ctx = DOC_CONTEXT.get(doc_id, "")
+    if not ctx:
+        return base
+    return [
+        Chunk(
+            chunk_id=f"{c.chunk_id}#ctx",
+            doc_id=c.doc_id,
+            text=f"[{ctx}] {c.text}",
+            meta=c.meta,
+        )
+        for c in base
+    ]
 
 
 # --------------------------------------------------------------------------- #
