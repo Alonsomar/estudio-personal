@@ -18,6 +18,7 @@ del script queda en sys.path, así que el import funciona sin instalación).
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 import re
 import unicodedata
@@ -664,3 +665,144 @@ class HybridRetriever:
                 raise ValueError("method='weighted' requiere weights")
             return weighted_fuse(rankings, self.weights, top_k=k)
         raise ValueError(f"método de fusión desconocido: {self.method}")
+
+
+# --------------------------------------------------------------------------- #
+# Query rewriting: HyDE, multi-query, decomposition, step-back vía LLM.
+# --------------------------------------------------------------------------- #
+class LLMRewriter:
+    """Cuatro estrategias de reescritura de queries con caché en disco.
+
+    La caché (JSON) hace que tras la primera corrida no haya más llamadas al
+    LLM: las reescrituras quedan fijas y reproducibles sin API key. Cambiar el
+    modelo o el prompt cambia la clave de caché y vuelve a llamar.
+    """
+
+    def __init__(
+        self,
+        model: str = "gpt-4o-mini",
+        cache_path: Path | None = None,
+        temperature: float = 0.0,
+    ) -> None:
+        self.model = model
+        self.cache_path = Path(cache_path) if cache_path else None
+        self.temperature = temperature
+        self._cache: dict[str, str] = {}
+        self.api_calls = 0
+        self._load()
+
+    def _load(self) -> None:
+        if self.cache_path and self.cache_path.exists():
+            self._cache = json.loads(self.cache_path.read_text(encoding="utf-8"))
+
+    def _save(self) -> None:
+        if not self.cache_path:
+            return
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        self.cache_path.write_text(
+            json.dumps(self._cache, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+
+    def _key(self, prompt: str) -> str:
+        return hashlib.sha1(
+            f"{self.model}\n{self.temperature}\n{prompt}".encode("utf-8")
+        ).hexdigest()
+
+    def _call(self, prompt: str) -> str:
+        k = self._key(prompt)
+        if k in self._cache:
+            return self._cache[k]
+        from dotenv import load_dotenv
+
+        load_dotenv()
+        from openai import OpenAI
+
+        client = OpenAI()
+        resp = client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=self.temperature,
+        )
+        text = (resp.choices[0].message.content or "").strip()
+        self._cache[k] = text
+        self.api_calls += 1
+        self._save()
+        return text
+
+    def hyde(self, query: str) -> list[str]:
+        """HyDE (Gao et al., 2022): el LLM genera un párrafo que *respondería*
+        la query como si fuera texto real de una norma. Se embebe ESE párrafo y
+        se busca con él, cerrando la brecha de vocabulario query↔documento."""
+        prompt = (
+            "Eres un asistente especializado en normativa fiscal y "
+            "regulatoria chilena. Escribe un párrafo de 2-4 frases en "
+            "español jurídico-técnico que respondería la siguiente "
+            "pregunta, como si fuera un fragmento real de un decreto, "
+            "circular del SII, ley o glosa presupuestaria. No agregues "
+            "introducción, citas ni comillas; solo el párrafo.\n\n"
+            f"Pregunta: {query}\n\nPárrafo:"
+        )
+        return [self._call(prompt)]
+
+    def multi_query(self, query: str, n: int = 4) -> list[str]:
+        """Multi-query: el LLM produce n reformulaciones; se buscan todas y
+        se fusionan con RRF. Cubre la vecindad parafrástica del original."""
+        prompt = (
+            f"Reformula la siguiente pregunta sobre normativa fiscal o "
+            f"regulatoria chilena de {n} formas distintas, manteniendo el "
+            "sentido pero variando vocabulario y estructura. Devuelve solo "
+            "las reformulaciones, una por línea, sin numerar ni viñetas.\n\n"
+            f"Pregunta original: {query}"
+        )
+        text = self._call(prompt)
+        variants = [line.strip(" -•\t") for line in text.splitlines() if line.strip()]
+        # Incluimos el original para no perderlo si las reformulaciones se desvían.
+        return [query] + variants[:n]
+
+    def decompose(self, query: str) -> list[str]:
+        """Decomposition: si la query exige consultar varias fuentes (multi-hop),
+        el LLM la parte en sub-preguntas más simples."""
+        prompt = (
+            "Si la siguiente pregunta sobre normativa chilena requiere "
+            "consultar varias fuentes distintas (multi-hop), descomponla "
+            "en sub-preguntas simples, una por aspecto o norma. Si la "
+            "pregunta NO requiere descomposición, devuelve solo la "
+            "pregunta original. Una por línea, sin numerar ni viñetas.\n\n"
+            f"Pregunta: {query}"
+        )
+        text = self._call(prompt)
+        parts = [line.strip(" -•\t") for line in text.splitlines() if line.strip()]
+        return parts or [query]
+
+    def step_back(self, query: str) -> list[str]:
+        """Step-back (Zheng et al., 2023): el LLM genera una pregunta MÁS
+        general/abstracta para anclar el contexto antes de la concreta."""
+        prompt = (
+            "Genera una pregunta más general y abstracta sobre el régimen "
+            "normativo o el área de política pública al que pertenece la "
+            "siguiente pregunta concreta. Devuelve solo la pregunta "
+            "general, una sola línea sin numerar.\n\n"
+            f"Pregunta concreta: {query}"
+        )
+        general = (self._call(prompt).splitlines() or [""])[0].strip(" -•\t")
+        return [query, general] if general else [query]
+
+
+class RewrittenRetriever:
+    """Envuelve un retriever base con una estrategia de reescritura.
+
+    Llama a `rewrite_fn(query)` para obtener una o más queries, busca cada una
+    en el base con profundidad `pool`, y fusiona los rankings con RRF.
+    """
+
+    def __init__(self, base, rewrite_fn, pool: int = 20, rrf_k: int = 60) -> None:
+        self.base = base
+        self.rewrite_fn = rewrite_fn
+        self.pool = pool
+        self.rrf_k = rrf_k
+
+    def search(self, query: str, k: int = 5) -> list[ScoredDoc]:
+        queries = self.rewrite_fn(query)
+        rankings = [self.base.search(q, k=self.pool) for q in queries]
+        return rrf_fuse(rankings, k=self.rrf_k, top_k=k)
