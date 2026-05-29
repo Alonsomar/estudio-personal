@@ -806,3 +806,151 @@ class RewrittenRetriever:
         queries = self.rewrite_fn(query)
         rankings = [self.base.search(q, k=self.pool) for q in queries]
         return rrf_fuse(rankings, k=self.rrf_k, top_k=k)
+
+
+# --------------------------------------------------------------------------- #
+# Reranking con LLM (pointwise y listwise). Cross-encoders y ColBERT se
+# discuten conceptualmente en theory/06; no se ejecutan aquí porque la API
+# de OpenAI no expone los embeddings token-level que ColBERT necesita ni un
+# cross-encoder con (query, passage) concatenados.
+# --------------------------------------------------------------------------- #
+class LLMReranker:
+    """Reranker basado en un LLM (gpt-4o-mini por defecto), con caché en disco.
+
+    Dos modos:
+      - pointwise: pide al LLM un score 0-10 para cada par (query, pasaje) y
+        ordena por ese score. N llamadas por query (alto costo, alta precisión).
+      - listwise: envía la lista completa de candidatos en un solo prompt y
+        pide los IDs en orden de relevancia. 1 llamada por query (más barato,
+        contexto más largo).
+    """
+
+    def __init__(
+        self,
+        model: str = "gpt-4o-mini",
+        cache_path: Path | None = None,
+        temperature: float = 0.0,
+    ) -> None:
+        self.model = model
+        self.cache_path = Path(cache_path) if cache_path else None
+        self.temperature = temperature
+        self._cache: dict[str, str] = {}
+        self.api_calls = 0
+        self._load()
+
+    def _load(self) -> None:
+        if self.cache_path and self.cache_path.exists():
+            self._cache = json.loads(self.cache_path.read_text(encoding="utf-8"))
+
+    def _save(self) -> None:
+        if not self.cache_path:
+            return
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        self.cache_path.write_text(
+            json.dumps(self._cache, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    def _key(self, prompt: str) -> str:
+        return hashlib.sha1(
+            f"{self.model}\n{self.temperature}\n{prompt}".encode("utf-8")
+        ).hexdigest()
+
+    def _call(self, prompt: str) -> str:
+        k = self._key(prompt)
+        if k in self._cache:
+            return self._cache[k]
+        from dotenv import load_dotenv
+
+        load_dotenv()
+        from openai import OpenAI
+
+        client = OpenAI()
+        resp = client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=self.temperature,
+        )
+        text = (resp.choices[0].message.content or "").strip()
+        self._cache[k] = text
+        self.api_calls += 1
+        self._save()
+        return text
+
+    def pointwise_score(self, query: str, passage: str) -> float:
+        prompt = (
+            "Eres un experto en normativa fiscal y regulatoria chilena. "
+            "Evalúa qué tan relevante es el siguiente PASAJE para responder "
+            "la PREGUNTA del usuario. Devuelve SOLO un número entero entre "
+            "0 (nada relevante) y 10 (perfectamente relevante), sin explicación.\n\n"
+            f"PREGUNTA: {query}\n\n"
+            f"PASAJE:\n{passage}\n\n"
+            "Score (solo el número):"
+        )
+        text = self._call(prompt)
+        try:
+            return float(text.strip().splitlines()[0].strip())
+        except (ValueError, IndexError):
+            return 0.0
+
+    def pointwise(self, query: str, candidates: list[ScoredDoc]) -> list[ScoredDoc]:
+        scored = [
+            ScoredDoc(
+                index=c.index,
+                score=self.pointwise_score(query, c.chunk.text),
+                chunk=c.chunk,
+            )
+            for c in candidates
+        ]
+        scored.sort(key=lambda x: x.score, reverse=True)
+        return scored
+
+    def listwise(self, query: str, candidates: list[ScoredDoc]) -> list[ScoredDoc]:
+        if not candidates:
+            return []
+        items = "\n".join(
+            f"[{i + 1}] {c.chunk.text[:350]}" for i, c in enumerate(candidates)
+        )
+        prompt = (
+            "Eres un experto en normativa fiscal y regulatoria chilena. "
+            "Recibes una PREGUNTA y N PASAJES numerados. Devuelve los "
+            "números de los pasajes ordenados de MÁS a MENOS relevante para "
+            "responder la pregunta. Devuelve SOLO los números, separados por "
+            "comas, en una sola línea (por ejemplo: 3, 1, 5, 2, 4).\n\n"
+            f"PREGUNTA: {query}\n\n"
+            f"PASAJES:\n{items}\n\n"
+            "Orden de relevancia (solo números separados por comas):"
+        )
+        text = self._call(prompt)
+        order: list[int] = []
+        for tok in re.split(r"[^\d]+", text.strip()):
+            if not tok:
+                continue
+            idx = int(tok) - 1
+            if 0 <= idx < len(candidates) and idx not in order:
+                order.append(idx)
+        # Cualquier candidato que el LLM omitió se anexa al final, preservando
+        # el orden original (así no perdemos cobertura si la respuesta es corta).
+        for i in range(len(candidates)):
+            if i not in order:
+                order.append(i)
+        result = []
+        for rank, i in enumerate(order):
+            c = candidates[i]
+            result.append(
+                ScoredDoc(index=c.index, score=1.0 / (rank + 1), chunk=c.chunk)
+            )
+        return result
+
+
+class RerankedRetriever:
+    """Envuelve un retriever base con un reranker; recupera pool, reordena."""
+
+    def __init__(self, base, reranker_fn, pool: int = 10) -> None:
+        self.base = base
+        self.reranker_fn = reranker_fn  # (query, candidates) -> reordered list
+        self.pool = pool
+
+    def search(self, query: str, k: int = 5) -> list[ScoredDoc]:
+        candidates = self.base.search(query, k=self.pool)
+        reranked = self.reranker_fn(query, candidates)
+        return reranked[:k]

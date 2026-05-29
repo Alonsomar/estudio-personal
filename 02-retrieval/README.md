@@ -7,7 +7,7 @@ rewriting, reranking, retrieval estructurado y evaluación aislada de retrieval.
 
 ## Estado: En progreso
 
-Estructura completa definida; secciones 1 a 5 terminadas. Ver
+Estructura completa definida; secciones 1 a 6 terminadas. Ver
 [theory/00-plan.md](theory/00-plan.md) para el plan maestro, el árbol propuesto y
 las decisiones técnicas pendientes (stack de embeddings, expansión del corpus).
 
@@ -21,7 +21,7 @@ las decisiones técnicas pendientes (stack de embeddings, expansión del corpus)
 | 03 | Hybrid search: sparse + dense (RRF)     | [theory/03-hybrid-search.md](theory/03-hybrid-search.md)  | [code/03-hybrid-rrf.py](code/03-hybrid-rrf.py) | Terminado  |
 | 04 | Chunking serio para documentos legales  | [theory/04-chunking.md](theory/04-chunking.md)            | [code/04-chunking-estrategias.py](code/04-chunking-estrategias.py) | Terminado  |
 | 05 | Query rewriting (HyDE, multi-query…)    | [theory/05-query-rewriting.md](theory/05-query-rewriting.md) | [code/05-query-rewriting.py](code/05-query-rewriting.py) | Terminado  |
-| 06 | Reranking (cross-encoders, ColBERT)     | —                                                         | —                                             | Pendiente  |
+| 06 | Reranking (cross-encoders, ColBERT)     | [theory/06-reranking.md](theory/06-reranking.md)          | [code/06-reranking.py](code/06-reranking.py)  | Terminado  |
 | 07 | Metadata filtering y retrieval estructurado | —                                                     | —                                             | Pendiente  |
 | 08 | Evaluación de retrieval aislada         | —                                                         | —                                             | Pendiente  |
 | 09 | Casos límite del dominio regulatorio    | —                                                         | —                                             | Pendiente  |
