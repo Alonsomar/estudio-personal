@@ -954,3 +954,107 @@ class RerankedRetriever:
         candidates = self.base.search(query, k=self.pool)
         reranked = self.reranker_fn(query, candidates)
         return reranked[:k]
+
+
+# --------------------------------------------------------------------------- #
+# Metadata estructurada del corpus, para filtros tipo WHERE en pgvector/Supabase.
+# Cada doc se anota con campos discretos (doc_type, organismo, tema, año,
+# leyes_citadas). El golden de 01-evals ya tiene `doc_type` por query; aquí lo
+# llevamos al lado del CORPUS para poder pre-filtrar antes del retrieval.
+# --------------------------------------------------------------------------- #
+DOC_METADATA: dict[str, dict] = {
+    "circular-01-sii-iva-digital.txt": dict(
+        doc_type="circular", organismo="SII", tema="IVA", anio=2020,
+        leyes_citadas=["21.210", "DL 825"],
+    ),
+    "circular-02-sii-renta-propyme.txt": dict(
+        doc_type="circular", organismo="SII", tema="Renta", anio=2020,
+        leyes_citadas=["21.210"],
+    ),
+    "circular-03-sii-ppm-honorarios.txt": dict(
+        doc_type="circular", organismo="SII", tema="Renta", anio=2022,
+        leyes_citadas=["21.133"],
+    ),
+    "circular-04-sii-iva-exenciones.txt": dict(
+        doc_type="circular", organismo="SII", tema="IVA", anio=2021,
+        leyes_citadas=["DL 825"],
+    ),
+    "decreto-01-subvencion-escolar.txt": dict(
+        doc_type="decreto", organismo="MINEDUC", tema="Educación", anio=2008,
+        leyes_citadas=["20.248", "DFL 2"],
+    ),
+    "decreto-02-reglamento-ley-lobby.txt": dict(
+        doc_type="decreto", organismo="SEGPRES", tema="Lobby", anio=2014,
+        leyes_citadas=["20.730"],
+    ),
+    "do-01-extracto-decreto-aranceles.txt": dict(
+        doc_type="diario_oficial", organismo="Varios", tema="Varios", anio=2024,
+        leyes_citadas=["DL 825", "DFL 2", "20.248"],
+    ),
+    "glosa-01-presupuesto-salud.txt": dict(
+        doc_type="glosa", organismo="MINSAL", tema="Salud", anio=2024,
+        partida=16, leyes_citadas=["19.123"],
+    ),
+    "glosa-02-presupuesto-educacion.txt": dict(
+        doc_type="glosa", organismo="MINEDUC", tema="Educación", anio=2024,
+        partida=9, leyes_citadas=["20.248", "DFL 2"],
+    ),
+    "glosa-03-presupuesto-trabajo.txt": dict(
+        doc_type="glosa", organismo="MINTRAB", tema="Trabajo", anio=2024,
+        partida=15, leyes_citadas=["20.338", "20.595"],
+    ),
+    "ley-01-dl-825-iva-base.txt": dict(
+        doc_type="ley", organismo="Congreso", tema="IVA", anio=1974,
+        leyes_citadas=["DL 825"],
+    ),
+    "ley-02-ley-21210-modernizacion.txt": dict(
+        doc_type="ley", organismo="Congreso", tema="Tributario", anio=2020,
+        leyes_citadas=["21.210", "DL 825", "DL 824"],
+    ),
+    "norma-01-ley-lobby.txt": dict(
+        doc_type="ley", organismo="Congreso", tema="Lobby", anio=2014,
+        leyes_citadas=["20.730"],
+    ),
+    "norma-02-ley-20880-probidad.txt": dict(
+        doc_type="ley", organismo="Congreso", tema="Probidad", anio=2016,
+        leyes_citadas=["20.880", "20.730"],
+    ),
+    "oficio-01-contraloria-subvenciones.txt": dict(
+        doc_type="oficio", organismo="Contraloría", tema="Educación", anio=2023,
+        leyes_citadas=["20.248"],
+    ),
+    "tabla-01-valores-tributarios-2024.txt": dict(
+        doc_type="tabla", organismo="SII", tema="Tributario", anio=2024,
+        leyes_citadas=[],
+    ),
+}
+
+
+class FilteredDenseRetriever:
+    """Pre-filtra el espacio de búsqueda denso por un predicado sobre doc_id.
+
+    Equivalente conceptual a un `WHERE` en pgvector (Supabase) aplicado ANTES de
+    la búsqueda kNN, no después: los docs filtrados ni siquiera entran al
+    cálculo de coseno. Implementación: máscara con -inf para los excluidos antes
+    de argsort. Es el patrón correcto cuando el filtro elimina mucho corpus.
+    """
+
+    def __init__(self, base: DenseRetriever, allowed_doc_ids: set[str]) -> None:
+        self.base = base
+        self.allowed_doc_ids = allowed_doc_ids
+        self.allowed_mask = np.array(
+            [c.doc_id in allowed_doc_ids for c in base.chunks], dtype=bool
+        )
+
+    def search(self, query: str, k: int = 5) -> list[ScoredDoc]:
+        q = _l2_normalize(self.base.embedder.embed([query]))[0]
+        sims = self.base.matrix @ q
+        sims = np.where(self.allowed_mask, sims, -np.inf)
+        order = np.argsort(-sims)[:k]
+        return [
+            ScoredDoc(
+                index=int(i), score=float(sims[i]), chunk=self.base.chunks[int(i)]
+            )
+            for i in order
+            if np.isfinite(sims[i])
+        ]
