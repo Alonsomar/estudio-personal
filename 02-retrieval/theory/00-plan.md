@@ -113,7 +113,7 @@ esas métricas suban".
   explicabilidad. (Nota a tu stack: esto es pgvector + columnas en Supabase.)
 - Diagrama Mermaid del árbol de decisión "¿semántico o estructurado?".
 
-### Sección 8 — Evaluación de retrieval aislada de la generación
+### Sección 8 — Evaluación de retrieval aislada de la generación  ✅
 - Por qué medir el retriever solo, sin LLM: aísla el diagnóstico.
 - Construir el ground truth a nivel *chunk*, no solo a nivel doc (lo que el
   golden de 01-evals aún no tiene; lo extendemos aquí).

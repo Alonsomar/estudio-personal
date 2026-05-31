@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "name": "Golden retrieval (chunk-level)",
+    "version": 1,
+    "created_at": "2026-05-31",
+    "based_on": "01-evals/examples/golden-dataset-rag-fiscal.json v1",
+    "chunker": "simple_chunk (blank-line blocks)",
+    "n_items_with_relevant": 27,
+    "n_abstention": 3,
+    "description": "Extiende el golden doc-level con expected_chunks: identifica el/los simple_chunk dentro de cada expected_doc que efectivamente contiene la información para responder. Anotado semi-automáticamente (BM25(expected_answer, chunks_del_expected_doc)) y revisado a mano. La anotación NO se hace contra un retriever evaluado, sino contra el answer ground-truth, así que no introduce sesgo a favor de ningún sistema.",
+    "notes": [
+      "Cuando el monto y su asignación caen en chunks distintos (ley de presupuestos), se anotan ambos: el sistema necesita ambos para responder.",
+      "Para queries multi-doc, se anota un chunk por doc esperado, salvo evidencia de que la respuesta exige más.",
+      "Los 3 items de abstención (gd-025, gd-026, gd-027) llevan expected_chunks=[]: la respuesta correcta es no responder; ningún chunk es relevante."
+    ]
+  },
+  "items": [
+    {"id": "gd-001", "query_type": "factual", "difficulty": "easy",   "expected_docs": ["circular-01-sii-iva-digital.txt"], "expected_chunks": ["circular-01-sii-iva-digital.txt#4"]},
+    {"id": "gd-002", "query_type": "numerico", "difficulty": "easy",  "expected_docs": ["circular-01-sii-iva-digital.txt"], "expected_chunks": ["circular-01-sii-iva-digital.txt#6"]},
+    {"id": "gd-003", "query_type": "factual", "difficulty": "medium", "expected_docs": ["circular-01-sii-iva-digital.txt"], "expected_chunks": ["circular-01-sii-iva-digital.txt#10"]},
+    {"id": "gd-004", "query_type": "entidad", "difficulty": "medium", "expected_docs": ["circular-01-sii-iva-digital.txt"], "expected_chunks": ["circular-01-sii-iva-digital.txt#15"]},
+    {"id": "gd-005", "query_type": "factual", "difficulty": "hard",   "expected_docs": ["circular-01-sii-iva-digital.txt"], "expected_chunks": ["circular-01-sii-iva-digital.txt#13"]},
+    {"id": "gd-006", "query_type": "numerico", "difficulty": "easy",  "expected_docs": ["decreto-01-subvencion-escolar.txt"], "expected_chunks": ["decreto-01-subvencion-escolar.txt#7"]},
+    {"id": "gd-007", "query_type": "numerico", "difficulty": "medium","expected_docs": ["decreto-01-subvencion-escolar.txt"], "expected_chunks": ["decreto-01-subvencion-escolar.txt#7"]},
+    {"id": "gd-008", "query_type": "entidad", "difficulty": "easy",   "expected_docs": ["decreto-01-subvencion-escolar.txt"], "expected_chunks": ["decreto-01-subvencion-escolar.txt#10"]},
+    {"id": "gd-009", "query_type": "factual", "difficulty": "hard",   "expected_docs": ["decreto-01-subvencion-escolar.txt"], "expected_chunks": ["decreto-01-subvencion-escolar.txt#15"]},
+    {"id": "gd-010", "query_type": "factual", "difficulty": "medium", "expected_docs": ["decreto-01-subvencion-escolar.txt"], "expected_chunks": ["decreto-01-subvencion-escolar.txt#9"]},
+    {"id": "gd-011", "query_type": "numerico", "difficulty": "easy",  "expected_docs": ["glosa-01-presupuesto-salud.txt"], "expected_chunks": ["glosa-01-presupuesto-salud.txt#3", "glosa-01-presupuesto-salud.txt#4"]},
+    {"id": "gd-012", "query_type": "numerico", "difficulty": "medium","expected_docs": ["glosa-01-presupuesto-salud.txt"], "expected_chunks": ["glosa-01-presupuesto-salud.txt#11", "glosa-01-presupuesto-salud.txt#12"]},
+    {"id": "gd-013", "query_type": "factual", "difficulty": "medium", "expected_docs": ["glosa-01-presupuesto-salud.txt"], "expected_chunks": ["glosa-01-presupuesto-salud.txt#5"]},
+    {"id": "gd-014", "query_type": "numerico", "difficulty": "hard",  "expected_docs": ["glosa-01-presupuesto-salud.txt"], "expected_chunks": ["glosa-01-presupuesto-salud.txt#13"]},
+    {"id": "gd-015", "query_type": "factual", "difficulty": "hard",   "expected_docs": ["glosa-01-presupuesto-salud.txt"], "expected_chunks": ["glosa-01-presupuesto-salud.txt#16"]},
+    {"id": "gd-016", "query_type": "factual", "difficulty": "easy",   "expected_docs": ["glosa-01-presupuesto-salud.txt"], "expected_chunks": ["glosa-01-presupuesto-salud.txt#6", "glosa-01-presupuesto-salud.txt#7"]},
+    {"id": "gd-017", "query_type": "multi-doc", "difficulty": "hard", "expected_docs": ["glosa-01-presupuesto-salud.txt"], "expected_chunks": ["glosa-01-presupuesto-salud.txt#4", "glosa-01-presupuesto-salud.txt#15"]},
+    {"id": "gd-018", "query_type": "factual", "difficulty": "easy",   "expected_docs": ["norma-01-ley-lobby.txt"], "expected_chunks": ["norma-01-ley-lobby.txt#5", "norma-01-ley-lobby.txt#6"]},
+    {"id": "gd-019", "query_type": "entidad", "difficulty": "easy",   "expected_docs": ["norma-01-ley-lobby.txt"], "expected_chunks": ["norma-01-ley-lobby.txt#9"]},
+    {"id": "gd-020", "query_type": "numerico", "difficulty": "medium","expected_docs": ["norma-01-ley-lobby.txt"], "expected_chunks": ["norma-01-ley-lobby.txt#14"]},
+    {"id": "gd-021", "query_type": "factual", "difficulty": "medium", "expected_docs": ["norma-01-ley-lobby.txt"], "expected_chunks": ["norma-01-ley-lobby.txt#10", "norma-01-ley-lobby.txt#11"]},
+    {"id": "gd-022", "query_type": "entidad", "difficulty": "hard",   "expected_docs": ["norma-01-ley-lobby.txt"], "expected_chunks": ["norma-01-ley-lobby.txt#12", "norma-01-ley-lobby.txt#13"]},
+    {"id": "gd-023", "query_type": "multi-doc", "difficulty": "hard", "expected_docs": ["norma-01-ley-lobby.txt"], "expected_chunks": ["norma-01-ley-lobby.txt#9", "norma-01-ley-lobby.txt#10"]},
+    {"id": "gd-024", "query_type": "multi-doc", "difficulty": "hard", "expected_docs": ["circular-01-sii-iva-digital.txt", "glosa-01-presupuesto-salud.txt"], "expected_chunks": ["circular-01-sii-iva-digital.txt#13", "glosa-01-presupuesto-salud.txt#5"]},
+    {"id": "gd-025", "query_type": "scope", "difficulty": "hard",     "expected_docs": [], "expected_chunks": [], "requires_abstention": true},
+    {"id": "gd-026", "query_type": "scope", "difficulty": "medium",   "expected_docs": [], "expected_chunks": [], "requires_abstention": true},
+    {"id": "gd-027", "query_type": "scope", "difficulty": "easy",     "expected_docs": [], "expected_chunks": [], "requires_abstention": true},
+    {"id": "gd-028", "query_type": "multi-doc", "difficulty": "hard", "expected_docs": ["decreto-01-subvencion-escolar.txt", "circular-01-sii-iva-digital.txt"], "expected_chunks": ["decreto-01-subvencion-escolar.txt#6", "circular-01-sii-iva-digital.txt#6"]},
+    {"id": "gd-029", "query_type": "numerico", "difficulty": "easy",  "expected_docs": ["norma-01-ley-lobby.txt"], "expected_chunks": ["norma-01-ley-lobby.txt#10"]},
+    {"id": "gd-030", "query_type": "entidad", "difficulty": "medium", "expected_docs": ["glosa-01-presupuesto-salud.txt"], "expected_chunks": ["glosa-01-presupuesto-salud.txt#16"]}
+  ]
+}

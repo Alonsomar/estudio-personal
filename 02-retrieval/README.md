@@ -7,7 +7,7 @@ rewriting, reranking, retrieval estructurado y evaluación aislada de retrieval.
 
 ## Estado: En progreso
 
-Estructura completa definida; secciones 1 a 7 terminadas. Ver
+Estructura completa definida; secciones 1 a 8 terminadas. Ver
 [theory/00-plan.md](theory/00-plan.md) para el plan maestro, el árbol propuesto y
 las decisiones técnicas pendientes (stack de embeddings, expansión del corpus).
 
@@ -23,7 +23,7 @@ las decisiones técnicas pendientes (stack de embeddings, expansión del corpus)
 | 05 | Query rewriting (HyDE, multi-query…)    | [theory/05-query-rewriting.md](theory/05-query-rewriting.md) | [code/05-query-rewriting.py](code/05-query-rewriting.py) | Terminado  |
 | 06 | Reranking (cross-encoders, ColBERT)     | [theory/06-reranking.md](theory/06-reranking.md)          | [code/06-reranking.py](code/06-reranking.py)  | Terminado  |
 | 07 | Metadata filtering y retrieval estructurado | [theory/07-metadata-estructurado.md](theory/07-metadata-estructurado.md) | [code/07-sql-vs-vectores.py](code/07-sql-vs-vectores.py) | Terminado  |
-| 08 | Evaluación de retrieval aislada         | —                                                         | —                                             | Pendiente  |
+| 08 | Evaluación de retrieval aislada         | [theory/08-evaluacion-retrieval.md](theory/08-evaluacion-retrieval.md) | [code/08-benchmark-retrievers.py](code/08-benchmark-retrievers.py) | Terminado  |
 | 09 | Casos límite del dominio regulatorio    | —                                                         | —                                             | Pendiente  |
 
 ## Cómo ejecutar código
@@ -39,7 +39,9 @@ demo numerados lo importan.
 ## Datos
 
 - Corpus regulatorio: `shared/corpus_chileno/`
-- Golden dataset reutilizado: `01-evals/examples/golden-dataset-rag-fiscal.json`
+- Golden doc-level reutilizado: `01-evals/examples/golden-dataset-rag-fiscal.json`
+- Golden chunk-level (§8): `02-retrieval/examples/golden-retrieval.json`
+- Resultados del benchmark (§8): `02-retrieval/examples/benchmark-retrievers.json`
 - Diagramas generados: `02-retrieval/diagrams/`
 
 Ver [AGENTS.md](../AGENTS.md) para convenciones completas.

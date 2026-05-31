@@ -1058,3 +1058,149 @@ class FilteredDenseRetriever:
             for i in order
             if np.isfinite(sims[i])
         ]
+
+
+# --------------------------------------------------------------------------- #
+# Métricas de retrieval e intervalos de confianza vía bootstrap.
+# §8 evalúa aisladamente al retriever; estas son las herramientas comunes.
+# Todas operan al mismo nivel: una lista de "items retrieved" (IDs, en orden)
+# vs un set de "expected" (IDs relevantes). El llamador decide si los IDs son
+# doc_id (recall a nivel doc) o chunk_id (recall a nivel chunk).
+# --------------------------------------------------------------------------- #
+def recall_at_k(retrieved: list[str], expected: set[str], k: int) -> float:
+    """Fracción de los items esperados que aparecen en el top-k recuperado.
+
+    Definición estándar: |R ∩ top-k| / |R|. Si no hay items esperados (query
+    de abstención), devuelve 1.0 cuando el retriever también devuelve vacío y
+    0.0 si recuperó algo. (Para retrievers que no abstienen nunca, esto es
+    siempre 0.0 en queries de abstención.)
+    """
+    if not expected:
+        return 1.0 if not retrieved else 0.0
+    return len(set(retrieved[:k]) & expected) / len(expected)
+
+
+def reciprocal_rank(retrieved: list[str], expected: set[str]) -> float:
+    """1 / rank del PRIMER item esperado en la lista recuperada (0 si no aparece).
+
+    MRR es el promedio de este valor sobre todas las queries. Es la métrica
+    natural cuando solo importa qué tan arriba está el primer relevante.
+    """
+    if not expected:
+        return 1.0 if not retrieved else 0.0
+    for rank, item in enumerate(retrieved, start=1):
+        if item in expected:
+            return 1.0 / rank
+    return 0.0
+
+
+def ndcg_at_k(retrieved: list[str], expected: set[str], k: int) -> float:
+    """nDCG@k con ganancia binaria.
+
+    DCG(k)  = Σ_{i=1..k}  rel_i / log2(i + 1)
+    IDCG(k) = DCG del orden ideal (todos los relevantes primero)
+    nDCG    = DCG / IDCG ∈ [0, 1]
+
+    Con ganancia binaria (rel ∈ {0,1}), penaliza posición pero no distingue
+    grados de relevancia. Para retrieval con etiquetas graduadas habría que
+    sustituir rel_i por la etiqueta del item.
+    """
+    if not expected:
+        return 1.0 if not retrieved else 0.0
+    rels = [1.0 if item in expected else 0.0 for item in retrieved[:k]]
+    dcg = sum(r / math.log2(i + 2) for i, r in enumerate(rels))
+    n_rel = min(len(expected), k)
+    idcg = sum(1.0 / math.log2(i + 2) for i in range(n_rel))
+    return dcg / idcg if idcg > 0 else 0.0
+
+
+def bootstrap_ci(
+    per_item: list[float],
+    n_boot: int = 1000,
+    alpha: float = 0.05,
+    seed: int = 0,
+) -> tuple[float, float, float]:
+    """IC bootstrap (percentil) para la media de una métrica por-query.
+
+    Devuelve (media puntual, lo, hi). Reusa la metodología de 01-evals §8:
+    remuestrear las queries con reemplazo n_boot veces, computar la media de
+    cada réplica, y tomar los percentiles α/2 y 1-α/2 como bordes del IC.
+
+    El IC mide variación atribuible al muestreo de QUERIES, no al modelo. Con
+    n=30 queries y muchas saturadas a 1.0, los IC serán anchos: eso es honesto,
+    no un defecto del método.
+    """
+    if not per_item:
+        return 0.0, 0.0, 0.0
+    arr = np.asarray(per_item, dtype=np.float64)
+    mean = float(arr.mean())
+    rng = np.random.default_rng(seed)
+    n = len(arr)
+    idx = rng.integers(0, n, size=(n_boot, n))
+    boot_means = arr[idx].mean(axis=1)
+    lo, hi = np.quantile(boot_means, [alpha / 2, 1 - alpha / 2])
+    return mean, float(lo), float(hi)
+
+
+def evaluate_retriever(
+    retriever,
+    items: list[dict],
+    queries_by_id: dict[str, str],
+    *,
+    granularity: str = "doc",
+    k_values: tuple[int, ...] = (1, 3, 5),
+    pool: int = 10,
+) -> dict:
+    """Evalúa un retriever sobre el golden, en granularidad doc o chunk.
+
+    `items` son entradas del chunk-level golden (con expected_docs y
+    expected_chunks). `queries_by_id` mapea gd-id → query text. Devuelve un
+    diccionario con métricas globales (media + IC bootstrap) y los valores
+    por-query (para estratificar después).
+
+    granularity='doc'   → trabaja con IDs de documento (chunks colapsados).
+    granularity='chunk' → trabaja con IDs de chunk individuales.
+    Para 'chunk', se asume que los chunks del retriever son los mismos del
+    golden (i.e., simple_chunk). El llamador debe asegurarse de eso.
+    """
+    assert granularity in {"doc", "chunk"}
+    per_query: dict[str, list[float]] = {f"recall@{k}": [] for k in k_values}
+    per_query["mrr"] = []
+    per_query.update({f"ndcg@{k}": [] for k in k_values})
+    per_query_records: list[dict] = []
+
+    k_max = max(k_values + (pool,))
+    for item in items:
+        q = queries_by_id[item["id"]]
+        if granularity == "doc":
+            expected = set(item.get("expected_docs", []))
+        else:
+            expected = set(item.get("expected_chunks", []))
+
+        results = retriever.search(q, k=k_max)
+        if granularity == "doc":
+            retrieved: list[str] = []
+            for r in results:
+                if r.chunk.doc_id not in retrieved:
+                    retrieved.append(r.chunk.doc_id)
+        else:
+            retrieved = [r.chunk.chunk_id for r in results]
+
+        rec = {"id": item["id"]}
+        for k in k_values:
+            v = recall_at_k(retrieved, expected, k)
+            per_query[f"recall@{k}"].append(v)
+            rec[f"recall@{k}"] = v
+            v = ndcg_at_k(retrieved, expected, k)
+            per_query[f"ndcg@{k}"].append(v)
+            rec[f"ndcg@{k}"] = v
+        mrr = reciprocal_rank(retrieved, expected)
+        per_query["mrr"].append(mrr)
+        rec["mrr"] = mrr
+        per_query_records.append(rec)
+
+    summary: dict = {}
+    for metric, vals in per_query.items():
+        mean, lo, hi = bootstrap_ci(vals)
+        summary[metric] = {"mean": mean, "lo": lo, "hi": hi}
+    return {"summary": summary, "per_query": per_query_records}
