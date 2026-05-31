@@ -1,0 +1,38 @@
+{
+  "60001ca713f669835ef07327accbf06b550a66fa": {
+    "text": "La normativa establece que los servicios digitales prestados de manera remota por proveedores no domiciliados ni residentes en Chile están afectos al Impuesto al Valor Agregado (IVA) con una tasa del 19%. Esta regulación fue introducida por la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios. Sin embargo, el texto proporcionado no detalla las obligaciones específicas que tienen los proveedores extranjeros en relación con este régimen.",
+    "in_tokens": 259,
+    "out_tokens": 94,
+    "latency_ms": 1484.8790889991506,
+    "model": "gpt-4o-mini",
+    "temperature": 0.0,
+    "run_tag": "det"
+  },
+  "3d4d7ac0d79f5eace41006319e89dcacb5139a2b": {
+    "text": "No está explícitamente presente la información sobre cómo opera el régimen de IVA a servicios digitales de proveedores extranjeros en Chile ni las obligaciones que tienen.",
+    "in_tokens": 259,
+    "out_tokens": 28,
+    "latency_ms": 905.5178779999551,
+    "model": "gpt-4o-mini",
+    "temperature": 0.9,
+    "run_tag": "sto-1"
+  },
+  "8331fed193ec2f0efd99a698c82bdc851279ccdb": {
+    "text": "No se puede brindar una respuesta explícita basada en los fragmentos proporcionados, ya que no se contienen detalles sobre cómo opera el régimen de IVA a servicios digitales de proveedores extranjeros en Chile ni las obligaciones específicas que tienen.",
+    "in_tokens": 259,
+    "out_tokens": 44,
+    "latency_ms": 1227.8302420018008,
+    "model": "gpt-4o-mini",
+    "temperature": 0.9,
+    "run_tag": "sto-2"
+  },
+  "9c561af4674377b1bbcac2c7fec28336c67eb260": {
+    "text": "La aplicación del Impuesto al Valor Agregado (IVA) a los servicios digitales prestados por proveedores no domiciliados ni residentes en Chile se rige por las modificaciones introducidas por la Ley Nº 21.210. Según esta normativa, los servicios digitales prestados de manera remota por proveedores extranjeros quedan afectos a IVA con una tasa del 19%. Sin embargo, el texto no contempla detalles específicos sobre las obligaciones que tienen estos proveedores en términos de cumplimiento tributario.",
+    "in_tokens": 259,
+    "out_tokens": 95,
+    "latency_ms": 2311.48956999823,
+    "model": "gpt-4o-mini",
+    "temperature": 0.9,
+    "run_tag": "sto-3"
+  }
+}
