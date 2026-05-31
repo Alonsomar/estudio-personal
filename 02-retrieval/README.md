@@ -5,9 +5,9 @@ posterior a los LLMs— aplicada a corpus regulatorio y fiscal chileno. Cubre de
 IR clásico (BM25, TF-IDF) hasta embeddings densos, hybrid search, chunking, query
 rewriting, reranking, retrieval estructurado y evaluación aislada de retrieval.
 
-## Estado: En progreso
+## Estado: Terminada
 
-Estructura completa definida; secciones 1 a 8 terminadas. Ver
+Masterclass completa: secciones 1 a 9 terminadas. Ver
 [theory/00-plan.md](theory/00-plan.md) para el plan maestro, el árbol propuesto y
 las decisiones técnicas pendientes (stack de embeddings, expansión del corpus).
 
@@ -24,7 +24,7 @@ las decisiones técnicas pendientes (stack de embeddings, expansión del corpus)
 | 06 | Reranking (cross-encoders, ColBERT)     | [theory/06-reranking.md](theory/06-reranking.md)          | [code/06-reranking.py](code/06-reranking.py)  | Terminado  |
 | 07 | Metadata filtering y retrieval estructurado | [theory/07-metadata-estructurado.md](theory/07-metadata-estructurado.md) | [code/07-sql-vs-vectores.py](code/07-sql-vs-vectores.py) | Terminado  |
 | 08 | Evaluación de retrieval aislada         | [theory/08-evaluacion-retrieval.md](theory/08-evaluacion-retrieval.md) | [code/08-benchmark-retrievers.py](code/08-benchmark-retrievers.py) | Terminado  |
-| 09 | Casos límite del dominio regulatorio    | —                                                         | —                                             | Pendiente  |
+| 09 | Casos límite del dominio regulatorio    | [theory/09-casos-limite-dominio.md](theory/09-casos-limite-dominio.md) | [code/09-casos-limite.py](code/09-casos-limite.py) | Terminado  |
 
 ## Cómo ejecutar código
 

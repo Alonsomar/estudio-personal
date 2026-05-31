@@ -1204,3 +1204,292 @@ def evaluate_retriever(
         mean, lo, hi = bootstrap_ci(vals)
         summary[metric] = {"mean": mean, "lo": lo, "hi": hi}
     return {"summary": summary, "per_query": per_query_records}
+
+
+# --------------------------------------------------------------------------- #
+# §9 — Helpers para los casos límite del dominio regulatorio:
+#   - extracción de citas normativas en la query
+#   - retrieval guiado por cita (filtra docs/chunks que mencionan la norma)
+#   - linealización de la tabla UTM (cada fila → un chunk con contexto)
+#   - diccionario de sinónimos legales + expansión de query
+#   - vigencia temporal por doc + retriever filtrado por fecha de la consulta
+# --------------------------------------------------------------------------- #
+
+# Captura "Ley 21.210", "Ley Nº 20.730", "DL 825", "DL Nº 825", "D.L. 824",
+# "DFL 2", "Decreto 1.423". El número se conserva con puntos para empatar la
+# forma que usan los documentos ("21.210", no "21210").
+_CITE_LEY_RE = re.compile(
+    r"(?i)\b(?:ley|d\.?l\.?|dfl|decreto(?:\s+(?:exento|supremo))?)"
+    r"\s+(?:n[°º]\s*)?(\d{1,3}(?:\.\d{3})*)\b"
+)
+# Captura "artículo 5", "art. 11º", "Art 8".
+_CITE_ART_RE = re.compile(r"(?i)\b(?:art[íi]culo|art\.?)\s+(\d+)[ºo]?\b")
+
+
+def extract_citations(text: str) -> dict[str, list[str]]:
+    """Devuelve las referencias normativas detectadas en la query.
+
+    Diccionario con claves 'leyes' (números tipo '21.210', '825') y
+    'articulos' (números tipo '5', '11'). Útil para enrutar la query: si
+    'leyes' no está vacío, el retrieval debería filtrar por los docs que
+    citan o son esa norma antes de pegar el coseno o BM25.
+    """
+    leyes = [m for m in _CITE_LEY_RE.findall(text)]
+    arts = [m for m in _CITE_ART_RE.findall(text)]
+    # De-duplicar preservando orden.
+    seen: set[str] = set()
+    leyes_u = [x for x in leyes if not (x in seen or seen.add(x))]
+    seen = set()
+    arts_u = [x for x in arts if not (x in seen or seen.add(x))]
+    return {"leyes": leyes_u, "articulos": arts_u}
+
+
+# Doc cuya identidad ES la ley citada (no solo la cita). Para "20.730", el
+# usuario probablemente quiere el texto de la Ley 20.730 (norma-01), no su
+# reglamento (decreto-02) que también la cita. Este mapeo lo hace explícito.
+PRIMARY_LAW_DOCS: dict[str, str] = {
+    "20.730": "norma-01-ley-lobby.txt",
+    "20.880": "norma-02-ley-20880-probidad.txt",
+    "21.210": "ley-02-ley-21210-modernizacion.txt",
+    "825": "ley-01-dl-825-iva-base.txt",
+    "20.248": "decreto-01-subvencion-escolar.txt",  # el reglamento, en este corpus
+}
+
+
+class CitationGuidedRetriever:
+    """Retrieval con dos rutas según la query contenga una cita normativa.
+
+    - Si la query menciona "Ley 21.210" / "DL 825" / "Decreto 1.423": se
+      restringe el universo de búsqueda a los chunks cuyo doc tiene ese
+      número en `DOC_METADATA["leyes_citadas"]` o cuyo texto lo menciona
+      literalmente. Sobre ese subconjunto se aplica BM25 (más sensible a
+      coincidencias léxicas que el coseno semántico).
+    - Si la query NO tiene cita: delega al retriever base sin tocar nada.
+
+    Con `prefer_primary=True` (default), si una de las citas tiene un doc
+    primario declarado en `PRIMARY_LAW_DOCS` (el doc que ES la norma, no los
+    que la citan), restringe el universo solo a ese doc. Pedagógicamente:
+    el ruteo evoluciona de "todos los docs que mencionan la cita" a "el doc
+    que es esa norma". En producción es la forma normal del router.
+
+    Es el patrón "cuando el usuario te da una llave SQL, úsala", llevado al
+    mundo del retrieval léxico. En producción suele ser el primer router de
+    un RAG regulatorio: las queries con cita son las mejor-resueltas y las
+    más fáciles de explicar al usuario.
+    """
+
+    def __init__(
+        self,
+        chunks: list[Chunk],
+        base,
+        doc_metadata: dict[str, dict],
+        primary_law_docs: dict[str, str] | None = None,
+        prefer_primary: bool = True,
+    ) -> None:
+        self.chunks = chunks
+        self.base = base
+        self.doc_metadata = doc_metadata
+        self.primary_law_docs = primary_law_docs or PRIMARY_LAW_DOCS
+        self.prefer_primary = prefer_primary
+
+    def _docs_for_citation(self, leyes: list[str]) -> set[str]:
+        keep: set[str] = set()
+        for doc_id, meta in self.doc_metadata.items():
+            citadas = set(meta.get("leyes_citadas", []))
+            for ley in leyes:
+                hits = {ley, f"DL {ley}", f"DFL {ley}"}
+                if hits & citadas:
+                    keep.add(doc_id)
+        for c in self.chunks:
+            for ley in leyes:
+                if ley in c.text:
+                    keep.add(c.doc_id)
+                    break
+        return keep
+
+    def _primary_for_citations(self, leyes: list[str]) -> set[str]:
+        out: set[str] = set()
+        for ley in leyes:
+            doc = self.primary_law_docs.get(ley)
+            if doc:
+                out.add(doc)
+        return out
+
+    def search(self, query: str, k: int = 5) -> list[ScoredDoc]:
+        cites = extract_citations(query)
+        if not cites["leyes"]:
+            return self.base.search(query, k=k)
+
+        if self.prefer_primary:
+            primary = self._primary_for_citations(cites["leyes"])
+            if primary:
+                sub_chunks = [c for c in self.chunks if c.doc_id in primary]
+                if sub_chunks:
+                    return BM25Retriever().fit(sub_chunks).search(query, k=k)
+
+        allowed = self._docs_for_citation(cites["leyes"])
+        if not allowed:
+            return self.base.search(query, k=k)
+        sub_chunks = [c for c in self.chunks if c.doc_id in allowed]
+        return BM25Retriever().fit(sub_chunks).search(query, k=k)
+
+
+# Sinónimos del dominio regulatorio chileno. La idea: el usuario escribe la
+# sigla ("USE", "PRAIS") y la norma usa la forma extendida — o viceversa. La
+# expansión léxica antes del retrieval cierra esa brecha SIN depender del
+# embedding (que en dominios estrechos puede no haber visto la sigla).
+LEGAL_SYNONYMS: dict[str, str] = {
+    "USE": "unidad de subvención escolar",
+    "USE.": "unidad de subvención escolar",
+    "PRAIS": "Programa de Reparación y Atención Integral de Salud",
+    "DL 825": "Decreto Ley 825 Impuesto al Valor Agregado IVA Ventas y Servicios",
+    "DL Nº 825": "Decreto Ley 825 Impuesto al Valor Agregado IVA Ventas y Servicios",
+    "21.210": "Ley 21.210 de Modernización Tributaria",
+    "20.730": "Ley 20.730 de Lobby y gestión de intereses particulares",
+    "20.248": "Ley 20.248 de Subvención Escolar Preferencial",
+    "20.880": "Ley 20.880 de Probidad en la Función Pública",
+    "Pro Pyme": "Régimen Pro Pyme tributación simplificada micro pequeñas medianas empresas",
+    "JUNAEB": "Junta Nacional de Auxilio Escolar y Becas",
+    "SII": "Servicio de Impuestos Internos",
+    "FONASA": "Fondo Nacional de Salud",
+    "SEP": "subvención escolar preferencial alumnos prioritarios",
+    "UTM": "Unidad Tributaria Mensual",
+    "UTA": "Unidad Tributaria Anual",
+    "UF": "Unidad de Fomento",
+}
+
+
+def expand_synonyms(
+    query: str, synonyms: dict[str, str] = LEGAL_SYNONYMS
+) -> str:
+    """Anexa la forma extendida de cada sigla/cita detectada en la query.
+
+    No reemplaza: ANEXA. Así, una query como "subvención USE alumnos prioritarios"
+    se vuelve "subvención USE alumnos prioritarios unidad de subvención escolar".
+    BM25 ve ambos: la sigla original (para coincidir con docs que la usan) y la
+    forma extendida (para coincidir con docs que escriben el nombre completo).
+    """
+    additions: list[str] = []
+    for sigla, extended in synonyms.items():
+        if re.search(rf"\b{re.escape(sigla)}\b", query, flags=re.IGNORECASE):
+            additions.append(extended)
+    if not additions:
+        return query
+    return query + " " + " ".join(additions)
+
+
+_UTM_MES_RE = re.compile(
+    r"^\s*([A-ZÁÉÍÓÚÑa-záéíóúñ]+)\s+([\d\.]+)\s+(-?[\d,]+)\s*$"
+)
+_MES_NUM = {
+    "Enero": 1, "Febrero": 2, "Marzo": 3, "Abril": 4, "Mayo": 5, "Junio": 6,
+    "Julio": 7, "Agosto": 8, "Septiembre": 9, "Octubre": 10,
+    "Noviembre": 11, "Diciembre": 12,
+}
+
+
+def linearize_utm_table(text: str, doc_id: str) -> list[Chunk]:
+    """Chunker específico para la tabla UTM: cada fila → un chunk con contexto.
+
+    El chunking ingenuo mete la tabla entera en un solo chunk: el embedding
+    promedia los 12 meses y diluye la señal del mes que el usuario pregunta.
+    Linealizar cada fila a una oración natural ("En septiembre de 2024, la
+    UTM fue $66.362, con variación mensual de 0,6%") devuelve al retriever
+    un objetivo con la cifra justa rodeada del contexto que la identifica.
+
+    En producción esta operación la haría un pipeline de ingesta con un
+    LLM-extractor o reglas específicas por tabla. Aquí va hand-coded para no
+    introducir más dependencias.
+    """
+    out: list[Chunk] = []
+    cidx = 0
+    # Cabecera global del doc (contexto para todos los chunks).
+    ctx = "Valores tributarios SII 2024 — UTM mensual."
+    for line in text.splitlines():
+        m = _UTM_MES_RE.match(line)
+        if not m:
+            continue
+        mes, monto, varmes = m.group(1).strip(), m.group(2), m.group(3)
+        if mes not in _MES_NUM:
+            continue
+        mes_num = _MES_NUM[mes]
+        linearized = (
+            f"{ctx} En {mes.lower()} de 2024 ({mes_num:02d}/2024), la UTM "
+            f"fue ${monto}, con variación mensual de {varmes}%."
+        )
+        out.append(
+            Chunk(
+                chunk_id=f"{doc_id}#utm{mes_num:02d}",
+                doc_id=doc_id,
+                text=linearized,
+                meta={"mes": mes_num, "anio": 2024, "tipo": "UTM"},
+            )
+        )
+        cidx += 1
+    return out
+
+
+# Vigencia temporal por documento (ISO 8601). 'desde' es la fecha de
+# publicación / entrada en vigor; 'hasta' es None si sigue vigente.
+# Para las leyes que modifican otras, 'desde' marca cuándo cambió el régimen.
+DOC_TEMPORAL: dict[str, dict] = {
+    "ley-01-dl-825-iva-base.txt": {
+        "vigencia_desde": "1974-12-31",
+        "vigencia_hasta": "2020-02-23",
+    },
+    "ley-02-ley-21210-modernizacion.txt": {
+        "vigencia_desde": "2020-02-24",
+        "vigencia_hasta": None,
+    },
+    # El resto de los docs no tienen versión temporal alternativa: vigentes desde
+    # su publicación, sin reemplazo en el corpus. Para queries con fecha, no se
+    # excluyen — solo filtran las leyes con ventana específica.
+}
+
+
+def _in_range(date_iso: str, desde: str | None, hasta: str | None) -> bool:
+    if desde and date_iso < desde:
+        return False
+    if hasta and date_iso > hasta:
+        return False
+    return True
+
+
+class TemporalFilteredRetriever:
+    """Excluye docs cuya vigencia no incluye la fecha de la consulta.
+
+    Patrón típico de RAG legal: el corpus contiene varias versiones de una
+    norma (texto refundido pre-reforma, texto vigente post-reforma). Una
+    query con fecha implícita o explícita ("¿qué decía la ley en 2018?")
+    debe ver SOLO la versión vigente entonces. Sin este filtro, el retriever
+    devuelve la versión más relevante por similitud, que normalmente es la
+    más reciente — y se equivoca.
+
+    La fecha se pasa por parámetro a search(). En producción la extrae un
+    pre-procesador de la query ("en 2018" → 2018-06-30); aquí se controla
+    explícita para que el efecto sea legible.
+    """
+
+    def __init__(self, base, temporal: dict[str, dict] = DOC_TEMPORAL) -> None:
+        self.base = base
+        self.temporal = temporal
+
+    def search(
+        self, query: str, k: int = 5, date_iso: str | None = None
+    ) -> list[ScoredDoc]:
+        results = self.base.search(query, k=k * 4)
+        if date_iso is None:
+            return results[:k]
+        filtered: list[ScoredDoc] = []
+        for r in results:
+            window = self.temporal.get(r.chunk.doc_id)
+            if window is None:
+                filtered.append(r)  # sin restricción declarada → siempre vigente
+                continue
+            if _in_range(
+                date_iso, window.get("vigencia_desde"), window.get("vigencia_hasta")
+            ):
+                filtered.append(r)
+            if len(filtered) >= k:
+                break
+        return filtered[:k]

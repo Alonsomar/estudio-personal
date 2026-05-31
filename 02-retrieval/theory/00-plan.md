@@ -124,7 +124,7 @@ esas métricas suban".
 - El error clásico: optimizar una métrica de retrieval que no correlaciona con
   la calidad final de la respuesta.
 
-### Sección 9 — Casos límite del dominio regulatorio chileno
+### Sección 9 — Casos límite del dominio regulatorio chileno  ✅
 - **Referencias normativas**: "el artículo 5º de la Ley 20.730" — recuperación
   guiada por cita, no por semántica.
 - **Tablas en PDFs**: montos presupuestarios en grillas que el chunking
