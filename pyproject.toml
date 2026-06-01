@@ -8,11 +8,15 @@ dependencies = [
     "openai",
     "python-dotenv",
     "pydantic",
+    "pydantic-settings",
     "matplotlib",
     "numpy",
     "pandas",
     "pytest",
     "rich",
+    "fastapi",
+    "httpx",
+    "uvicorn",
 ]
 
 [dependency-groups]
