@@ -250,7 +250,7 @@ graph TD
     Q2 -->|"Sí, solo el primero"| MRR_D["Usa MRR"]
     Q2 -->|"Sí, todo el ranking"| NDCG
 
-    style NDCG fill:#f9d71c,stroke:#333
+    style NDCG fill:#f9d71c,stroke:#333,color:#1a1a1a
 ```
 
 ### Limitaciones

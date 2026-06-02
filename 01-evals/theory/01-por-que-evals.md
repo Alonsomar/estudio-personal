@@ -30,8 +30,8 @@ graph TB
         O --> E[Evals<br/>verifican la calidad]
     end
 
-    style A fill:#f9d71c,stroke:#333
-    style E fill:#f9d71c,stroke:#333
+    style A fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style E fill:#f9d71c,stroke:#333,color:#1a1a1a
 ```
 
 | Auditoría financiera | Evaluación de sistemas IA |
@@ -117,10 +117,10 @@ graph LR
     E7 --> E8[8. Monitorea<br/>en producción]
     E8 -->|Regresión| E4
 
-    style E1 fill:#f9d71c,stroke:#333
-    style E3 fill:#f9d71c,stroke:#333
-    style E6 fill:#f9d71c,stroke:#333
-    style E8 fill:#f9d71c,stroke:#333
+    style E1 fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style E3 fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style E6 fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style E8 fill:#f9d71c,stroke:#333,color:#1a1a1a
 ```
 
 Los pasos amarillos son evaluación. La mitad del ciclo es evaluar. Esto no es
@@ -184,7 +184,7 @@ graph TB
     S4 --> S12
     S7 --> S12
 
-    style S1 fill:#f9d71c,stroke:#333
+    style S1 fill:#f9d71c,stroke:#333,color:#1a1a1a
 ```
 
 ### Qué *no* cubre esta masterclass

@@ -34,10 +34,10 @@ graph TD
     F --> |"No"| BAD1["Hallucination<br/>Inventa cosas"]
     AR --> |"No"| BAD2["Off-topic<br/>No responde"]
 
-    style F fill:#f9d71c,stroke:#333
-    style GOOD fill:#2ecc71,stroke:#333
-    style BAD1 fill:#e74c3c,stroke:#333
-    style BAD2 fill:#e74c3c,stroke:#333
+    style F fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style GOOD fill:#2ecc71,stroke:#333,color:#1a1a1a
+    style BAD1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style BAD2 fill:#e74c3c,stroke:#333,color:#1a1a1a
 ```
 
 | Métrica | Pregunta | Input necesario | Requiere gold answer |
@@ -102,8 +102,8 @@ graph TD
     V2 --> SCORE
     V3 --> SCORE
 
-    style C3 fill:#e74c3c,stroke:#333
-    style V3 fill:#e74c3c,stroke:#333
+    style C3 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style V3 fill:#e74c3c,stroke:#333,color:#1a1a1a
 ```
 
 ### Ejemplo detallado

@@ -215,8 +215,8 @@ graph TD
     POST --> DEV
     KEEP --> DEV
 
-    style DEV fill:#bdf,stroke:#333
-    style INC fill:#fbb,stroke:#333
+    style DEV fill:#bdf,stroke:#333,color:#1a1a1a
+    style INC fill:#fbb,stroke:#333,color:#1a1a1a
 ```
 
 Cada uno de los nodos de ese ciclo es una sección. La cosa que importa

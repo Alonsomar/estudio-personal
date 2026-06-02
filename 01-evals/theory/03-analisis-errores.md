@@ -25,8 +25,8 @@ graph LR
         B1[Generar N outputs<br/>con queries reales] --> B2[Leer y anotar<br/>cada output] --> B3[Identificar<br/>patrones de fallo] --> B4[Diseñar golden<br/>dataset que cubra<br/>esos patrones]
     end
 
-    style A4 fill:#e74c3c,stroke:#333
-    style B4 fill:#2ecc71,stroke:#333
+    style A4 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style B4 fill:#2ecc71,stroke:#333,color:#1a1a1a
 ```
 
 ## Taxonomía de errores en RAG
@@ -91,21 +91,21 @@ graph TD
     B --> B3[B3: Format failure]
     B --> B4[B4: Inconsistencia]
 
-    style R1 fill:#e74c3c,stroke:#333
-    style G1 fill:#e74c3c,stroke:#333
-    style G2 fill:#e74c3c,stroke:#333
-    style B1 fill:#e74c3c,stroke:#333
-    style R3 fill:#f39c12,stroke:#333
-    style G3 fill:#f39c12,stroke:#333
-    style G4 fill:#f39c12,stroke:#333
-    style G5 fill:#f39c12,stroke:#333
-    style B4 fill:#f39c12,stroke:#333
-    style R2 fill:#f1c40f,stroke:#333
-    style R4 fill:#f1c40f,stroke:#333
-    style R5 fill:#f1c40f,stroke:#333
-    style G6 fill:#f1c40f,stroke:#333
-    style B2 fill:#f1c40f,stroke:#333
-    style B3 fill:#3498db,stroke:#333
+    style R1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style G1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style G2 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style B1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style R3 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style G3 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style G4 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style G5 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style B4 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style R2 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style R4 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style R5 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style G6 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style B2 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style B3 fill:#3498db,stroke:#333,color:#1a1a1a
 ```
 
 Colores: 🔴 crítico (puede causar daño), 🟠 alto (respuesta incorrecta),
@@ -233,9 +233,9 @@ graph LR
     E2 --> FIX2["Prioridad 2:<br/>Grounding más estricto"]
     E3 --> FIX3["Prioridad 3:<br/>Calibrar abstención"]
 
-    style E1 fill:#e74c3c,stroke:#333
-    style E2 fill:#e74c3c,stroke:#333
-    style E3 fill:#e74c3c,stroke:#333
+    style E1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style E2 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style E3 fill:#e74c3c,stroke:#333,color:#1a1a1a
 ```
 
 ### Paso 3: Análisis de co-ocurrencia
@@ -280,9 +280,9 @@ graph TD
     Q --> Q2["Cuánto: 55% ok"]
     Q --> Q3["Multi-doc: 35% ok"]
 
-    style T3 fill:#e74c3c,stroke:#333
-    style Q2 fill:#f39c12,stroke:#333
-    style Q3 fill:#e74c3c,stroke:#333
+    style T3 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style Q2 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style Q3 fill:#e74c3c,stroke:#333,color:#1a1a1a
 ```
 
 La segmentación te dice **para qué** es bueno tu sistema y para qué no.

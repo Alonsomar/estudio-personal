@@ -154,7 +154,7 @@ graph TD
     S8 --> S9[9. Casos límite dominio]
     S7 --> S9
     S4 --> S9
-    style S1 fill:#bdf,stroke:#333
+    style S1 fill:#bdf,stroke:#333,color:#1a1a1a
 ```
 
 (Sección 1 marcada como terminada.)

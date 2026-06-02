@@ -23,8 +23,8 @@ graph LR
         A2["Recall@5 = 0.70<br/>CI 95%: [0.62, 0.78]"] --> D2["Sí mejoró:<br/>CI anterior [0.55, 0.65]<br/>no se solapan ✓"]
     end
     
-    style D1 fill:#fee,stroke:#c33
-    style D2 fill:#efe,stroke:#3c3
+    style D1 fill:#fee,stroke:#c33,color:#1a1a1a
+    style D2 fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ## Por qué bootstrapping y no tests paramétricos
@@ -51,8 +51,8 @@ graph TD
     B --> B2["Resample con<br/>reemplazo"]
     B --> B3["Funciona con<br/>cualquier métrica"]
     
-    style P3 fill:#fee,stroke:#c33
-    style B3 fill:#efe,stroke:#3c3
+    style P3 fill:#fee,stroke:#c33,color:#1a1a1a
+    style B3 fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 **Analogía económica:** el bootstrap es como un análisis de escenarios Monte Carlo
@@ -129,7 +129,7 @@ graph TD
     BS --> CI["CI 95%: [0.02, 0.18]"]
     CI --> V["No incluye 0<br/>→ B es significativamente<br/>mejor que A ✓"]
     
-    style V fill:#efe,stroke:#3c3
+    style V fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 **Analogía económica:** es como un test pareado de diferencia de medias para rendimientos
@@ -221,8 +221,8 @@ graph TD
     C --> B["Corrección Bonferroni<br/>α=0.005 por test"]
     B --> OK["P(falso positivo<br/>global) ≈ 5% ✓"]
     
-    style FP fill:#fee,stroke:#c33
-    style OK fill:#efe,stroke:#3c3
+    style FP fill:#fee,stroke:#c33,color:#1a1a1a
+    style OK fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ### 2. El CI no es lo que crees
@@ -262,9 +262,9 @@ graph TD
     E7 -- No --> E8["Mejora real pero<br/>trivial. Considerar<br/>costo del cambio."]
     E7 -- Sí --> E9["Mejora significativa<br/>y relevante.<br/>Deploy ✓"]
     
-    style E6 fill:#fee,stroke:#c33
-    style E8 fill:#ffe,stroke:#cc3
-    style E9 fill:#efe,stroke:#3c3
+    style E6 fill:#fee,stroke:#c33,color:#1a1a1a
+    style E8 fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style E9 fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ## Conexión con otras secciones

@@ -241,9 +241,9 @@ graph TD
     H4 --> H5["Golden dataset v1<br/>~150-200 items"]
     H5 --> H6["Iteración continua<br/>agregar items de<br/>errores en producción"]
 
-    style H1 fill:#f39c12,stroke:#333
-    style H3 fill:#f39c12,stroke:#333
-    style H6 fill:#f39c12,stroke:#333
+    style H1 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style H3 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style H6 fill:#f39c12,stroke:#333,color:#1a1a1a
 ```
 
 Los pasos amarillos requieren trabajo humano. Los otros son automatizables.
@@ -312,8 +312,8 @@ graph LR
 
     GD3 -.->|"subrepresentado 5x"| RD3
 
-    style GD3 fill:#e74c3c,stroke:#333
-    style RD3 fill:#e74c3c,stroke:#333
+    style GD3 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style RD3 fill:#e74c3c,stroke:#333,color:#1a1a1a
 ```
 
 ### 4. Respuestas de referencia incorrectas

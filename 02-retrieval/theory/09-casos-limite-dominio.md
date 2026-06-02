@@ -65,7 +65,7 @@ graph TD
     FIL --> OUT
     BASE --> OUT
 
-    style PRI fill:#bdf,stroke:#333
+    style PRI fill:#bdf,stroke:#333,color:#1a1a1a
 ```
 
 **Lección general**: en cualquier dominio donde los usuarios citen IDs
@@ -281,10 +281,10 @@ graph TD
     FDR --> EVAL
     SEM --> EVAL
 
-    style CITED fill:#bdf,stroke:#333
-    style SQL fill:#bfb,stroke:#333
-    style TFIL fill:#fd9,stroke:#333
-    style ABS fill:#fbb,stroke:#333
+    style CITED fill:#bdf,stroke:#333,color:#1a1a1a
+    style SQL fill:#bfb,stroke:#333,color:#1a1a1a
+    style TFIL fill:#fd9,stroke:#333,color:#1a1a1a
+    style ABS fill:#fbb,stroke:#333,color:#1a1a1a
 ```
 
 Los **rendimientos decrecientes** caen ahí donde no hay router: insistir

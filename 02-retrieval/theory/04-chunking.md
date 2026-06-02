@@ -212,7 +212,7 @@ graph TD
     Q3 -->|"Sí"| SEM["semantic<br/>(threshold 0.5-0.6)"]
     Q3 -->|"No"| STR["structural<br/>(por encabezados)"]
 
-    style HIER fill:#bdf,stroke:#333
+    style HIER fill:#bdf,stroke:#333,color:#1a1a1a
 ```
 
 Defaults para corpus regulatorio chileno: empieza con **hierarchical**; si el

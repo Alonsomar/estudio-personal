@@ -33,8 +33,8 @@ graph LR
         F --> G
     end
     
-    style P fill:#ffe,stroke:#cc3
-    style F fill:#efe,stroke:#3c3
+    style P fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style F fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ### Modos de fallo que solo se ven en producción
@@ -64,8 +64,8 @@ graph TD
     R --> FB["Feedback<br/>usuario"]
     FB --> ST
     
-    style LOG fill:#eef,stroke:#66c
-    style AE fill:#efe,stroke:#3c3
+    style LOG fill:#eef,stroke:#66c,color:#1a1a1a
+    style AE fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 **Principio clave:** el logging y la evaluación son **asíncronos** — nunca bloquean
@@ -91,8 +91,8 @@ graph LR
     B --> C
     C --> D["Dashboard:<br/>A vs B por query"]
     
-    style A fill:#efe,stroke:#3c3
-    style B fill:#eef,stroke:#66c
+    style A fill:#efe,stroke:#3c3,color:#1a1a1a
+    style B fill:#eef,stroke:#66c,color:#1a1a1a
 ```
 
 ### Cuándo usar shadow mode
@@ -152,8 +152,8 @@ graph TD
     D -- Sí, B mejor --> SHIP["Ship B ✓"]
     D -- No / B peor --> KEEP["Mantener A"]
     
-    style SHIP fill:#efe,stroke:#3c3
-    style KEEP fill:#fee,stroke:#c33
+    style SHIP fill:#efe,stroke:#3c3,color:#1a1a1a
+    style KEEP fill:#fee,stroke:#c33,color:#1a1a1a
 ```
 
 ### Métricas para A/B en RAG
@@ -334,7 +334,7 @@ graph TD
     R --> G["Golden dataset<br/>actualizado"]
     G --> E["Eval offline<br/>mejorada"]
     
-    style G fill:#efe,stroke:#3c3
+    style G fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ### Protocolo de incorporación

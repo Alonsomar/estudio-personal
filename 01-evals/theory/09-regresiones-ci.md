@@ -35,9 +35,9 @@ graph LR
         G2 -- Sí --> A["Alerta +<br/>rollback?"]
     end
     
-    style B fill:#fee,stroke:#c33
-    style A fill:#ffe,stroke:#cc3
-    style OK fill:#efe,stroke:#3c3
+    style B fill:#fee,stroke:#c33,color:#1a1a1a
+    style A fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style OK fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ## Qué correr en cada etapa
@@ -137,9 +137,9 @@ graph TD
     C5 -- No --> WARN["⚠️ WARN<br/>Merge con nota"]
     C5 -- Sí --> PASS["✅ PASS"]
     
-    style FAIL fill:#fee,stroke:#c33
-    style WARN fill:#ffe,stroke:#cc3
-    style PASS fill:#efe,stroke:#3c3
+    style FAIL fill:#fee,stroke:#c33,color:#1a1a1a
+    style WARN fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style PASS fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ## Gestión de regresiones
@@ -163,9 +163,9 @@ graph LR
         F3["Recall baja 0.01<br/>cada semana × 8<br/>(tendencia)"]
     end
     
-    style F1 fill:#efe,stroke:#3c3
-    style F2 fill:#fee,stroke:#c33
-    style F3 fill:#ffe,stroke:#cc3
+    style F1 fill:#efe,stroke:#3c3,color:#1a1a1a
+    style F2 fill:#fee,stroke:#c33,color:#1a1a1a
+    style F3 fill:#ffe,stroke:#cc3,color:#1a1a1a
 ```
 
 ### Protocolo ante regresión

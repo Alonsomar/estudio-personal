@@ -160,8 +160,8 @@ graph LR
     DENSE -->|"top-20"| RRF
     RRF -->|"top-k amplio<br/>(alto recall@k)"| RER["Reranker<br/>(sección 6)"]
     RER -->|"top-3 reordenado<br/>(alta precisión)"| GEN["Generador"]
-    style RRF fill:#bdf,stroke:#333
-    style RER fill:#fd9,stroke:#333
+    style RRF fill:#bdf,stroke:#333,color:#1a1a1a
+    style RER fill:#fd9,stroke:#333,color:#1a1a1a
 ```
 
 Y los números de arriba explican exactamente por qué hay un reranker después: RRF

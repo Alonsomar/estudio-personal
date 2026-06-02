@@ -159,8 +159,8 @@ graph TD
     C1 -- "No (ambiguo)" --> S["Sonnet judge<br/>(re-evaluar)"]
     S --> R2["Usar score<br/>de Sonnet<br/>($0.02 + $0.005)"]
     
-    style R1 fill:#efe,stroke:#3c3
-    style R2 fill:#ffe,stroke:#cc3
+    style R1 fill:#efe,stroke:#3c3,color:#1a1a1a
+    style R2 fill:#ffe,stroke:#cc3,color:#1a1a1a
 ```
 
 **Ahorro esperado:** si ~60% de los juicios son claros (score 1-2 o 4-5), el costo
@@ -272,10 +272,10 @@ graph TD
     Q3 -- Sí --> C3["Sonnet judge + cascading<br/>Full pipeline<br/>100+ queries"]
     Q3 -- No --> C4["Multi-judge + humano<br/>Full pipeline + weekly<br/>calibración mensual"]
     
-    style C1 fill:#fee,stroke:#c33
-    style C2 fill:#ffe,stroke:#cc3
-    style C3 fill:#efe,stroke:#3c3
-    style C4 fill:#efe,stroke:#3c3
+    style C1 fill:#fee,stroke:#c33,color:#1a1a1a
+    style C2 fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style C3 fill:#efe,stroke:#3c3,color:#1a1a1a
+    style C4 fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ### La regla del 10x

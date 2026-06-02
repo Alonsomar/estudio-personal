@@ -41,8 +41,8 @@ graph LR
     COST --> SEC["Seguridad<br/>(§11)"]
     SEC --> INC["Incidentes<br/>(§12)"]
 
-    style DEV fill:#bdf,stroke:#333
-    style INC fill:#fd9,stroke:#333
+    style DEV fill:#bdf,stroke:#333,color:#1a1a1a
+    style INC fill:#fd9,stroke:#333,color:#1a1a1a
 ```
 
 ## Principios de trabajo
@@ -259,8 +259,8 @@ graph TD
     S5 --> S12[12. Incidentes]
     S6 --> S12
     S10 --> S12
-    style S1 fill:#bdf,stroke:#333
-    style S12 fill:#fd9,stroke:#333
+    style S1 fill:#bdf,stroke:#333,color:#1a1a1a
+    style S12 fill:#fd9,stroke:#333,color:#1a1a1a
 ```
 
 ## Árbol propuesto

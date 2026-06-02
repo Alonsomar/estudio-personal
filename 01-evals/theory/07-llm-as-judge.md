@@ -46,11 +46,11 @@ graph TD
     ANCH --> ANCH_D["Se ancla al rubric<br/>o ejemplo dado"]
     LENI --> LENI_D["Puntúa generosamente<br/>en general"]
 
-    style POS fill:#e74c3c,stroke:#333
-    style VERB fill:#f39c12,stroke:#333
-    style SELF fill:#f39c12,stroke:#333
-    style ANCH fill:#f1c40f,stroke:#333
-    style LENI fill:#f1c40f,stroke:#333
+    style POS fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style VERB fill:#f39c12,stroke:#333,color:#1a1a1a
+    style SELF fill:#f39c12,stroke:#333,color:#1a1a1a
+    style ANCH fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style LENI fill:#f1c40f,stroke:#333,color:#1a1a1a
 ```
 
 ### 1. Position bias

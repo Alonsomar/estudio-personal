@@ -87,10 +87,10 @@ graph TB
 
     E2E --- SYS --- COMP --- UNIT
 
-    style UNIT fill:#2ecc71,stroke:#333
-    style COMP fill:#3498db,stroke:#333
-    style SYS fill:#f39c12,stroke:#333
-    style E2E fill:#e74c3c,stroke:#333
+    style UNIT fill:#2ecc71,stroke:#333,color:#1a1a1a
+    style COMP fill:#3498db,stroke:#333,color:#1a1a1a
+    style SYS fill:#f39c12,stroke:#333,color:#1a1a1a
+    style E2E fill:#e74c3c,stroke:#333,color:#1a1a1a
 ```
 
 > ⚠️ No verificado: los porcentajes son orientativos, no provienen de un
@@ -329,16 +329,16 @@ graph TB
     U1 --> C1 --> S1 --> O1
     U2 --> C2 --> S2 --> O2
 
-    style U1 fill:#2ecc71
-    style U2 fill:#2ecc71
-    style C1 fill:#3498db
-    style C2 fill:#3498db
-    style S1 fill:#f39c12
-    style S2 fill:#f39c12
-    style S3 fill:#f39c12
-    style O1 fill:#e74c3c
-    style O2 fill:#e74c3c
-    style O3 fill:#e74c3c
+    style U1 fill:#2ecc71,color:#1a1a1a
+    style U2 fill:#2ecc71,color:#1a1a1a
+    style C1 fill:#3498db,color:#1a1a1a
+    style C2 fill:#3498db,color:#1a1a1a
+    style S1 fill:#f39c12,color:#1a1a1a
+    style S2 fill:#f39c12,color:#1a1a1a
+    style S3 fill:#f39c12,color:#1a1a1a
+    style O1 fill:#e74c3c,color:#1a1a1a
+    style O2 fill:#e74c3c,color:#1a1a1a
+    style O3 fill:#e74c3c,color:#1a1a1a
 ```
 
 ## Qué está resuelto y qué no

@@ -31,8 +31,8 @@ graph TD
         C2c --> I2
     end
     
-    style I1 fill:#ffe,stroke:#cc3
-    style I2 fill:#fee,stroke:#c33
+    style I1 fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style I2 fill:#fee,stroke:#c33,color:#1a1a1a
 ```
 
 ## Los 5 fallos críticos en dominio fiscal
@@ -59,11 +59,11 @@ graph LR
     A --> T4["Vigencia<br/>incorrecta"]
     A --> T5["Jurisdicción<br/>cruzada"]
     
-    style T1 fill:#fee,stroke:#c33
-    style T2 fill:#fee,stroke:#c33
-    style T3 fill:#ffe,stroke:#cc3
-    style T4 fill:#ffe,stroke:#cc3
-    style T5 fill:#eef,stroke:#66c
+    style T1 fill:#fee,stroke:#c33,color:#1a1a1a
+    style T2 fill:#fee,stroke:#c33,color:#1a1a1a
+    style T3 fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style T4 fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style T5 fill:#eef,stroke:#66c,color:#1a1a1a
 ```
 
 ### 2. Cita fantasma
@@ -124,11 +124,11 @@ graph TD
     V4 -- No --> F4["⚠️ INTERPRETACIÓN<br/>SESGADA"]
     V4 -- Sí --> OK["✅ CITA VERIFICADA"]
     
-    style F1 fill:#fee,stroke:#c33
-    style F2 fill:#fee,stroke:#c33
-    style F3 fill:#fee,stroke:#c33
-    style F4 fill:#ffe,stroke:#cc3
-    style OK fill:#efe,stroke:#3c3
+    style F1 fill:#fee,stroke:#c33,color:#1a1a1a
+    style F2 fill:#fee,stroke:#c33,color:#1a1a1a
+    style F3 fill:#fee,stroke:#c33,color:#1a1a1a
+    style F4 fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style OK fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 **Métrica:** `citation_accuracy = citas_verificadas / total_citas`
@@ -171,10 +171,10 @@ graph TD
     C3 -- Sí --> A3["Responder con<br/>disclaimer:<br/>'Según el texto...<br/>pero consulte a un<br/>profesional'<br/>✓ Abstención parcial"]
     C3 -- No --> A4["Responder<br/>normalmente<br/>✓ Respuesta"]
     
-    style A1 fill:#eef,stroke:#66c
-    style A2 fill:#eef,stroke:#66c
-    style A3 fill:#ffe,stroke:#cc3
-    style A4 fill:#efe,stroke:#3c3
+    style A1 fill:#eef,stroke:#66c,color:#1a1a1a
+    style A2 fill:#eef,stroke:#66c,color:#1a1a1a
+    style A3 fill:#ffe,stroke:#cc3,color:#1a1a1a
+    style A4 fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 **Métricas de abstención:**
@@ -261,8 +261,8 @@ graph LR
     G2 -.->|"zero tolerance"| F2
     G3 -.->|"igual"| F3
     
-    style F2 fill:#fee,stroke:#c33
-    style F5 fill:#fee,stroke:#c33
+    style F2 fill:#fee,stroke:#c33,color:#1a1a1a
+    style F5 fill:#fee,stroke:#c33,color:#1a1a1a
 ```
 
 ## Implicaciones regulatorias
@@ -339,8 +339,8 @@ graph TD
     G -- Sí --> D["Deploy con<br/>disclaimer"]
     G -- No --> R["Revisión humana<br/>obligatoria"]
     
-    style R fill:#fee,stroke:#c33
-    style D fill:#efe,stroke:#3c3
+    style R fill:#fee,stroke:#c33,color:#1a1a1a
+    style D fill:#efe,stroke:#3c3,color:#1a1a1a
 ```
 
 ## Conexión con todas las secciones

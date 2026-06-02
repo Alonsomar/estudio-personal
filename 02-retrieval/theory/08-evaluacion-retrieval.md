@@ -16,7 +16,7 @@ graph LR
     CTX --> GEN["Generador<br/>(LLM)"]
     GEN --> A["Respuesta"]
 
-    style RT fill:#bdf,stroke:#333
+    style RT fill:#bdf,stroke:#333,color:#1a1a1a
 ```
 
 Cuando una respuesta es mala, hay dos hipótesis: o el retriever trajo material

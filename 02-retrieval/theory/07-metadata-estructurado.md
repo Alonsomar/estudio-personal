@@ -44,8 +44,8 @@ graph TD
     FIL --> A
     VEC --> A
 
-    style SQL fill:#bdf,stroke:#333
-    style FIL fill:#fd9,stroke:#333
+    style SQL fill:#bdf,stroke:#333,color:#1a1a1a
+    style FIL fill:#fd9,stroke:#333,color:#1a1a1a
 ```
 
 Los dos patrones nuevos:
@@ -219,9 +219,9 @@ graph TD
     Q4 -->|"Sí"| FIL["Metadata filter<br/>+ vector"]
     Q4 -->|"No"| OUT["Vector libre"]
 
-    style SQL fill:#bdf,stroke:#333
-    style FIL fill:#fd9,stroke:#333
-    style EXTR fill:#bfb,stroke:#333
+    style SQL fill:#bdf,stroke:#333,color:#1a1a1a
+    style FIL fill:#fd9,stroke:#333,color:#1a1a1a
+    style EXTR fill:#bfb,stroke:#333,color:#1a1a1a
 ```
 
 Regla práctica para corpus regulatorio chileno (mismo de éste):

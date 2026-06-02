@@ -52,8 +52,8 @@ graph TD
     RET -.lectura.-> PG[(Postgres + pgvector<br/>o caché en memoria)]
     LLM -.HTTPS.-> EXT[Proveedor LLM]
 
-    style APP fill:#bdf,stroke:#333
-    style RAG fill:#bfb,stroke:#333
+    style APP fill:#bdf,stroke:#333,color:#1a1a1a
+    style RAG fill:#bfb,stroke:#333,color:#1a1a1a
 ```
 
 Lo crítico es la línea punteada hacia Postgres y el proveedor LLM: son
