@@ -1,0 +1,27 @@
+name: Desplegar documentación
+
+# Reconstruye y publica el sitio en GitHub Pages en cada push a main.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Instalar dependencias de docs
+        run: uv sync --group docs
+
+      - name: Construir y publicar en gh-pages
+        run: uv run mkdocs gh-deploy --force

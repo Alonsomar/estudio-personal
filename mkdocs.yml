@@ -1,0 +1,124 @@
+site_name: Estudio Personal — IA aplicada a corpus regulatorio chileno
+site_description: >-
+  Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval,
+  patrones de producción y economía de inferencia.
+site_author: Alonso Valdés
+
+# docs/ contiene solo symlinks a las carpetas reales del repo (01-evals, etc.).
+# Así no se mueve ningún archivo y las rutas relativas (../diagrams/*.png) resuelven.
+docs_dir: docs
+
+# Excluir del sitio todo lo que no sea documentación (código, datos, cachés).
+exclude_docs: |
+  **/code/
+  **/examples/
+  **/__pycache__/
+  **/*.py
+  **/*.pyc
+  **/*.ipynb
+  **/*.csv
+  **/*.json
+  **/*.jsonl
+
+plugins:
+  - search:
+      lang:
+        - es
+
+theme:
+  name: material
+  language: es
+  palette:
+    # Modo claro
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Cambiar a modo oscuro
+    # Modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Cambiar a modo claro
+  features:
+    - navigation.instant      # navegación tipo SPA
+    - navigation.tracking     # actualiza la URL al hacer scroll
+    - navigation.top          # botón "volver arriba"
+    - navigation.indexes      # README.md como portada de cada sección
+    - search.suggest
+    - search.highlight
+    - content.code.copy       # botón copiar en bloques de código
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.details
+  # Mermaid embebido (renderizado nativo de Material)
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+# Navegación. Los archivos están numerados (NN-), así que el orden refleja
+# la secuencia de lectura. Al añadir un documento nuevo, agrégalo aquí.
+nav:
+  - Inicio: index.md
+  - 01 · Evaluación de sistemas IA:
+      - 01-evals/README.md
+      - 01-evals/theory/00-plan.md
+      - 01-evals/theory/01-por-que-evals.md
+      - 01-evals/theory/02-taxonomia.md
+      - 01-evals/theory/03-analisis-errores.md
+      - 01-evals/theory/04-golden-datasets.md
+      - 01-evals/theory/05-metricas-retrieval.md
+      - 01-evals/theory/06-metricas-generacion.md
+      - 01-evals/theory/07-llm-as-judge.md
+      - 01-evals/theory/08-estadistica-estocastica.md
+      - 01-evals/theory/09-regresiones-ci.md
+      - 01-evals/theory/10-costo-pareto.md
+      - 01-evals/theory/11-online-evals.md
+      - 01-evals/theory/12-dominios-alto-stake.md
+  - 02 · Information Retrieval:
+      - 02-retrieval/README.md
+      - 02-retrieval/theory/00-plan.md
+      - 02-retrieval/theory/01-ir-pre-llm.md
+      - 02-retrieval/theory/02-embeddings-densos.md
+      - 02-retrieval/theory/03-hybrid-search.md
+      - 02-retrieval/theory/04-chunking.md
+      - 02-retrieval/theory/05-query-rewriting.md
+      - 02-retrieval/theory/06-reranking.md
+      - 02-retrieval/theory/07-metadata-estructurado.md
+      - 02-retrieval/theory/08-evaluacion-retrieval.md
+      - 02-retrieval/theory/09-casos-limite-dominio.md
+  - 03 · Patrones de producción:
+      - 03-produccion/README.md
+      - 03-produccion/theory/00-plan.md
+      - 03-produccion/theory/01-salto-a-produccion.md
+      - 03-produccion/theory/02-arquitectura-servicio.md
+  - 04 · Economía de inferencia:
+      - 04-economia/README.md
+  - Material compartido:
+      - Corpus chileno: shared/corpus_chileno/README.md
+  - Blog drafts: blog-drafts/README.md
+
+# No tratar como error los avisos de archivos no incluidos en la navegación.
+validation:
+  nav:
+    omitted_files: ignore
+  not_found: warn
