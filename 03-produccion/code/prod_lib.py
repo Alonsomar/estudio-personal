@@ -2,8 +2,8 @@
 
 Acumula los patrones de producción que las secciones introducen:
 
-  §2  LLMClient (Protocol) + adaptadores Anthropic/OpenAI + RAGOrchestrator
-       (esta sección).
+  §2  LLMClient (Protocol) + adaptadores Anthropic/OpenAI + RAGOrchestrator.
+  §3  PromptTemplate + PromptRegistry + render_safe (esta sección).
   §4  LRUCache, ResponseCache, SemanticCache (a futuro).
   §6  TokenBucket, retry_with_backoff, CircuitBreaker (a futuro).
   §8  ModelRouter con shadow / canary / A/B (a futuro).
@@ -17,9 +17,12 @@ adaptadores que viven aquí.
 
 from __future__ import annotations
 
+import hashlib
+import re
 import time
 import uuid
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
 # Tarifas públicas USD por 1M tokens (2026-Q2, aproximadas). Centralizadas
@@ -206,6 +209,148 @@ class StaticLLMClient:
 
 
 # --------------------------------------------------------------------------- #
+# §3 Gestión de prompts: el prompt es código. Va versionado, con hash de
+# contenido, validado al cargar y renderizado de forma SEGURA contra inyección
+# desde el corpus (un chunk que contiene metacaracteres de template no debe
+# poder alterar la plantilla).
+#
+# Decisión de templating: un renderizador propio de una sola pasada con
+# placeholders estilo `{{ var }}`. Se eligió por encima de:
+#   - str.format(): frágil — un chunk con un `{` crudo lanza ValueError, y un
+#     `{query}` dentro del chunk se re-sustituye (doble inyección).
+#   - string.Template ($var): choca con los `$` de montos en pesos del dominio
+#     fiscal ("$1.000.000" rompería el parseo).
+# El renderizador de una pasada inserta los valores LITERALMENTE: lo que venga
+# en `context` nunca se re-evalúa como template. Esa es toda la defensa.
+# --------------------------------------------------------------------------- #
+_PLACEHOLDER = re.compile(r"\{\{\s*(\w+)\s*\}\}")
+
+
+class PromptError(ValueError):
+    """Prompt inválido: faltan variables requeridas, versión mal formada, etc."""
+
+
+def render_safe(body: str, values: dict[str, str]) -> str:
+    """Renderiza `body` sustituyendo `{{ var }}` por values[var], en UNA pasada.
+
+    Clave de seguridad: `re.sub` con función reemplaza cada match llamando a
+    `repl` una vez; el string devuelto se inserta tal cual y NO se vuelve a
+    escanear. Por eso un valor que contenga `{{ query }}` o `{` queda literal
+    en la salida — el corpus no puede inyectar instrucciones en la plantilla.
+    """
+
+    def repl(m: re.Match) -> str:
+        key = m.group(1)
+        if key not in values:
+            raise PromptError(f"variable sin valor al renderizar: {{{{ {key} }}}}")
+        return str(values[key])
+
+    return _PLACEHOLDER.sub(repl, body)
+
+
+@dataclass(frozen=True)
+class PromptTemplate:
+    """Un prompt versionado e inmutable.
+
+    Identidad = (name, version, content_hash). El hash sobre el cuerpo permite
+    detectar cambios fuera de banda: si alguien edita el prompt en producción
+    sin subir versión, el hash cambia y los logs lo delatan.
+    """
+
+    name: str
+    version: str
+    body: str
+    required_vars: tuple[str, ...] = ("context", "query")
+    description: str = ""
+
+    @property
+    def content_hash(self) -> str:
+        return hashlib.sha256(self.body.encode("utf-8")).hexdigest()[:12]
+
+    @property
+    def ref(self) -> str:
+        """Referencia citable que viaja en logs y en la respuesta del RAG."""
+        return f"{self.name}@{self.version}#{self.content_hash}"
+
+    def declared_vars(self) -> set[str]:
+        return set(_PLACEHOLDER.findall(self.body))
+
+    def validate(self) -> None:
+        """Test obligatorio que corre al registrar: variables requeridas presentes."""
+        missing = set(self.required_vars) - self.declared_vars()
+        if missing:
+            raise PromptError(
+                f"prompt {self.name}@{self.version} no declara {sorted(missing)}; "
+                f"declara {sorted(self.declared_vars())}"
+            )
+
+    def render(self, **values: str) -> str:
+        return render_safe(self.body, values)
+
+
+def _version_key(version: str) -> tuple[int, str]:
+    """Ordena 'v2' > 'v10' correctamente (numérico cuando se puede)."""
+    m = re.fullmatch(r"v(\d+)", version)
+    return (int(m.group(1)), version) if m else (-1, version)
+
+
+class PromptRegistry:
+    """Carga prompts versionados desde un directorio y los sirve por nombre.
+
+    Convención de archivos: `<name>.<version>.txt`, p. ej. `rag-fiscal.v2.txt`.
+    El cuerpo del archivo ES el prompt (el hash se calcula sobre él, sin
+    metadata, para que sea estable). Validar al cargar es la política de
+    "tests obligatorios": un prompt inválido jamás entra al registry.
+    """
+
+    _FILE = re.compile(r"^(?P<name>[a-z0-9-]+)\.(?P<version>v\d+)\.txt$")
+
+    def __init__(
+        self,
+        root: str | Path,
+        required_vars: tuple[str, ...] = ("context", "query"),
+    ) -> None:
+        self.root = Path(root)
+        self.required_vars = required_vars
+        self._by_name: dict[str, dict[str, PromptTemplate]] = {}
+        self._load()
+
+    def _load(self) -> None:
+        if not self.root.is_dir():
+            raise FileNotFoundError(f"directorio de prompts inexistente: {self.root}")
+        for f in sorted(self.root.glob("*.txt")):
+            m = self._FILE.match(f.name)
+            if not m:
+                continue  # archivos que no siguen la convención se ignoran
+            tmpl = PromptTemplate(
+                name=m["name"],
+                version=m["version"],
+                body=f.read_text(encoding="utf-8"),
+                required_vars=self.required_vars,
+            )
+            tmpl.validate()  # rechaza prompts inválidos AL CARGAR, no en runtime
+            self._by_name.setdefault(tmpl.name, {})[tmpl.version] = tmpl
+
+    def names(self) -> list[str]:
+        return sorted(self._by_name)
+
+    def versions(self, name: str) -> list[str]:
+        return sorted(self._by_name.get(name, {}), key=_version_key)
+
+    def get(self, name: str, version: str | None = None) -> PromptTemplate:
+        versions = self._by_name.get(name)
+        if not versions:
+            raise PromptError(f"prompt desconocido: {name!r} (hay: {self.names()})")
+        if version is None:
+            version = self.versions(name)[-1]  # latest
+        if version not in versions:
+            raise PromptError(
+                f"{name} no tiene versión {version} (hay: {self.versions(name)})"
+            )
+        return versions[version]
+
+
+# --------------------------------------------------------------------------- #
 # Orquestador: el RAG completo como un objeto invocable. El handler HTTP solo
 # tiene que llamar `rag.query(text)` y obtener un RAGAnswer estructurado.
 # --------------------------------------------------------------------------- #
@@ -266,7 +411,7 @@ class RAGOrchestrator:
         self,
         retriever,
         llm_client: LLMClient,
-        prompt_template: str = DEFAULT_PROMPT_TEMPLATE,
+        prompt_template: str | PromptTemplate = DEFAULT_PROMPT_TEMPLATE,
         default_model: str | None = None,
         k_default: int = 3,
         temperature: float = 0.0,
@@ -289,7 +434,19 @@ class RAGOrchestrator:
         ctx = "\n\n".join(
             f"[Fragmento {i + 1}]\n{c.text}" for i, c in enumerate(chunks)
         )
+        # §3: si es un PromptTemplate, render seguro ({{ }}, una pasada). Si es
+        # un str legado (§2), str.format. El template versionado es lo correcto
+        # en prod: el chunk no puede inyectar instrucciones en la plantilla.
+        if isinstance(self.prompt_template, PromptTemplate):
+            return self.prompt_template.render(context=ctx, query=query)
         return self.prompt_template.format(context=ctx, query=query)
+
+    @property
+    def prompt_ref(self) -> str | None:
+        """Referencia del prompt versionado (None si se usa el str legado)."""
+        if isinstance(self.prompt_template, PromptTemplate):
+            return self.prompt_template.ref
+        return None
 
     def query(self, query: str, *, k: int | None = None, model: str | None = None) -> RAGAnswer:
         k_eff = k or self.k_default
@@ -330,5 +487,6 @@ class RAGOrchestrator:
                 "llm_ms": llm_resp.latency_ms,
                 "k": k_eff,
                 "client": self.llm_client.name,
+                "prompt_ref": self.prompt_ref,  # None con el template legado
             },
         )
