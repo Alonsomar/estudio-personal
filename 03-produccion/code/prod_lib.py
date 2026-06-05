@@ -4,7 +4,8 @@ Acumula los patrones de producción que las secciones introducen:
 
   §2  LLMClient (Protocol) + adaptadores Anthropic/OpenAI + RAGOrchestrator.
   §3  PromptTemplate + PromptRegistry + render_safe.
-  §4  LRUCache, ResponseCache, SemanticCache (esta sección).
+  §4  LRUCache, ResponseCache, SemanticCache.
+  §5  StructuredLogger + MetricsRegistry + Tracer/Span (esta sección).
   §6  TokenBucket, retry_with_backoff, CircuitBreaker (a futuro).
   §8  ModelRouter con shadow / canary / A/B (a futuro).
   §10 CostMeter (a futuro).
@@ -17,15 +18,19 @@ adaptadores que viven aquí.
 
 from __future__ import annotations
 
+import contextvars
 import hashlib
+import json
 import re
+import sys
 import threading
 import time
 import uuid
 from collections import OrderedDict
+from contextlib import contextmanager
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any, Callable, Protocol, runtime_checkable
+from typing import Any, Callable, Iterator, Protocol, runtime_checkable
 
 import numpy as np
 
@@ -561,6 +566,224 @@ class SemanticCache:
             "hit_rate": round(self.hit_rate, 4),
             "threshold": self.threshold,
         }
+
+
+# --------------------------------------------------------------------------- #
+# §5 Observabilidad: las tres patas son logs estructurados, métricas y traces.
+# Acá están las primitivas desde cero (para entender qué hace OpenTelemetry por
+# debajo). El trace_id se propaga por contextvars: un request lo fija una vez y
+# todo lo que emite (logs, spans) lo hereda sin pasarlo a mano por cada función.
+# --------------------------------------------------------------------------- #
+_trace_id_ctx: contextvars.ContextVar[str | None] = contextvars.ContextVar(
+    "trace_id", default=None
+)
+_span_ctx: contextvars.ContextVar["Span | None"] = contextvars.ContextVar(
+    "current_span", default=None
+)
+
+
+def current_trace_id() -> str | None:
+    """trace_id del request en curso (None fuera de un trace)."""
+    return _trace_id_ctx.get()
+
+
+class StructuredLogger:
+    """Emite un evento = una línea JSON. La diferencia con `print` no es estética:
+    un log estructurado es **consultable** (`event=query_error model=...`), se
+    parsea sin regex frágiles y se agrega por campos. El trace_id se inyecta solo
+    desde el contexto, así cada línea es correlacionable con su request y su trace.
+    """
+
+    def __init__(self, service: str = "rag", stream: Any = None) -> None:
+        self.service = service
+        self.stream = stream if stream is not None else sys.stdout
+        self._lock = threading.Lock()
+
+    def emit(self, level: str, event: str, **fields: Any) -> dict:
+        record = {
+            "ts": round(time.time(), 3),
+            "level": level,
+            "service": self.service,
+            "event": event,
+            "trace_id": current_trace_id(),
+            **fields,
+        }
+        line = json.dumps(record, ensure_ascii=False, default=str)
+        with self._lock:
+            self.stream.write(line + "\n")
+            self.stream.flush()
+        return record
+
+    def info(self, event: str, **fields: Any) -> dict:
+        return self.emit("INFO", event, **fields)
+
+    def warning(self, event: str, **fields: Any) -> dict:
+        return self.emit("WARNING", event, **fields)
+
+    def error(self, event: str, **fields: Any) -> dict:
+        return self.emit("ERROR", event, **fields)
+
+
+class Counter:
+    """Monótono creciente: requests, hits, errores. Solo sube."""
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.value = 0
+        self._lock = threading.Lock()
+
+    def inc(self, n: int = 1) -> None:
+        with self._lock:
+            self.value += n
+
+
+class Gauge:
+    """Valor instantáneo que sube y baja: tamaño de cache, conexiones abiertas."""
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.value = 0.0
+
+    def set(self, v: float) -> None:
+        self.value = float(v)
+
+
+class Histogram:
+    """Distribución de una medición (latencia, costo). Guarda muestras y calcula
+    percentiles. Para producción de alto volumen se usan buckets/HDR para no
+    guardar todo; a esta escala, las muestras crudas son exactas y simples.
+    """
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self._samples: list[float] = []
+        self._lock = threading.Lock()
+
+    def observe(self, v: float) -> None:
+        with self._lock:
+            self._samples.append(float(v))
+
+    @property
+    def count(self) -> int:
+        return len(self._samples)
+
+    @property
+    def sum(self) -> float:
+        return float(sum(self._samples))
+
+    def percentile(self, p: float) -> float:
+        if not self._samples:
+            return 0.0
+        return float(np.percentile(self._samples, p))
+
+    def summary(self) -> dict:
+        return {
+            "count": self.count,
+            "sum": round(self.sum, 6),
+            "p50": round(self.percentile(50), 3),
+            "p95": round(self.percentile(95), 3),
+            "p99": round(self.percentile(99), 3),
+        }
+
+
+class MetricsRegistry:
+    """Registro central. `counter('x')` crea-o-devuelve; `snapshot()` exporta todo
+    en una estructura que un scraper (Prometheus) o un print leen igual."""
+
+    def __init__(self) -> None:
+        self._counters: dict[str, Counter] = {}
+        self._gauges: dict[str, Gauge] = {}
+        self._histograms: dict[str, Histogram] = {}
+        self._lock = threading.Lock()
+
+    def counter(self, name: str) -> Counter:
+        with self._lock:
+            return self._counters.setdefault(name, Counter(name))
+
+    def gauge(self, name: str) -> Gauge:
+        with self._lock:
+            return self._gauges.setdefault(name, Gauge(name))
+
+    def histogram(self, name: str) -> Histogram:
+        with self._lock:
+            return self._histograms.setdefault(name, Histogram(name))
+
+    def snapshot(self) -> dict:
+        return {
+            "counters": {n: c.value for n, c in self._counters.items()},
+            "gauges": {n: g.value for n, g in self._gauges.items()},
+            "histograms": {n: h.summary() for n, h in self._histograms.items()},
+        }
+
+
+@dataclass
+class Span:
+    """Un tramo de trabajo dentro de un trace. Los spans anidan: el span hijo
+    (LLM) vive dentro del padre (request). El árbol cuenta la historia de dónde
+    se fue el tiempo de un request."""
+
+    name: str
+    trace_id: str
+    span_id: str
+    parent_id: str | None = None
+    duration_ms: float = 0.0
+    attributes: dict = field(default_factory=dict)
+    children: list["Span"] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "span_id": self.span_id,
+            "duration_ms": round(self.duration_ms, 2),
+            "attributes": self.attributes,
+            "children": [c.to_dict() for c in self.children],
+        }
+
+
+class Tracer:
+    """Crea traces y spans anidados, propagando el contexto por contextvars.
+
+    `duration_ms` opcional permite construir traces MODELADOS (fixtures, demos
+    deterministas); en producción se omite y el span mide su propio wall-clock.
+    """
+
+    @contextmanager
+    def trace(self, name: str, trace_id: str | None = None,
+              duration_ms: float | None = None, **attrs: Any) -> Iterator["Span"]:
+        tid = trace_id or uuid.uuid4().hex
+        root = Span(name=name, trace_id=tid, span_id=uuid.uuid4().hex[:8], attributes=dict(attrs))
+        t_tok = _trace_id_ctx.set(tid)
+        s_tok = _span_ctx.set(root)
+        start = time.perf_counter()
+        try:
+            yield root
+        finally:
+            root.duration_ms = duration_ms if duration_ms is not None else (
+                time.perf_counter() - start) * 1000
+            _span_ctx.reset(s_tok)
+            _trace_id_ctx.reset(t_tok)
+
+    @contextmanager
+    def span(self, name: str, duration_ms: float | None = None,
+             **attrs: Any) -> Iterator["Span"]:
+        parent = _span_ctx.get()
+        sp = Span(
+            name=name,
+            trace_id=current_trace_id() or "",
+            span_id=uuid.uuid4().hex[:8],
+            parent_id=parent.span_id if parent else None,
+            attributes=dict(attrs),
+        )
+        if parent is not None:
+            parent.children.append(sp)
+        tok = _span_ctx.set(sp)
+        start = time.perf_counter()
+        try:
+            yield sp
+        finally:
+            sp.duration_ms = duration_ms if duration_ms is not None else (
+                time.perf_counter() - start) * 1000
+            _span_ctx.reset(tok)
 
 
 # --------------------------------------------------------------------------- #

@@ -1,0 +1,59 @@
+{
+  "name": "POST /query",
+  "span_id": "s00",
+  "duration_ms": 820.8,
+  "attributes": {
+    "query": "¿Tasa de IVA digital?",
+    "prompt_ref": "rag-fiscal@v2"
+  },
+  "children": [
+    {
+      "name": "retrieval",
+      "span_id": "s01",
+      "duration_ms": 4.8,
+      "attributes": {
+        "k": 3,
+        "retriever": "hybrid-rrf"
+      },
+      "children": [
+        {
+          "name": "bm25",
+          "span_id": "s02",
+          "duration_ms": 1.2,
+          "attributes": {},
+          "children": []
+        },
+        {
+          "name": "dense",
+          "span_id": "s03",
+          "duration_ms": 2.9,
+          "attributes": {
+            "embedding_cache": "hit"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "rerank",
+      "span_id": "s04",
+      "duration_ms": 2.1,
+      "attributes": {
+        "candidates": 20
+      },
+      "children": []
+    },
+    {
+      "name": "llm",
+      "span_id": "s05",
+      "duration_ms": 812.4,
+      "attributes": {
+        "model": "gpt-4o-mini",
+        "from_cache": false,
+        "in_tokens": 272,
+        "out_tokens": 21
+      },
+      "children": []
+    }
+  ]
+}

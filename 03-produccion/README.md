@@ -11,7 +11,7 @@ producción exige.
 
 ## Estado: En progreso
 
-Plan maestro escrito; secciones 1 a 4 terminadas. Ver
+Plan maestro escrito; secciones 1 a 5 terminadas. Ver
 [theory/00-plan.md](theory/00-plan.md) para el plan completo, dependencias
 y decisiones técnicas tomadas (stack FastAPI + wrappers propios, despliegue
 nivel B, cost monitoring real con caché).
@@ -25,7 +25,7 @@ nivel B, cost monitoring real con caché).
 | 02 | Arquitectura de servicio          | [theory/02-arquitectura-servicio.md](theory/02-arquitectura-servicio.md) | [code/02-fastapi-rag.py](code/02-fastapi-rag.py) + [code/prod_lib.py](code/prod_lib.py) | Terminado  |
 | 03 | Gestión de prompts                | [theory/03-gestion-prompts.md](theory/03-gestion-prompts.md) | [code/03-prompt-registry.py](code/03-prompt-registry.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 04 | Caching multinivel                | [theory/04-caching-multinivel.md](theory/04-caching-multinivel.md) | [code/04-caching.py](code/04-caching.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
-| 05 | Observabilidad y tracing          | —                                                         | —                                                     | Pendiente  |
+| 05 | Observabilidad y tracing          | [theory/05-observabilidad.md](theory/05-observabilidad.md) | [code/05-tracing.py](code/05-tracing.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 06 | Reliability (rate, retry, breaker)| —                                                         | —                                                     | Pendiente  |
 | 07 | Despliegue y configuración        | —                                                         | —                                                     | Pendiente  |
 | 08 | Versionado de modelos             | —                                                         | —                                                     | Pendiente  |
@@ -44,8 +44,10 @@ El núcleo reutilizable vive en [code/prod_lib.py](code/prod_lib.py) y va
 creciendo: §2 trajo `LLMClient` (puertos + adaptadores Anthropic/OpenAI/Static)
 y `RAGOrchestrator`; §3 sumó `PromptRegistry` + `PromptTemplate` + `render_safe`
 (prompts versionados con hash y render seguro); §4 sumó `LRUCache`,
-`ResponseCache` (componible como `LLMClient`) y `SemanticCache`. Próximas
-secciones agregan reliability (§6), model router (§8), cost meter (§10).
+`ResponseCache` (componible como `LLMClient`) y `SemanticCache`; §5 sumó
+`StructuredLogger`, `MetricsRegistry` y `Tracer`/`Span` (observabilidad desde
+cero). Próximas secciones agregan reliability (§6), model router (§8),
+cost meter (§10).
 
 ## Datos
 
