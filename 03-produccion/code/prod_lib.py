@@ -3,8 +3,8 @@
 Acumula los patrones de producción que las secciones introducen:
 
   §2  LLMClient (Protocol) + adaptadores Anthropic/OpenAI + RAGOrchestrator.
-  §3  PromptTemplate + PromptRegistry + render_safe (esta sección).
-  §4  LRUCache, ResponseCache, SemanticCache (a futuro).
+  §3  PromptTemplate + PromptRegistry + render_safe.
+  §4  LRUCache, ResponseCache, SemanticCache (esta sección).
   §6  TokenBucket, retry_with_backoff, CircuitBreaker (a futuro).
   §8  ModelRouter con shadow / canary / A/B (a futuro).
   §10 CostMeter (a futuro).
@@ -19,11 +19,15 @@ from __future__ import annotations
 
 import hashlib
 import re
+import threading
 import time
 import uuid
-from dataclasses import dataclass, field
+from collections import OrderedDict
+from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Callable, Protocol, runtime_checkable
+
+import numpy as np
 
 # Tarifas públicas USD por 1M tokens (2026-Q2, aproximadas). Centralizadas
 # para que el CostMeter de §10 y el cost en RAGAnswer salgan del mismo lugar.
@@ -60,6 +64,7 @@ class LLMResponse:
     latency_ms: float
     model: str
     cost_usd: float = 0.0
+    from_cache: bool = False  # §4: True si salió de un cache (no se pagó la API)
 
     def __post_init__(self) -> None:
         if self.cost_usd == 0.0:
@@ -351,6 +356,214 @@ class PromptRegistry:
 
 
 # --------------------------------------------------------------------------- #
+# §4 Caching multinivel. Tres niveles cubren casi todo el valor:
+#   1. Embedding cache  → ya vive en OpenAIEmbedder (02-retrieval).
+#   2. Response cache   → exacto: hash(prompt+modelo+temp) → respuesta. Acá.
+#   3. Semantic cache   → por similitud de la query; atrapa paráfrasis. Acá.
+# El LRU con TTL es la primitiva debajo de los tres.
+# --------------------------------------------------------------------------- #
+class LRUCache:
+    """Cache LRU con TTL opcional, desde cero y thread-safe.
+
+    `OrderedDict` da el orden de uso: `move_to_end` marca "recién usado",
+    `popitem(last=False)` desaloja el menos usado. El TTL se guarda por entrada
+    como timestamp de expiración y se chequea perezosamente en `get()` (no hay
+    hilo de limpieza; una entrada vencida se descarta cuando alguien la pide).
+
+    Los valores cacheados se asumen no-None (en este proyecto, LLMResponse o
+    RAGAnswer); por eso `get` usa None como "miss", sin sentinela.
+    """
+
+    def __init__(self, maxsize: int = 1024, ttl_s: float | None = None) -> None:
+        self.maxsize = maxsize
+        self.ttl_s = ttl_s
+        self._data: OrderedDict[str, tuple[Any, float | None]] = OrderedDict()
+        self._lock = threading.Lock()
+        self.hits = 0
+        self.misses = 0
+        self.evictions = 0
+        self.expirations = 0
+
+    def get(self, key: str) -> Any | None:
+        with self._lock:
+            item = self._data.get(key)
+            if item is None:
+                self.misses += 1
+                return None
+            value, expiry = item
+            if expiry is not None and time.time() > expiry:
+                del self._data[key]
+                self.expirations += 1
+                self.misses += 1
+                return None
+            self._data.move_to_end(key)
+            self.hits += 1
+            return value
+
+    def put(self, key: str, value: Any) -> None:
+        with self._lock:
+            expiry = time.time() + self.ttl_s if self.ttl_s else None
+            self._data[key] = (value, expiry)
+            self._data.move_to_end(key)
+            while len(self._data) > self.maxsize:
+                self._data.popitem(last=False)
+                self.evictions += 1
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    @property
+    def hit_rate(self) -> float:
+        total = self.hits + self.misses
+        return self.hits / total if total else 0.0
+
+    def stats(self) -> dict:
+        return {
+            "size": len(self._data),
+            "hits": self.hits,
+            "misses": self.misses,
+            "hit_rate": round(self.hit_rate, 4),
+            "evictions": self.evictions,
+            "expirations": self.expirations,
+        }
+
+
+class ResponseCache:
+    """Cache EXACTO de respuestas LLM. Implementa el Protocol LLMClient, así que
+    se compone con los adaptadores de §2: `ResponseCache(OpenAILLMClient())` es
+    a su vez un LLMClient y entra donde sea que el handler espere uno.
+
+    Clave = hash(model, temperature, max_tokens, prompt). Si dos requests son
+    idénticos, el segundo no paga la API. En un hit se devuelve la respuesta
+    con `from_cache=True` y la latencia del lookup (≈0); `cost_usd` conserva el
+    costo NOMINAL (lo que habría costado) — el ahorro es no haberlo incurrido.
+
+    Cuidado con temperature > 0: cachear sirve UNA muestra para todos los
+    requests idénticos. Correcto y deseable con temp=0 (determinista); con
+    temp>0 es decisión de producto (consistencia vs diversidad).
+    """
+
+    def __init__(self, base: LLMClient, maxsize: int = 2048, ttl_s: float | None = None) -> None:
+        self.base = base
+        self.name = base.name
+        self.cache = LRUCache(maxsize=maxsize, ttl_s=ttl_s)
+
+    @property
+    def default_model(self) -> str | None:
+        return getattr(self.base, "default_model", None)
+
+    @staticmethod
+    def _key(prompt: str, model: str | None, temperature: float, max_tokens: int) -> str:
+        raw = f"{model}|{temperature}|{max_tokens}|{prompt}"
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+    def complete(
+        self,
+        prompt: str,
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int = 512,
+    ) -> LLMResponse:
+        key = self._key(prompt, model, temperature, max_tokens)
+        t0 = time.perf_counter()
+        cached = self.cache.get(key)
+        if cached is not None:
+            lookup_ms = (time.perf_counter() - t0) * 1000
+            return replace(cached, latency_ms=lookup_ms, from_cache=True)
+        resp = self.base.complete(
+            prompt, model=model, temperature=temperature, max_tokens=max_tokens
+        )
+        self.cache.put(key, resp)
+        return resp
+
+
+class SemanticCache:
+    """Cache por similitud semántica de la QUERY (no del prompt completo).
+
+    Embebe la query entrante; si su coseno con alguna query previa supera
+    `threshold`, devuelve la respuesta cacheada. Atrapa paráfrasis que el cache
+    exacto no ve ("tasa de IVA digital" ~ "qué IVA pagan los servicios
+    digitales extranjeros"). El riesgo es servir la respuesta de una query NO
+    equivalente: por eso el umbral va alto (0.9+) y conviene auditar los hits.
+
+    `embed_fn` se inyecta para no acoplar prod_lib a un embedder concreto.
+    Implementación de scan lineal: suficiente para cientos de entradas; a
+    escala, esto vive en el vector store (pgvector) con el mismo principio.
+    """
+
+    def __init__(
+        self,
+        embed_fn: Callable[[str], np.ndarray],
+        threshold: float = 0.92,
+        maxsize: int = 512,
+        ttl_s: float | None = None,
+    ) -> None:
+        self.embed_fn = embed_fn
+        self.threshold = threshold
+        self.maxsize = maxsize
+        self.ttl_s = ttl_s
+        self._queries: list[str] = []
+        self._emb: list[np.ndarray] = []
+        self._val: list[tuple[Any, float | None]] = []
+        self._lock = threading.Lock()
+        self.hits = 0
+        self.misses = 0
+
+    @staticmethod
+    def _norm(v: np.ndarray) -> np.ndarray:
+        v = np.asarray(v, dtype=np.float32)
+        n = float(np.linalg.norm(v))
+        return v / n if n else v
+
+    def get(self, query: str) -> tuple[Any | None, float]:
+        """Devuelve (valor_o_None, mejor_similitud)."""
+        emb = self._norm(self.embed_fn(query))
+        with self._lock:
+            if not self._emb:
+                self.misses += 1
+                return None, 0.0
+            sims = np.array([float(emb @ e) for e in self._emb])
+            i = int(sims.argmax())
+            best = float(sims[i])
+            if best >= self.threshold:
+                value, expiry = self._val[i]
+                if expiry is not None and time.time() > expiry:
+                    self.misses += 1
+                    return None, best
+                self.hits += 1
+                return value, best
+            self.misses += 1
+            return None, best
+
+    def put(self, query: str, value: Any) -> None:
+        emb = self._norm(self.embed_fn(query))
+        expiry = time.time() + self.ttl_s if self.ttl_s else None
+        with self._lock:
+            self._queries.append(query)
+            self._emb.append(emb)
+            self._val.append((value, expiry))
+            while len(self._emb) > self.maxsize:
+                self._queries.pop(0)
+                self._emb.pop(0)
+                self._val.pop(0)
+
+    @property
+    def hit_rate(self) -> float:
+        total = self.hits + self.misses
+        return self.hits / total if total else 0.0
+
+    def stats(self) -> dict:
+        return {
+            "size": len(self._emb),
+            "hits": self.hits,
+            "misses": self.misses,
+            "hit_rate": round(self.hit_rate, 4),
+            "threshold": self.threshold,
+        }
+
+
+# --------------------------------------------------------------------------- #
 # Orquestador: el RAG completo como un objeto invocable. El handler HTTP solo
 # tiene que llamar `rag.query(text)` y obtener un RAGAnswer estructurado.
 # --------------------------------------------------------------------------- #
@@ -488,5 +701,6 @@ class RAGOrchestrator:
                 "k": k_eff,
                 "client": self.llm_client.name,
                 "prompt_ref": self.prompt_ref,  # None con el template legado
+                "from_cache": llm_resp.from_cache,  # §4: ¿salió del response cache?
             },
         )

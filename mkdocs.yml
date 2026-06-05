@@ -112,6 +112,7 @@ nav:
       - 03-produccion/theory/01-salto-a-produccion.md
       - 03-produccion/theory/02-arquitectura-servicio.md
       - 03-produccion/theory/03-gestion-prompts.md
+      - 03-produccion/theory/04-caching-multinivel.md
   - 04 · Economía de inferencia:
       - 04-economia/README.md
   - Material compartido:
