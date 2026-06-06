@@ -114,6 +114,7 @@ nav:
       - 03-produccion/theory/03-gestion-prompts.md
       - 03-produccion/theory/04-caching-multinivel.md
       - 03-produccion/theory/05-observabilidad.md
+      - 03-produccion/theory/06-reliability.md
   - 04 · Economía de inferencia:
       - 04-economia/README.md
   - Material compartido:

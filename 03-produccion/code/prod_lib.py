@@ -5,8 +5,9 @@ Acumula los patrones de producción que las secciones introducen:
   §2  LLMClient (Protocol) + adaptadores Anthropic/OpenAI + RAGOrchestrator.
   §3  PromptTemplate + PromptRegistry + render_safe.
   §4  LRUCache, ResponseCache, SemanticCache.
-  §5  StructuredLogger + MetricsRegistry + Tracer/Span (esta sección).
-  §6  TokenBucket, retry_with_backoff, CircuitBreaker (a futuro).
+  §5  StructuredLogger + MetricsRegistry + Tracer/Span.
+  §6  TokenBucket, retry_with_backoff, CircuitBreaker + wrappers LLMClient
+       (RateLimited / Retrying / CircuitBreaking / Fallback) (esta sección).
   §8  ModelRouter con shadow / canary / A/B (a futuro).
   §10 CostMeter (a futuro).
 
@@ -21,6 +22,7 @@ from __future__ import annotations
 import contextvars
 import hashlib
 import json
+import random
 import re
 import sys
 import threading
@@ -784,6 +786,283 @@ class Tracer:
             sp.duration_ms = duration_ms if duration_ms is not None else (
                 time.perf_counter() - start) * 1000
             _span_ctx.reset(tok)
+
+
+# --------------------------------------------------------------------------- #
+# §6 Reliability. Las APIs de LLM son red externa flaky, no servicios infalibles.
+# El cliente se defiende con cuatro capas, cada una un LLMClient componible:
+#   RateLimited → se autolimita ANTES del 429 del proveedor.
+#   Retrying    → reintenta lo transitorio con backoff exponencial + jitter.
+#   CircuitBreaking → deja de pegarle al proveedor caído (closed/open/half-open).
+#   Fallback    → cuando todo falla, degrada visiblemente en vez de explotar.
+# --------------------------------------------------------------------------- #
+class LLMError(Exception):
+    """Base de errores de proveedor LLM, normalizados sobre cualquier SDK."""
+
+
+class TransientLLMError(LLMError):
+    """5xx, timeout, conexión cortada: vale la pena reintentar."""
+
+
+class RateLimitLLMError(TransientLLMError):
+    """429: too many requests. Reintentar respetando retry_after si lo hay."""
+
+    def __init__(self, message: str = "rate limited", retry_after: float | None = None):
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
+class ClientLLMError(LLMError):
+    """4xx del cliente (prompt inválido, auth): reintentar NO ayuda. No se retenta."""
+
+
+class CircuitOpenError(LLMError):
+    """El circuit breaker está abierto: ni se intentó llamar al proveedor."""
+
+
+def is_retryable(exc: Exception) -> bool:
+    """Solo lo transitorio se reintenta. Un 4xx o un circuito abierto, no."""
+    return isinstance(exc, TransientLLMError)
+
+
+class TokenBucket:
+    """Rate limiter de cliente desde cero. Se rellena a `rate` tokens/seg hasta
+    `capacity`; cada request consume uno. Autolimitarse ANTES de que el proveedor
+    devuelva 429 evita el castigo (backoff forzado, baneos) y reparte el tráfico.
+
+    `clock` es inyectable para tests deterministas (sin esperar tiempo real).
+    """
+
+    def __init__(self, rate: float, capacity: float, clock: Callable[[], float] = time.monotonic):
+        self.rate = rate
+        self.capacity = capacity
+        self._tokens = capacity
+        self._clock = clock
+        self._updated = clock()
+        self._lock = threading.Lock()
+
+    def _refill(self) -> None:
+        now = self._clock()
+        self._tokens = min(self.capacity, self._tokens + (now - self._updated) * self.rate)
+        self._updated = now
+
+    def try_acquire(self, n: int = 1) -> bool:
+        """No bloqueante: True si había tokens, False si no (el caller decide)."""
+        with self._lock:
+            self._refill()
+            if self._tokens >= n:
+                self._tokens -= n
+                return True
+            return False
+
+    @property
+    def tokens(self) -> float:
+        with self._lock:
+            self._refill()
+            return self._tokens
+
+
+def retry_with_backoff(
+    fn: Callable[[], Any],
+    *,
+    max_retries: int = 3,
+    base_delay: float = 0.5,
+    max_delay: float = 8.0,
+    jitter: bool = True,
+    retryable: Callable[[Exception], bool] = is_retryable,
+    sleep: Callable[[float], None] = time.sleep,
+    rng: random.Random | None = None,
+    on_retry: Callable[[int, Exception, float], None] | None = None,
+) -> Any:
+    """Reintenta `fn` ante errores retryables con backoff exponencial + jitter.
+
+    El jitter (full jitter, estilo AWS: delay uniforme en [0, tope]) evita el
+    *thundering herd*: sin él, mil clientes que fallan al mismo tiempo
+    reintentan al mismo tiempo y vuelven a tumbar al proveedor que recién se
+    recuperaba. Lo NO retryable (4xx) se relanza de inmediato.
+    """
+    _rng = rng or random
+    attempt = 0
+    while True:
+        try:
+            return fn()
+        except Exception as e:
+            if not retryable(e) or attempt >= max_retries:
+                raise
+            cap = min(max_delay, base_delay * (2 ** attempt))
+            # retry_after del proveedor (429) manda sobre el backoff calculado.
+            retry_after = getattr(e, "retry_after", None)
+            delay = retry_after if retry_after is not None else (
+                _rng.uniform(0, cap) if jitter else cap
+            )
+            if on_retry is not None:
+                on_retry(attempt + 1, e, delay)
+            sleep(delay)
+            attempt += 1
+
+
+class CircuitBreaker:
+    """Máquina de tres estados que corta el tráfico hacia un proveedor caído.
+
+        closed     → todo pasa; cuenta fallos consecutivos.
+        open       → rechaza al instante (CircuitOpenError) sin llamar al
+                     proveedor; tras `recovery_timeout` pasa a half-open.
+        half-open  → deja pasar UNA prueba; si va bien cierra, si falla reabre.
+
+    Sin breaker, un proveedor caído recibe todos tus reintentos y agrava su
+    incidente (y te cuelga workers esperando timeouts). El breaker te saca de
+    esa trampa. `clock` inyectable para tests.
+    """
+
+    def __init__(
+        self,
+        failure_threshold: int = 5,
+        recovery_timeout: float = 30.0,
+        clock: Callable[[], float] = time.monotonic,
+    ):
+        self.failure_threshold = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self._clock = clock
+        self.state = "closed"
+        self._failures = 0
+        self._opened_at: float | None = None
+        self._lock = threading.Lock()
+
+    def _allow(self) -> bool:
+        with self._lock:
+            if self.state == "open":
+                if self._clock() - (self._opened_at or 0) >= self.recovery_timeout:
+                    self.state = "half-open"  # dejamos pasar una prueba
+                    return True
+                return False
+            return True  # closed o half-open
+
+    def record_success(self) -> None:
+        with self._lock:
+            self._failures = 0
+            self.state = "closed"
+            self._opened_at = None
+
+    def record_failure(self) -> None:
+        with self._lock:
+            self._failures += 1
+            if self.state == "half-open" or self._failures >= self.failure_threshold:
+                self.state = "open"
+                self._opened_at = self._clock()
+
+    def call(self, fn: Callable[[], Any]) -> Any:
+        if not self._allow():
+            raise CircuitOpenError("circuit breaker abierto; no se llamó al proveedor")
+        try:
+            result = fn()
+        except Exception:
+            self.record_failure()
+            raise
+        else:
+            self.record_success()
+            return result
+
+
+# --- Wrappers: cada uno ES un LLMClient y envuelve a otro. Se apilan. --------- #
+class RateLimitedLLMClient:
+    """Autolimita con un TokenBucket. Sin token: RateLimitLLMError (retryable),
+    así la capa de retry de arriba la absorbe con backoff."""
+
+    def __init__(self, base: LLMClient, bucket: TokenBucket) -> None:
+        self.base = base
+        self.name = base.name
+        self.bucket = bucket
+
+    @property
+    def default_model(self) -> str | None:
+        return getattr(self.base, "default_model", None)
+
+    def complete(self, prompt: str, *, model: str | None = None,
+                 temperature: float = 0.0, max_tokens: int = 512) -> LLMResponse:
+        if not self.bucket.try_acquire():
+            raise RateLimitLLMError("rate limit de cliente (token bucket vacío)")
+        return self.base.complete(prompt, model=model, temperature=temperature,
+                                  max_tokens=max_tokens)
+
+
+class RetryingLLMClient:
+    """Reintenta lo transitorio con backoff + jitter."""
+
+    def __init__(self, base: LLMClient, *, max_retries: int = 3,
+                 base_delay: float = 0.5, max_delay: float = 8.0,
+                 sleep: Callable[[float], None] = time.sleep,
+                 rng: random.Random | None = None,
+                 on_retry: Callable[[int, Exception, float], None] | None = None) -> None:
+        self.base = base
+        self.name = base.name
+        self.max_retries = max_retries
+        self.base_delay = base_delay
+        self.max_delay = max_delay
+        self._sleep = sleep
+        self._rng = rng
+        self._on_retry = on_retry
+
+    @property
+    def default_model(self) -> str | None:
+        return getattr(self.base, "default_model", None)
+
+    def complete(self, prompt: str, *, model: str | None = None,
+                 temperature: float = 0.0, max_tokens: int = 512) -> LLMResponse:
+        return retry_with_backoff(
+            lambda: self.base.complete(prompt, model=model, temperature=temperature,
+                                       max_tokens=max_tokens),
+            max_retries=self.max_retries, base_delay=self.base_delay,
+            max_delay=self.max_delay, sleep=self._sleep, rng=self._rng,
+            on_retry=self._on_retry,
+        )
+
+
+class CircuitBreakingLLMClient:
+    """Enruta las llamadas por un CircuitBreaker."""
+
+    def __init__(self, base: LLMClient, breaker: CircuitBreaker) -> None:
+        self.base = base
+        self.name = base.name
+        self.breaker = breaker
+
+    @property
+    def default_model(self) -> str | None:
+        return getattr(self.base, "default_model", None)
+
+    def complete(self, prompt: str, *, model: str | None = None,
+                 temperature: float = 0.0, max_tokens: int = 512) -> LLMResponse:
+        return self.breaker.call(
+            lambda: self.base.complete(prompt, model=model, temperature=temperature,
+                                       max_tokens=max_tokens)
+        )
+
+
+class FallbackLLMClient:
+    """Intenta `primary`; si lanza un LLMError (incluido circuito abierto), cae a
+    `secondary`. El secondary puede ser otro modelo (GPT-4o-mini), o un
+    StaticLLMClient de "estamos en mantención": degradar visible > 500."""
+
+    def __init__(self, primary: LLMClient, secondary: LLMClient,
+                 on_fallback: Callable[[Exception], None] | None = None) -> None:
+        self.primary = primary
+        self.secondary = secondary
+        self.name = primary.name
+        self._on_fallback = on_fallback
+
+    @property
+    def default_model(self) -> str | None:
+        return getattr(self.primary, "default_model", None)
+
+    def complete(self, prompt: str, *, model: str | None = None,
+                 temperature: float = 0.0, max_tokens: int = 512) -> LLMResponse:
+        try:
+            return self.primary.complete(prompt, model=model, temperature=temperature,
+                                         max_tokens=max_tokens)
+        except LLMError as e:
+            if self._on_fallback is not None:
+                self._on_fallback(e)
+            return self.secondary.complete(prompt, model=model, temperature=temperature,
+                                           max_tokens=max_tokens)
 
 
 # --------------------------------------------------------------------------- #
