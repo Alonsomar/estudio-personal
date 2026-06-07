@@ -8,8 +8,8 @@ Acumula los patrones de producción que las secciones introducen:
   §5  StructuredLogger + MetricsRegistry + Tracer/Span.
   §6  TokenBucket, retry_with_backoff, CircuitBreaker + wrappers LLMClient
        (RateLimited / Retrying / CircuitBreaking / Fallback).
-  §7  ServiceSettings + scan_for_secrets / redact_secrets (esta sección).
-  §8  ModelRouter con shadow / canary / A/B (a futuro).
+  §7  ServiceSettings + scan_for_secrets / redact_secrets.
+  §8  ShadowLLMClient + CanaryLLMClient (shadow / A·B / canary) (esta sección).
   §10 CostMeter (a futuro).
 
 Diseño: cada componente es pequeño, sin estado global, testeable
@@ -1161,6 +1161,153 @@ class ServiceSettings(BaseSettings):
             else:
                 out[name] = value
         return out
+
+
+# --------------------------------------------------------------------------- #
+# §8 Versionado de modelos. El modelo es config (§7), no constante. Para cambiarlo
+# sin susto, tres patrones, dos wrappers LLMClient (de la misma familia que los
+# de §6):
+#   Shadow  → el candidato corre en paralelo SIN afectar al usuario; comparás
+#             offline. Cuesta doble: es para una ventana, no permanente.
+#   A/B     → CanaryLLMClient con fraction fija (típico 0.5): mitad y mitad,
+#             comparás online.
+#   Canary  → CanaryLLMClient con fraction en rampa (1% → 5% → 25% → 100%) y
+#             guardia de rollback automático.
+# --------------------------------------------------------------------------- #
+@dataclass
+class ShadowComparison:
+    """Una observación de shadow: lo que el usuario recibió (primary) vs lo que
+    el candidato habría respondido. `candidate_error` no None = el candidato
+    falló (y el usuario ni se enteró)."""
+
+    primary_model: str
+    candidate_model: str
+    agree: bool
+    primary_cost: float
+    candidate_cost: float
+    primary_ms: float
+    candidate_ms: float
+    candidate_error: str | None = None
+
+
+class ShadowLLMClient:
+    """Sirve `primary` al usuario y corre `candidate` en sombra para comparar.
+
+    El candidato NUNCA afecta al usuario: si falla, se traga el error y se
+    registra. Cuesta dos llamadas por request, así que en la práctica se aplica
+    sobre un `sample` del tráfico y por una ventana acotada, no permanente.
+    """
+
+    def __init__(self, primary: LLMClient, candidate: LLMClient,
+                 on_compare: Callable[[ShadowComparison], None] | None = None,
+                 sample: float = 1.0, rng: random.Random | None = None,
+                 agree_fn: Callable[[LLMResponse, LLMResponse], bool] | None = None) -> None:
+        self.primary = primary
+        self.candidate = candidate
+        self.name = primary.name
+        self.on_compare = on_compare
+        self.sample = sample
+        self._rng = rng or random
+        self._agree_fn = agree_fn or (lambda a, b: a.text == b.text)
+
+    @property
+    def default_model(self) -> str | None:
+        return getattr(self.primary, "default_model", None)
+
+    def complete(self, prompt: str, *, model: str | None = None,
+                 temperature: float = 0.0, max_tokens: int = 512) -> LLMResponse:
+        resp = self.primary.complete(prompt, model=model, temperature=temperature,
+                                     max_tokens=max_tokens)
+        if self._rng.random() < self.sample:
+            try:
+                cand = self.candidate.complete(prompt, model=model,
+                                               temperature=temperature, max_tokens=max_tokens)
+                cmp = ShadowComparison(
+                    primary_model=resp.model, candidate_model=cand.model,
+                    agree=self._agree_fn(resp, cand),
+                    primary_cost=resp.cost_usd, candidate_cost=cand.cost_usd,
+                    primary_ms=resp.latency_ms, candidate_ms=cand.latency_ms,
+                )
+            except Exception as e:  # el candidato falla → el usuario NO se entera
+                cmp = ShadowComparison(
+                    primary_model=resp.model, candidate_model="?",
+                    agree=False, primary_cost=resp.cost_usd, candidate_cost=0.0,
+                    primary_ms=resp.latency_ms, candidate_ms=0.0,
+                    candidate_error=str(e),
+                )
+            if self.on_compare is not None:
+                self.on_compare(cmp)
+        return resp
+
+
+class CanaryLLMClient:
+    """Enruta una fracción del tráfico al candidato; el resto al estable.
+
+    El ruteo es STICKY por una clave (default: el trace_id del request, §5): la
+    misma clave cae siempre en la misma variante (un usuario no parpadea entre
+    modelos). `fraction` es mutable: subila para la rampa del canary, o fijala en
+    0.5 para un A/B. Si se pasa `max_error_rate`, hay rollback AUTOMÁTICO: cuando
+    el candidato supera esa tasa de error tras `min_calls`, fraction→0.
+    """
+
+    def __init__(self, stable: LLMClient, candidate: LLMClient, *,
+                 fraction: float = 0.0,
+                 key_fn: Callable[[], str | None] = current_trace_id,
+                 max_error_rate: float | None = None, min_calls: int = 20,
+                 on_rollback: Callable[[dict], None] | None = None) -> None:
+        self.stable = stable
+        self.candidate = candidate
+        self.name = stable.name
+        self.fraction = fraction
+        self.key_fn = key_fn
+        self.max_error_rate = max_error_rate
+        self.min_calls = min_calls
+        self._on_rollback = on_rollback
+        self.rolled_back = False
+        self.routed = {"stable": 0, "candidate": 0}
+        self.errors = {"stable": 0, "candidate": 0}
+        self._lock = threading.Lock()
+
+    @property
+    def default_model(self) -> str | None:
+        return getattr(self.stable, "default_model", None)
+
+    def _to_candidate(self) -> bool:
+        if self.rolled_back or self.fraction <= 0:
+            return False
+        key = self.key_fn() or uuid.uuid4().hex
+        bucket = int(hashlib.sha256(str(key).encode()).hexdigest(), 16) % 10_000
+        return bucket < self.fraction * 10_000
+
+    def _record(self, variant: str, error: bool) -> None:
+        with self._lock:
+            self.routed[variant] += 1
+            if error:
+                self.errors[variant] += 1
+            c = self.routed["candidate"]
+            if (self.max_error_rate is not None and not self.rolled_back
+                    and c >= self.min_calls
+                    and self.errors["candidate"] / c > self.max_error_rate):
+                self.rolled_back = True
+                self.fraction = 0.0
+                fire = True
+            else:
+                fire = False
+        if fire and self._on_rollback is not None:
+            self._on_rollback({"routed": dict(self.routed), "errors": dict(self.errors)})
+
+    def complete(self, prompt: str, *, model: str | None = None,
+                 temperature: float = 0.0, max_tokens: int = 512) -> LLMResponse:
+        variant = "candidate" if self._to_candidate() else "stable"
+        target = self.candidate if variant == "candidate" else self.stable
+        try:
+            resp = target.complete(prompt, model=model, temperature=temperature,
+                                   max_tokens=max_tokens)
+        except Exception:
+            self._record(variant, error=True)
+            raise
+        self._record(variant, error=False)
+        return resp
 
 
 # --------------------------------------------------------------------------- #
