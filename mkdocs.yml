@@ -118,6 +118,7 @@ nav:
       - 03-produccion/theory/07-despliegue-config.md
       - 03-produccion/theory/08-versionado-modelos.md
       - 03-produccion/theory/09-online-evals-loop.md
+      - 03-produccion/theory/10-costo-produccion.md
   - 04 · Economía de inferencia:
       - 04-economia/README.md
   - Material compartido:

@@ -10,8 +10,8 @@ Acumula los patrones de producción que las secciones introducen:
        (RateLimited / Retrying / CircuitBreaking / Fallback).
   §7  ServiceSettings + scan_for_secrets / redact_secrets.
   §8  ShadowLLMClient + CanaryLLMClient (shadow / A·B / canary).
-  §9  TraceSampler + OnlineEvalLoop + DriftDetector / psi (esta sección).
-  §10 CostMeter (a futuro).
+  §9  TraceSampler + OnlineEvalLoop + DriftDetector / psi.
+  §10 CostMeter + BudgetGuard + CostAwareRouter (esta sección).
 
 Diseño: cada componente es pequeño, sin estado global, testeable
 in-process sin mock global. La idea es que la app HTTP (`02-fastapi-rag.py`)
@@ -30,7 +30,7 @@ import sys
 import threading
 import time
 import uuid
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from contextlib import contextmanager
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -1448,6 +1448,99 @@ class DriftDetector:
         s = self.score(batch)
         level = "drift" if s >= self.drift else "watch" if s >= self.watch else "ok"
         return level, s
+
+
+# --------------------------------------------------------------------------- #
+# §10 Costo en producción. El costo del LLM es la línea más volátil del P&L: un
+# cambio de modelo, de tasa o de tráfico puede 10×-arlo en un día. Tres piezas:
+# medirlo por feature (CostMeter), presupuestarlo con alertas de quema
+# (BudgetGuard) y enrutar a lo más barato que alcanza (CostAwareRouter).
+# --------------------------------------------------------------------------- #
+class CostMeter:
+    """Acumula costo por request y por etiqueta (feature). Medir el costo por
+    feature es la base para presupuestarlo: 'la búsqueda cuesta X, el chat Y'."""
+
+    def __init__(self) -> None:
+        self.total_usd = 0.0
+        self._by_label: dict[str, list[float]] = defaultdict(list)
+
+    def record(self, cost_usd: float, label: str = "default") -> None:
+        self.total_usd += cost_usd
+        self._by_label[label].append(cost_usd)
+
+    def feature(self, label: str) -> dict:
+        costs = self._by_label.get(label, [])
+        if not costs:
+            return {"count": 0, "total": 0.0, "mean": 0.0, "p99": 0.0}
+        arr = np.array(costs)
+        return {
+            "count": len(costs),
+            "total": float(arr.sum()),
+            "mean": float(arr.mean()),
+            "p99": float(np.percentile(arr, 99)),
+        }
+
+    def summary(self) -> dict:
+        return {"total_usd": round(self.total_usd, 6),
+                "by_feature": {k: self.feature(k) for k in self._by_label}}
+
+
+class BudgetGuard:
+    """Vigila la quema de un presupuesto mensual. Dado lo gastado y las horas
+    transcurridas, proyecta el gasto a fin de mes y alerta si va a superarlo —
+    ANTES de que la factura llegue."""
+
+    HOURS_PER_MONTH = 730.0  # ~30.4 días
+
+    def __init__(self, monthly_budget_usd: float, warn_ratio: float = 0.9) -> None:
+        self.budget = monthly_budget_usd
+        self.warn_ratio = warn_ratio
+
+    def project(self, spent_usd: float, elapsed_hours: float) -> dict:
+        rate = spent_usd / elapsed_hours if elapsed_hours > 0 else 0.0
+        projected = rate * self.HOURS_PER_MONTH
+        ratio = projected / self.budget if self.budget else float("inf")
+        # horas hasta agotar el presupuesto al ritmo actual
+        remaining = max(self.budget - spent_usd, 0.0)
+        hours_left = remaining / rate if rate > 0 else float("inf")
+        return {
+            "burn_per_hour": rate,
+            "projected_month": projected,
+            "budget": self.budget,
+            "ratio": ratio,
+            "hours_to_exhaust": hours_left,
+        }
+
+    def status(self, spent_usd: float, elapsed_hours: float) -> tuple[str, dict]:
+        p = self.project(spent_usd, elapsed_hours)
+        level = ("over" if p["ratio"] > 1.0
+                 else "warn" if p["ratio"] >= self.warn_ratio else "ok")
+        return level, p
+
+
+class CostAwareRouter:
+    """Enruta cada query al modelo más barato que la resuelve. Implementa el
+    Protocol LLMClient. La pregunta no es 'qué modelo es mejor' sino 'cuál es el
+    más barato que ALCANZA para esta query'. `classify(prompt)` → tier; `routes`
+    mapea tier → LLMClient (haiku para lo simple, sonnet para lo complejo)."""
+
+    def __init__(self, routes: dict[str, LLMClient],
+                 classify: Callable[[str], str], name: str = "router") -> None:
+        self.routes = routes
+        self.classify = classify
+        self.name = name
+        self.routed: dict[str, int] = defaultdict(int)
+
+    @property
+    def default_model(self) -> str | None:
+        return None
+
+    def complete(self, prompt: str, *, model: str | None = None,
+                 temperature: float = 0.0, max_tokens: int = 512) -> LLMResponse:
+        tier = self.classify(prompt)
+        self.routed[tier] += 1
+        return self.routes[tier].complete(prompt, model=model,
+                                          temperature=temperature, max_tokens=max_tokens)
 
 
 # --------------------------------------------------------------------------- #
