@@ -11,7 +11,8 @@ Acumula los patrones de producción que las secciones introducen:
   §7  ServiceSettings + scan_for_secrets / redact_secrets.
   §8  ShadowLLMClient + CanaryLLMClient (shadow / A·B / canary).
   §9  TraceSampler + OnlineEvalLoop + DriftDetector / psi.
-  §10 CostMeter + BudgetGuard + CostAwareRouter (esta sección).
+  §10 CostMeter + BudgetGuard + CostAwareRouter.
+  §11 redact_pii (RUT/email/tel) + detect_injection + AuditLog (esta sección).
 
 Diseño: cada componente es pequeño, sin estado global, testeable
 in-process sin mock global. La idea es que la app HTTP (`02-fastapi-rag.py`)
@@ -1541,6 +1542,135 @@ class CostAwareRouter:
         self.routed[tier] += 1
         return self.routes[tier].complete(prompt, model=model,
                                           temperature=temperature, max_tokens=max_tokens)
+
+
+# --------------------------------------------------------------------------- #
+# §11 Seguridad. Tres frentes para un RAG sobre normativa chilena:
+#   PII        → redactar RUT (con dígito verificador), email y teléfono antes
+#                de loguear (Ley 19.628).
+#   Injection  → detectar instrucciones hostiles en el corpus + output filtering;
+#                la defensa estructural (separar contexto de instrucción) ya está
+#                en el templating de §3.
+#   Auditoría  → registrar lo obligatorio, con PII redactada y retención acotada.
+# --------------------------------------------------------------------------- #
+
+# --- PII: RUT chileno con dígito verificador (módulo 11) -------------------- #
+def rut_check_digit(body: int) -> str:
+    """Dígito verificador de un RUT por módulo 11. Devuelve '0'-'9' o 'K'."""
+    total = 0
+    mult = 2
+    for ch in reversed(str(body)):
+        total += int(ch) * mult
+        mult = 2 if mult == 7 else mult + 1
+    r = 11 - (total % 11)
+    return {11: "0", 10: "K"}.get(r, str(r))
+
+
+def is_valid_rut(rut: str) -> bool:
+    """Valida un RUT (acepta puntos y guion). El dígito verificador hace que NO
+    cualquier secuencia de 8 dígitos sea un RUT: baja los falsos positivos."""
+    cleaned = rut.upper().replace(".", "").replace("-", "").strip()
+    if len(cleaned) < 2 or not cleaned[:-1].isdigit():
+        return False
+    body, dv = cleaned[:-1], cleaned[-1]
+    return rut_check_digit(int(body)) == dv
+
+
+_RUT_RE = re.compile(r"\b(?:\d{1,3}(?:\.\d{3})+|\d{7,8})-[\dkK]\b")
+_EMAIL_RE = re.compile(r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b")
+_PHONE_CL_RE = re.compile(r"\+?56\s?9\s?\d{4}\s?\d{4}\b")
+
+
+def redact_pii(text: str) -> str:
+    """Redacta PII chilena: RUT (solo los que validan), email y teléfono CL.
+    Validar el RUT antes de redactar evita marcar números de ley/montos."""
+    text = _PHONE_CL_RE.sub("[TEL]", text)
+    text = _EMAIL_RE.sub("[EMAIL]", text)
+    text = _RUT_RE.sub(lambda m: "[RUT]" if is_valid_rut(m.group(0)) else m.group(0), text)
+    return text
+
+
+def scan_for_pii(text: str) -> list[str]:
+    """Devuelve la PII detectada (para un gate de CI sobre logs/ejemplos)."""
+    found = [m.group(0) for m in _RUT_RE.finditer(text) if is_valid_rut(m.group(0))]
+    found += [m.group(0) for m in _EMAIL_RE.finditer(text)]
+    found += [m.group(0) for m in _PHONE_CL_RE.finditer(text)]
+    return found
+
+
+# --- Prompt injection ------------------------------------------------------- #
+_INJECTION_PATTERNS = [
+    re.compile(p, re.IGNORECASE) for p in [
+        r"ignor[ae]\s+(las\s+|todas\s+las\s+)?instrucciones?\s+(anteriores|previas)",
+        r"ignore\s+(all\s+)?(previous|prior)\s+instructions",
+        r"olvid[áa]\s+(todo|las\s+instrucciones|lo\s+anterior)",
+        r"disregard\s+(the\s+)?(above|previous)",
+        r"(revel[áa]|reveal|mostr[áa]|print)\s+.{0,20}(prompt|instrucc|system)",
+        r"act[úu]a\s+como\s+(si|un)\b",
+        r"system\s*prompt",
+    ]
+]
+
+
+def detect_injection(text: str) -> list[str]:
+    """Heurística: instrucciones hostiles típicas embebidas en el texto. NO es la
+    defensa principal (un atacante reformula) — es una señal para loguear/alertar.
+    La defensa estructural es el templating de §3 + el output filtering de abajo."""
+    return [p.pattern for p in _INJECTION_PATTERNS if p.search(text)]
+
+
+def output_violates(answer: str, forbidden: list[str]) -> bool:
+    """Output filtering: ¿la respuesta filtró un marcador prohibido (el system
+    prompt, una palabra-canario que el atacante pidió, etc.)? Última capa."""
+    low = answer.lower()
+    return any(f.lower() in low for f in forbidden)
+
+
+# --- Auditoría con retención ------------------------------------------------ #
+@dataclass
+class AuditEvent:
+    """Un registro de auditoría: lo MÍNIMO para rendir cuentas, con PII redactada.
+    `retention_days` lo fija la política (no se guarda para siempre)."""
+
+    ts: float
+    actor: str            # id de usuario/seudónimo, NO datos personales crudos
+    action: str
+    query_redacted: str
+    decision: str
+    retention_days: int
+
+    def as_dict(self) -> dict:
+        return {"ts": round(self.ts, 3), "actor": self.actor, "action": self.action,
+                "query": self.query_redacted, "decision": self.decision,
+                "retention_days": self.retention_days}
+
+
+class AuditLog:
+    """Bitácora de auditoría separada de los logs operativos (§5). Redacta PII en
+    el ingreso y marca la retención; lo vencido se purga."""
+
+    def __init__(self, retention_days: int = 365,
+                 clock: Callable[[], float] = time.time) -> None:
+        self.retention_days = retention_days
+        self._clock = clock
+        self._events: list[AuditEvent] = []
+
+    def record(self, actor: str, action: str, query: str, decision: str) -> AuditEvent:
+        ev = AuditEvent(ts=self._clock(), actor=actor, action=action,
+                        query_redacted=redact_pii(query), decision=decision,
+                        retention_days=self.retention_days)
+        self._events.append(ev)
+        return ev
+
+    def purge_expired(self) -> int:
+        """Elimina lo que pasó su retención (minimización de datos, Ley 19.628)."""
+        cutoff = self._clock() - self.retention_days * 86400
+        before = len(self._events)
+        self._events = [e for e in self._events if e.ts >= cutoff]
+        return before - len(self._events)
+
+    def __len__(self) -> int:
+        return len(self._events)
 
 
 # --------------------------------------------------------------------------- #

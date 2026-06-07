@@ -11,7 +11,7 @@ producción exige.
 
 ## Estado: En progreso
 
-Plan maestro escrito; secciones 1 a 10 terminadas. Ver
+Plan maestro escrito; secciones 1 a 11 terminadas. Ver
 [theory/00-plan.md](theory/00-plan.md) para el plan completo, dependencias
 y decisiones técnicas tomadas (stack FastAPI + wrappers propios, despliegue
 nivel B, cost monitoring real con caché).
@@ -31,7 +31,7 @@ nivel B, cost monitoring real con caché).
 | 08 | Versionado de modelos             | [theory/08-versionado-modelos.md](theory/08-versionado-modelos.md) | [code/08-model-routing.py](code/08-model-routing.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 09 | Online evals y loop de feedback   | [theory/09-online-evals-loop.md](theory/09-online-evals-loop.md) | [code/09-online-eval-loop.py](code/09-online-eval-loop.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 10 | Costo en producción               | [theory/10-costo-produccion.md](theory/10-costo-produccion.md) | [code/10-cost-meter.py](code/10-cost-meter.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
-| 11 | Seguridad                         | —                                                         | —                                                     | Pendiente  |
+| 11 | Seguridad                         | [theory/11-seguridad.md](theory/11-seguridad.md)          | [code/11-prompt-injection.py](code/11-prompt-injection.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 12 | Incidentes y postmortems          | —                                                         | —                                                     | Pendiente  |
 
 ## Cómo ejecutar código
@@ -51,8 +51,9 @@ wrappers `RateLimited`/`Retrying`/`CircuitBreaking`/`Fallback`; §7 sumó
 `ServiceSettings` (config tipada por entorno) y `scan_for_secrets`/`redact_secrets`;
 §8 sumó `ShadowLLMClient` y `CanaryLLMClient` (shadow / A·B / canary con rollback);
 §9 sumó `TraceSampler`, `OnlineEvalLoop` y `DriftDetector`/`psi`; §10 sumó
-`CostMeter`, `BudgetGuard` y `CostAwareRouter`. Próximas secciones: seguridad
-(§11), incidentes (§12).
+`CostMeter`, `BudgetGuard` y `CostAwareRouter`; §11 sumó `redact_pii` (RUT con
+DV/email/teléfono), `detect_injection`/`output_violates` y `AuditLog`. Próxima
+sección: incidentes (§12).
 
 ## Datos
 
