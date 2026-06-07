@@ -280,12 +280,17 @@ def _demo() -> None:
               f"(esperado 422 — Pydantic rechaza min_length=3)")
 
 
-def _serve(host: str = "127.0.0.1", port: int = 8000) -> None:
+def _serve(host: str | None = None, port: int | None = None) -> None:
     """Arranca uvicorn programáticamente. No usamos `uvicorn fastapi_rag:app`
     porque el nombre del archivo (`02-fastapi-rag.py`) empieza con dígito y
-    no es importable como módulo Python."""
+    no es importable como módulo Python.
+
+    HOST/PORT salen del entorno (default local 127.0.0.1:8000). En el contenedor
+    de §7 se setea HOST=0.0.0.0 para escuchar fuera del localhost del container."""
     import uvicorn
 
+    host = host or os.environ.get("HOST", "127.0.0.1")
+    port = port or int(os.environ.get("PORT", "8000"))
     uvicorn.run(app, host=host, port=port, log_level="info")
 
 

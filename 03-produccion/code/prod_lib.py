@@ -7,7 +7,8 @@ Acumula los patrones de producción que las secciones introducen:
   §4  LRUCache, ResponseCache, SemanticCache.
   §5  StructuredLogger + MetricsRegistry + Tracer/Span.
   §6  TokenBucket, retry_with_backoff, CircuitBreaker + wrappers LLMClient
-       (RateLimited / Retrying / CircuitBreaking / Fallback) (esta sección).
+       (RateLimited / Retrying / CircuitBreaking / Fallback).
+  §7  ServiceSettings + scan_for_secrets / redact_secrets (esta sección).
   §8  ModelRouter con shadow / canary / A/B (a futuro).
   §10 CostMeter (a futuro).
 
@@ -35,6 +36,8 @@ from pathlib import Path
 from typing import Any, Callable, Iterator, Protocol, runtime_checkable
 
 import numpy as np
+from pydantic import Field, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Tarifas públicas USD por 1M tokens (2026-Q2, aproximadas). Centralizadas
 # para que el CostMeter de §10 y el cost en RAGAnswer salgan del mismo lugar.
@@ -596,9 +599,13 @@ class StructuredLogger:
     desde el contexto, así cada línea es correlacionable con su request y su trace.
     """
 
-    def __init__(self, service: str = "rag", stream: Any = None) -> None:
+    def __init__(self, service: str = "rag", stream: Any = None,
+                 redact: bool = True) -> None:
         self.service = service
         self.stream = stream if stream is not None else sys.stdout
+        # redact=True (default) pasa cada línea por redact_secrets (§7): aunque
+        # alguien loguee un campo con un api key por error, no llega al archivo.
+        self.redact = redact
         self._lock = threading.Lock()
 
     def emit(self, level: str, event: str, **fields: Any) -> dict:
@@ -611,6 +618,8 @@ class StructuredLogger:
             **fields,
         }
         line = json.dumps(record, ensure_ascii=False, default=str)
+        if self.redact:
+            line = redact_secrets(line)
         with self._lock:
             self.stream.write(line + "\n")
             self.stream.flush()
@@ -1063,6 +1072,95 @@ class FallbackLLMClient:
                 self._on_fallback(e)
             return self.secondary.complete(prompt, model=model, temperature=temperature,
                                            max_tokens=max_tokens)
+
+
+# --------------------------------------------------------------------------- #
+# §7 Configuración y secretos. La config es entrada del entorno, no constantes
+# en el código. ServiceSettings centraliza TODOS los knobs de §§2-6 con tipos
+# validados y defaults; los secretos son SecretStr (no se imprimen). Y dos
+# utilidades para que un secreto nunca termine en logs ni en el repo.
+# --------------------------------------------------------------------------- #
+_SECRET_PATTERNS = [
+    re.compile(r"sk-ant-[A-Za-z0-9_\-]{12,}"),                  # Anthropic
+    re.compile(r"sk-[A-Za-z0-9_\-]{16,}"),                      # OpenAI-style
+    re.compile(r"gh[pousr]_[A-Za-z0-9]{20,}"),                  # GitHub token
+    re.compile(r"(?P<scheme>postgres(?:ql)?|redis|mysql)://[^:/\s]+:[^@\s]+@"),  # url con pass
+    re.compile(r"AKIA[0-9A-Z]{16}"),                            # AWS access key
+]
+
+
+def scan_for_secrets(text: str) -> list[str]:
+    """Devuelve los secretos detectados en `text`. Vacío = limpio. Pensado para
+    correr en CI sobre diffs, logs de ejemplo y dumps de config (falla el build
+    si encuentra algo)."""
+    found = []
+    for pat in _SECRET_PATTERNS:
+        for m in pat.finditer(text):
+            found.append(m.group(0))
+    return found
+
+
+def redact_secrets(text: str) -> str:
+    """Reemplaza secretos por un marcador. La URL con password conserva el scheme
+    y el host (útil para debug) pero borra las credenciales."""
+    out = text
+    for pat in _SECRET_PATTERNS:
+        if "scheme" in pat.groupindex:
+            out = pat.sub(lambda m: f"{m.group('scheme')}://***:***@", out)
+        else:
+            out = pat.sub("***REDACTED***", out)
+    return out
+
+
+class ServiceSettings(BaseSettings):
+    """Config del servicio desde entorno / .env. Un solo lugar tipado y validado
+    en vez de os.environ[...] regado por el código. Los secretos son SecretStr:
+    su repr es '**********', así no se filtran en un print o un stack trace.
+    """
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore",
+                                      case_sensitive=False)
+
+    # --- proveedor LLM (§2) ---
+    llm_provider: str = "openai"
+    llm_model: str = "gpt-4o-mini"
+    openai_api_key: SecretStr | None = None
+    anthropic_api_key: SecretStr | None = None
+    # --- estado externo (§7): secretos, nunca hardcodeados ---
+    database_url: SecretStr | None = None      # postgres+pgvector (Supabase)
+    redis_url: SecretStr | None = None         # cache compartido multi-réplica
+    # --- knobs del RAG (§2/§3) ---
+    k_default: int = Field(3, ge=1, le=20)
+    temperature: float = Field(0.0, ge=0.0, le=2.0)
+    max_tokens: int = Field(512, ge=1, le=4096)
+    prompt_name: str = "rag-fiscal"
+    prompt_version: str | None = None          # None = última
+    # --- caché (§4) ---
+    response_cache_size: int = Field(2048, ge=0)
+    response_cache_ttl_s: float | None = 3600.0
+    semantic_threshold: float = Field(0.7, ge=0.0, le=1.0)
+    # --- reliability (§6) ---
+    rate_limit_rps: float = Field(10.0, gt=0)
+    rate_limit_burst: int = Field(20, ge=1)
+    max_retries: int = Field(3, ge=0, le=10)
+    breaker_failure_threshold: int = Field(5, ge=1)
+    breaker_recovery_timeout_s: float = Field(30.0, gt=0)
+    llm_timeout_s: float = Field(30.0, gt=0)   # cierra el anti-patrón "sin timeout" de §2
+    # --- ops (§5) ---
+    log_level: str = "INFO"
+    service_version: str = "0.1.0"
+
+    def public_dict(self) -> dict:
+        """Dump con los secretos redactados — apto para loguear en el startup y
+        para que /info muestre la config sin filtrar credenciales."""
+        out = {}
+        for name, value in self.model_dump().items():
+            field = type(self).model_fields[name]
+            if field.annotation is not None and "SecretStr" in str(field.annotation):
+                out[name] = "***SET***" if getattr(self, name) is not None else None
+            else:
+                out[name] = value
+        return out
 
 
 # --------------------------------------------------------------------------- #

@@ -11,7 +11,7 @@ producción exige.
 
 ## Estado: En progreso
 
-Plan maestro escrito; secciones 1 a 6 terminadas. Ver
+Plan maestro escrito; secciones 1 a 7 terminadas. Ver
 [theory/00-plan.md](theory/00-plan.md) para el plan completo, dependencias
 y decisiones técnicas tomadas (stack FastAPI + wrappers propios, despliegue
 nivel B, cost monitoring real con caché).
@@ -27,7 +27,7 @@ nivel B, cost monitoring real con caché).
 | 04 | Caching multinivel                | [theory/04-caching-multinivel.md](theory/04-caching-multinivel.md) | [code/04-caching.py](code/04-caching.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 05 | Observabilidad y tracing          | [theory/05-observabilidad.md](theory/05-observabilidad.md) | [code/05-tracing.py](code/05-tracing.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 06 | Reliability (rate, retry, breaker)| [theory/06-reliability.md](theory/06-reliability.md)      | [code/06-reliability.py](code/06-reliability.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
-| 07 | Despliegue y configuración        | —                                                         | —                                                     | Pendiente  |
+| 07 | Despliegue y configuración        | [theory/07-despliegue-config.md](theory/07-despliegue-config.md) | [code/07-config-secrets.py](code/07-config-secrets.py) + [examples/deploy/](examples/deploy/) | Terminado  |
 | 08 | Versionado de modelos             | —                                                         | —                                                     | Pendiente  |
 | 09 | Online evals y loop de feedback   | —                                                         | —                                                     | Pendiente  |
 | 10 | Costo en producción               | —                                                         | —                                                     | Pendiente  |
@@ -47,8 +47,9 @@ y `RAGOrchestrator`; §3 sumó `PromptRegistry` + `PromptTemplate` + `render_saf
 `ResponseCache` (componible como `LLMClient`) y `SemanticCache`; §5 sumó
 `StructuredLogger`, `MetricsRegistry` y `Tracer`/`Span` (observabilidad desde
 cero); §6 sumó `TokenBucket`, `retry_with_backoff`, `CircuitBreaker` y los
-wrappers `RateLimited`/`Retrying`/`CircuitBreaking`/`Fallback`. Próximas
-secciones agregan model router (§8), cost meter (§10).
+wrappers `RateLimited`/`Retrying`/`CircuitBreaking`/`Fallback`; §7 sumó
+`ServiceSettings` (config tipada por entorno) y `scan_for_secrets`/`redact_secrets`.
+Próximas secciones agregan model router (§8), cost meter (§10).
 
 ## Datos
 
