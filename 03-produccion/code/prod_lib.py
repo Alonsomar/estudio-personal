@@ -9,7 +9,8 @@ Acumula los patrones de producción que las secciones introducen:
   §6  TokenBucket, retry_with_backoff, CircuitBreaker + wrappers LLMClient
        (RateLimited / Retrying / CircuitBreaking / Fallback).
   §7  ServiceSettings + scan_for_secrets / redact_secrets.
-  §8  ShadowLLMClient + CanaryLLMClient (shadow / A·B / canary) (esta sección).
+  §8  ShadowLLMClient + CanaryLLMClient (shadow / A·B / canary).
+  §9  TraceSampler + OnlineEvalLoop + DriftDetector / psi (esta sección).
   §10 CostMeter (a futuro).
 
 Diseño: cada componente es pequeño, sin estado global, testeable
@@ -1308,6 +1309,145 @@ class CanaryLLMClient:
             raise
         self._record(variant, error=False)
         return resp
+
+
+# --------------------------------------------------------------------------- #
+# §9 Online evals. No es un dashboard: es el ciclo cerrado producción → golden.
+# Se muestrea tráfico (no el 100%), se lo juzga, las fallas alimentan el golden
+# de 01-evals, y se vigila el drift de la distribución de queries/corpus.
+# --------------------------------------------------------------------------- #
+class TraceSampler:
+    """Decide qué requests evaluar. Evaluar el 100% es caro (un judge por
+    request); se muestrea. Estratificado: tasa base + reglas 'siempre muestrear'
+    (errores, score bajo) + tasas por estrato (subir las queries raras, que de
+    otro modo nunca caen en la muestra).
+    """
+
+    def __init__(self, base_rate: float = 0.1, rng: random.Random | None = None):
+        self.base_rate = base_rate
+        self._rng = rng or random
+        self._always: list[Callable[[dict], bool]] = []
+        self._stratum_fn: Callable[[dict], str] | None = None
+        self._strata: dict[str, float] = {}
+        self.seen = 0
+        self.sampled = 0
+
+    def always_sample_if(self, pred: Callable[[dict], bool]) -> "TraceSampler":
+        self._always.append(pred)
+        return self
+
+    def stratify(self, fn: Callable[[dict], str], rates: dict[str, float]) -> "TraceSampler":
+        self._stratum_fn = fn
+        self._strata = rates
+        return self
+
+    def should_sample(self, record: dict) -> bool:
+        self.seen += 1
+        decision = self._decide(record)
+        if decision:
+            self.sampled += 1
+        return decision
+
+    def _decide(self, record: dict) -> bool:
+        for pred in self._always:
+            if pred(record):
+                return True
+        rate = self.base_rate
+        if self._stratum_fn is not None:
+            rate = self._strata.get(self._stratum_fn(record), self.base_rate)
+        return self._rng.random() < rate
+
+
+@dataclass
+class GoldenCandidate:
+    """Una query de producción que el judge marcó mal: candidata a entrar al
+    golden de 01-evals. Las fallas de prod son el mejor inventario para crecerlo."""
+
+    trace_id: str
+    query: str
+    reason: str
+
+
+class OnlineEvalLoop:
+    """Cierra el loop: muestrea → juzga → acumula calidad online → junta fallas
+    como candidatos a golden.
+
+    El judge auto-evalúa con CONFIANZA: en lo que el judge sabe juzgar (p. ej.
+    'la query estaba fuera de scope y el sistema lo dijo') su veredicto se toma;
+    en lo que NO (una afirmación factual sobre una tasa específica), la confianza
+    es baja y el caso va a revisión humana, no a una métrica automática mentirosa.
+    """
+
+    def __init__(self, sampler: TraceSampler,
+                 judge_fn: Callable[[dict], dict], min_confidence: float = 0.7):
+        self.sampler = sampler
+        self.judge = judge_fn
+        self.min_confidence = min_confidence
+        self.evaluated = 0
+        self.passed = 0
+        self.golden_candidates: list[GoldenCandidate] = []
+        self.human_review: list[dict] = []
+
+    def observe(self, record: dict) -> dict | None:
+        if not self.sampler.should_sample(record):
+            return None
+        verdict = self.judge(record)
+        if verdict.get("confidence", 1.0) < self.min_confidence:
+            self.human_review.append({"trace_id": record.get("trace_id"),
+                                      "query": record.get("query"),
+                                      "reason": verdict.get("reason", "")})
+            return verdict
+        self.evaluated += 1
+        if verdict["pass"]:
+            self.passed += 1
+        else:
+            self.golden_candidates.append(GoldenCandidate(
+                trace_id=record.get("trace_id", ""), query=record.get("query", ""),
+                reason=verdict.get("reason", "")))
+        return verdict
+
+    @property
+    def pass_rate(self) -> float:
+        return self.passed / self.evaluated if self.evaluated else 0.0
+
+
+def psi(expected: np.ndarray, actual: np.ndarray, bins: int = 10) -> float:
+    """Population Stability Index: cuánto se movió la distribución de `actual`
+    respecto de `expected`. Regla de pulgar: <0.1 estable, 0.1-0.25 cambio
+    moderado, >0.25 cambio grande (drift). Los bins salen de los cuantiles de
+    `expected` (equi-frecuencia)."""
+    expected = np.asarray(expected, dtype=float)
+    actual = np.asarray(actual, dtype=float)
+    edges = np.unique(np.quantile(expected, np.linspace(0, 1, bins + 1)))
+    if len(edges) < 2:
+        return 0.0
+    edges[0], edges[-1] = -np.inf, np.inf
+    e = np.histogram(expected, edges)[0] / len(expected)
+    a = np.histogram(actual, edges)[0] / len(actual)
+    e = np.clip(e, 1e-6, None)
+    a = np.clip(a, 1e-6, None)
+    return float(np.sum((a - e) * np.log(a / e)))
+
+
+class DriftDetector:
+    """Vigila si la distribución de una feature (largo de query, distancia del
+    embedding al centroide del corpus, etc.) se aleja de un baseline. En prod la
+    feature suele ser embedding-based; acá es un escalar genérico."""
+
+    def __init__(self, baseline: np.ndarray, bins: int = 10,
+                 watch: float = 0.1, drift: float = 0.25):
+        self.baseline = np.asarray(baseline, dtype=float)
+        self.bins = bins
+        self.watch = watch
+        self.drift = drift
+
+    def score(self, batch: np.ndarray) -> float:
+        return psi(self.baseline, batch, self.bins)
+
+    def status(self, batch: np.ndarray) -> tuple[str, float]:
+        s = self.score(batch)
+        level = "drift" if s >= self.drift else "watch" if s >= self.watch else "ok"
+        return level, s
 
 
 # --------------------------------------------------------------------------- #
