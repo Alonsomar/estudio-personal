@@ -12,7 +12,8 @@ Acumula los patrones de producción que las secciones introducen:
   §8  ShadowLLMClient + CanaryLLMClient (shadow / A·B / canary).
   §9  TraceSampler + OnlineEvalLoop + DriftDetector / psi.
   §10 CostMeter + BudgetGuard + CostAwareRouter.
-  §11 redact_pii (RUT/email/tel) + detect_injection + AuditLog (esta sección).
+  §11 redact_pii (RUT/email/tel) + detect_injection + AuditLog.
+  §12 IncidentDetector + RUNBOOKS (mapea señales → modo de falla) (esta sección).
 
 Diseño: cada componente es pequeño, sin estado global, testeable
 in-process sin mock global. La idea es que la app HTTP (`02-fastapi-rag.py`)
@@ -1671,6 +1672,103 @@ class AuditLog:
 
     def __len__(self) -> int:
         return len(self._events)
+
+
+# --------------------------------------------------------------------------- #
+# §12 Incidentes. Los cinco modos de falla de un RAG en prod, y el detector que
+# mapea las señales (de §5 métricas, §6 fallos, §9 calidad, §10 costo) al modo y
+# su runbook. Convierte un panel en un diagnóstico accionable → baja el MTTD.
+# --------------------------------------------------------------------------- #
+RUNBOOKS: dict[str, list[str]] = {
+    "provider_down": [
+        "Confirmar en el status page del proveedor: ¿es global o solo tuyo?",
+        "Verificar que el circuit breaker (§6) abrió y el fallback al secundario sirve.",
+        "Mirar la tasa de error POR proveedor: ¿uno o todos?",
+        "Si el fallback no cubre: servir respuesta cacheada (§4) o degradar visible.",
+        "Comunicar estado; NO reintentar a mano contra el proveedor caído.",
+    ],
+    "latency_blowup": [
+        "Abrir un trace (§5): ¿el tiempo se va en LLM, retrieval o la cola?",
+        "Verificar timeouts (§6/§7): ¿hay llamadas colgadas sin cortar?",
+        "¿Subió el tráfico (cola) o el modelo está lento? QPS vs latencia del proveedor.",
+        "Mitigar: bajar max_tokens, rutear a un modelo más rápido (§8/§10), +workers.",
+        "Confirmar que rate limit + breaker (§6) están protegiendo de la saturación.",
+    ],
+    "hallucination": [
+        "¿Coincide con un deploy/canary reciente (§8)? Correlacionar por prompt_ref/model.",
+        "Mirar el pass_rate online (§9) por variante: ¿cayó solo el candidato?",
+        "Rollback inmediato del canary (§8) a la versión estable.",
+        "Muestrear las respuestas malas por trace_id (§5) hacia el golden (§9).",
+        "NO 'arreglar el prompt en caliente': revertir primero, diagnosticar después.",
+    ],
+    "retrieval_broken": [
+        "¿Cayó el retrieval_score promedio? ¿cambió de versión el embedding model (§8)?",
+        "Verificar que el índice cargó OK en el último deploy (§2 readyz/lifespan).",
+        "¿La dimensión del embedding coincide con la del índice? Un cambio la rompe.",
+        "Mitigar: rollback del embedding/reindexar; servir cacheado mientras.",
+        "Revisar el drift detector (§9): ¿es el corpus o son las queries?",
+    ],
+    "cost_runaway": [
+        "¿Quién? Top usuarios por costo/tokens en la última hora (§10).",
+        "¿Un usuario en loop o una query que itera tools sin fin? (§6/§11).",
+        "Aplicar rate limit por usuario (§6); cortar la sesión abusiva.",
+        "Verificar que no se cambió a un modelo más caro sin querer (§8).",
+        "Revisar la alerta de quema (§10): ¿qué proyecta a fin de mes?",
+    ],
+}
+
+
+@dataclass
+class Incident:
+    """Un incidente detectado: el modo de falla, qué señal lo disparó, y el
+    runbook (qué mirar en los primeros 5 minutos)."""
+
+    mode: str
+    severity: str  # "warn" | "critical"
+    signal: str
+
+    @property
+    def runbook(self) -> list[str]:
+        return RUNBOOKS.get(self.mode, [])
+
+
+class IncidentDetector:
+    """Mapea un snapshot de señales al modo (o modos) de falla activo. Las señales
+    vienen de las secciones previas; acá se las traduce a un diagnóstico con
+    runbook, que es lo que de verdad baja el MTTD (no el panel, el diagnóstico)."""
+
+    def __init__(self, *, error_rate_crit: float = 0.20, p95_ms_crit: float = 5000.0,
+                 pass_rate_floor: float = 0.70, retrieval_floor: float = 0.30,
+                 budget_ratio_crit: float = 1.5) -> None:
+        self.error_rate_crit = error_rate_crit
+        self.p95_ms_crit = p95_ms_crit
+        self.pass_rate_floor = pass_rate_floor
+        self.retrieval_floor = retrieval_floor
+        self.budget_ratio_crit = budget_ratio_crit
+
+    def check(self, signals: dict) -> list[Incident]:
+        out: list[Incident] = []
+        er = signals.get("provider_error_rate", 0.0)
+        if er >= self.error_rate_crit:
+            out.append(Incident("provider_down", "critical",
+                                f"provider_error_rate={er:.0%}"))
+        p95 = signals.get("latency_p95_ms", 0.0)
+        if p95 >= self.p95_ms_crit:
+            out.append(Incident("latency_blowup", "critical",
+                                f"latency_p95_ms={p95:.0f}"))
+        pr = signals.get("online_pass_rate", 1.0)
+        if pr < self.pass_rate_floor:
+            out.append(Incident("hallucination", "warn",
+                                f"online_pass_rate={pr:.0%}"))
+        rs = signals.get("avg_retrieval_score", 1.0)
+        if rs < self.retrieval_floor:
+            out.append(Incident("retrieval_broken", "warn",
+                                f"avg_retrieval_score={rs:.2f}"))
+        br = signals.get("budget_ratio", 0.0)
+        if br >= self.budget_ratio_crit:
+            out.append(Incident("cost_runaway", "warn",
+                                f"budget_ratio={br:.1f}x"))
+        return out
 
 
 # --------------------------------------------------------------------------- #

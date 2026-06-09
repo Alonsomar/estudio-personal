@@ -237,7 +237,7 @@ def main() -> None:
         ("Crecimiento (1k usuarios)",   10_000),
         ("Escala (10k usuarios activos)", 1_000_000),
     ]
-    print(f"\n  $USD/mes por escala y modelo (tarifas 2026-Q2, [aprox.]):\n")
+    print("\n  $USD/mes por escala y modelo (tarifas 2026-Q2, [aprox.]):\n")
     print(f"  {'escenario':32s} {'queries/mes':>13s}  | " + " ".join(f"{m:>14s}" for m in PRICING))
     print("  " + "-" * 110)
     for label, qpm in scales:

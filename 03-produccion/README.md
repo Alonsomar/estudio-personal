@@ -9,9 +9,9 @@ El RAG de **02-retrieval** y las métricas de **01-evals** son los insumos.
 Aquí no cambiamos el RAG ni las métricas — los envolvemos en lo que
 producción exige.
 
-## Estado: En progreso
+## Estado: Terminada
 
-Plan maestro escrito; secciones 1 a 11 terminadas. Ver
+Plan maestro y las 12 secciones completas (00-12). Ver
 [theory/00-plan.md](theory/00-plan.md) para el plan completo, dependencias
 y decisiones técnicas tomadas (stack FastAPI + wrappers propios, despliegue
 nivel B, cost monitoring real con caché).
@@ -32,7 +32,7 @@ nivel B, cost monitoring real con caché).
 | 09 | Online evals y loop de feedback   | [theory/09-online-evals-loop.md](theory/09-online-evals-loop.md) | [code/09-online-eval-loop.py](code/09-online-eval-loop.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 10 | Costo en producción               | [theory/10-costo-produccion.md](theory/10-costo-produccion.md) | [code/10-cost-meter.py](code/10-cost-meter.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 | 11 | Seguridad                         | [theory/11-seguridad.md](theory/11-seguridad.md)          | [code/11-prompt-injection.py](code/11-prompt-injection.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
-| 12 | Incidentes y postmortems          | —                                                         | —                                                     | Pendiente  |
+| 12 | Incidentes y postmortems          | [theory/12-incidentes-postmortems.md](theory/12-incidentes-postmortems.md) | [code/12-incident-runbooks.py](code/12-incident-runbooks.py) + [prod_lib.py](code/prod_lib.py) | Terminado  |
 
 ## Cómo ejecutar código
 
@@ -52,8 +52,8 @@ wrappers `RateLimited`/`Retrying`/`CircuitBreaking`/`Fallback`; §7 sumó
 §8 sumó `ShadowLLMClient` y `CanaryLLMClient` (shadow / A·B / canary con rollback);
 §9 sumó `TraceSampler`, `OnlineEvalLoop` y `DriftDetector`/`psi`; §10 sumó
 `CostMeter`, `BudgetGuard` y `CostAwareRouter`; §11 sumó `redact_pii` (RUT con
-DV/email/teléfono), `detect_injection`/`output_violates` y `AuditLog`. Próxima
-sección: incidentes (§12).
+DV/email/teléfono), `detect_injection`/`output_violates` y `AuditLog`; §12 sumó `IncidentDetector`
+y `RUNBOOKS`. Núcleo completo: las 12 secciones acumuladas en un solo módulo.
 
 ## Datos
 

@@ -268,7 +268,7 @@ def _demo() -> None:
             print(f"  tokens   : {data['in_tokens']} in / {data['out_tokens']} out "
                   f"(${data['cost_usd']:.6f})")
             print(f"  answer   : {' '.join(data['answer'].split())[:160]}…")
-            print(f"  sources  :")
+            print("  sources  :")
             for s in data["sources"]:
                 print(f"    - [{s['score']:.3f}] {s['chunk_id']:42s} {s['snippet'][:70]}…")
 
