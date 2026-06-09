@@ -1,0 +1,2677 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../00-plan/">
+      
+      
+        <link rel="next" href="../02-embeddings-densos/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>01 — IR pre-LLM: BM25 y TF-IDF - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#01-ir-pre-llm-bm25-y-tf-idf" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              01 — IR pre-LLM: BM25 y TF-IDF
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../01-evals/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/01-por-que-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/03-analisis-errores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/05-metricas-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#por-que-empezar-por-lo-viejo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué empezar por lo "viejo"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-problema-de-ir-formalmente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El problema de IR, formalmente
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tokenizacion-la-decision-silenciosa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tokenización: la decisión silenciosa
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tf-idf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TF-IDF
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TF-IDF">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#formulas-las-que-implementamos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fórmulas (las que implementamos)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#idf-sobre-el-corpus-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IDF sobre el corpus real
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bm25-lo-que-tf-idf-no-tiene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BM25: lo que TF-IDF no tiene
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BM25: lo que TF-IDF no tiene">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea-1-saturacion-k1-utilidad-marginal-decreciente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea 1 — Saturación (k₁): utilidad marginal decreciente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#idea-2-normalizacion-por-longitud-b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea 2 — Normalización por longitud (b)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#demostracion-sobre-el-corpus-chileno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demostración sobre el corpus chileno
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Demostración sobre el corpus chileno">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#caso-1-bm25-clava-la-referencia-normativa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caso 1 — BM25 clava la referencia normativa
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caso-2-bm25-y-tf-idf-rankean-igual-por-razones-distintas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caso 2 — BM25 y TF-IDF rankean igual, por razones distintas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caso-3-el-talon-de-aquiles-brecha-de-vocabulario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caso 3 — El talón de Aquiles: brecha de vocabulario
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metricas-sobre-el-golden-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métricas sobre el golden dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuando-bm25-es-la-respuesta-correcta-y-no-un-paso-previo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo BM25 es la respuesta correcta (y no un paso previo)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-chunking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-reranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../03-produccion/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/07-despliegue-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#por-que-empezar-por-lo-viejo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué empezar por lo "viejo"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-problema-de-ir-formalmente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El problema de IR, formalmente
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tokenizacion-la-decision-silenciosa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tokenización: la decisión silenciosa
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tf-idf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TF-IDF
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TF-IDF">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#formulas-las-que-implementamos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fórmulas (las que implementamos)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#idf-sobre-el-corpus-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IDF sobre el corpus real
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bm25-lo-que-tf-idf-no-tiene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BM25: lo que TF-IDF no tiene
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BM25: lo que TF-IDF no tiene">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea-1-saturacion-k1-utilidad-marginal-decreciente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea 1 — Saturación (k₁): utilidad marginal decreciente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#idea-2-normalizacion-por-longitud-b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea 2 — Normalización por longitud (b)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#demostracion-sobre-el-corpus-chileno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demostración sobre el corpus chileno
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Demostración sobre el corpus chileno">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#caso-1-bm25-clava-la-referencia-normativa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caso 1 — BM25 clava la referencia normativa
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caso-2-bm25-y-tf-idf-rankean-igual-por-razones-distintas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caso 2 — BM25 y TF-IDF rankean igual, por razones distintas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caso-3-el-talon-de-aquiles-brecha-de-vocabulario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caso 3 — El talón de Aquiles: brecha de vocabulario
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metricas-sobre-el-golden-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métricas sobre el golden dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuando-bm25-es-la-respuesta-correcta-y-no-un-paso-previo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo BM25 es la respuesta correcta (y no un paso previo)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="01-ir-pre-llm-bm25-y-tf-idf">01 — IR pre-LLM: BM25 y TF-IDF<a class="headerlink" href="#01-ir-pre-llm-bm25-y-tf-idf" title="Permanent link">&para;</a></h1>
+<h2 id="por-que-empezar-por-lo-viejo">Por qué empezar por lo "viejo"<a class="headerlink" href="#por-que-empezar-por-lo-viejo" title="Permanent link">&para;</a></h2>
+<p>Information retrieval es una disciplina de los años 60–70. Cuando Karen Spärck
+Jones formuló la IDF (1972) y Stephen Robertson formalizó BM25 (1994, sobre el
+modelo probabilístico de Robertson–Spärck Jones), no existían las redes
+neuronales que usamos hoy. Sin embargo, en 2026, si abres el motor de búsqueda
+de Elasticsearch, de Postgres (<code>ts_rank</code>), o el retriever por defecto de la
+mitad de los sistemas RAG en producción, lo que encuentras es <strong>BM25</strong>.</p>
+<p>Esto no es nostalgia. Es que el matching léxico exacto resuelve bien una clase
+de queries que los embeddings densos resuelven <em>mal</em> — y esa clase es
+sobrerrepresentada justo en dominios como el regulatorio. Antes de entender por
+qué los vectores densos son poderosos (sección 2), hay que entender qué problema
+resolvían ya, y bien, los métodos clásicos. Si no, no se puede razonar sobre
+híbrido (sección 3), que es donde converge el estado del arte.</p>
+<p><strong>Analogía económica.</strong> BM25 es como un índice de precios bien construido: no
+"entiende" la economía, pero cuenta lo que hay que contar, con las ponderaciones
+correctas, de forma transparente y barata. Los embeddings densos son como un
+modelo estructural: capturan relaciones que el índice no ve, a cambio de opacidad
+y costo. El analista serio no elige uno por moda; usa el índice como base y el
+modelo donde aporta.</p>
+<h2 id="el-problema-de-ir-formalmente">El problema de IR, formalmente<a class="headerlink" href="#el-problema-de-ir-formalmente" title="Permanent link">&para;</a></h2>
+<p>Dado un corpus de documentos <code>D = {d₁, …, d_N}</code> y una query <code>q</code>, queremos una
+función de score <code>s(q, d)</code> que ordene los documentos de más a menos relevantes.
+Todo lo demás —TF-IDF, BM25, embeddings, rerankers— son formas distintas de
+definir <code>s</code>.</p>
+<p>Los métodos clásicos comparten un supuesto: <strong>bag-of-words</strong>. Un documento es un
+multiconjunto de términos; el orden no importa. "El IVA grava servicios" y
+"servicios grava el IVA" son idénticos. Es una simplificación brutal, y aun así
+funciona sorprendentemente bien, porque para muchas queries la <em>presencia</em> de los
+términos correctos es casi toda la señal.</p>
+<pre class="mermaid"><code>graph LR
+    Q["Query&lt;br/&gt;'tasa de IVA digital'"] --&gt; T["Tokenización&lt;br/&gt;+ normalización"]
+    D["Corpus&lt;br/&gt;(N documentos)"] --&gt; IDX["Índice invertido&lt;br/&gt;término → docs"]
+    T --&gt; SCORE["Score s(q, d)&lt;br/&gt;TF-IDF o BM25"]
+    IDX --&gt; SCORE
+    SCORE --&gt; RANK["Ranking&lt;br/&gt;top-k documentos"]</code></pre>
+<h2 id="tokenizacion-la-decision-silenciosa">Tokenización: la decisión silenciosa<a class="headerlink" href="#tokenizacion-la-decision-silenciosa" title="Permanent link">&para;</a></h2>
+<p>Antes de cualquier score hay que convertir texto en términos. Esta etapa, que
+parece trivial, define el techo de calidad de todo lo demás: <strong>un término que no
+se tokeniza bien no se puede recuperar</strong>. En dominio jurídico chileno hay tres
+trampas concretas, que nuestro tokenizador (<code>retrieval_lib.tokenize</code>) maneja
+explícitamente:</p>
+<ol>
+<li><strong>Acentos.</strong> El usuario escribe "articulo", la norma dice "artículo". Si no
+   normalizamos diacríticos, no hacen match. Solución: <code>NFKD</code> + descartar marcas
+   combinantes.</li>
+<li><strong>Referencias normativas con puntuación interna.</strong> "Ley Nº 21.210",
+   "Decreto Nº 1.423", "1,694 USE". Un tokenizador ingenuo parte "21.210" en
+   "21" y "210". Preservamos el patrón <code>\d+([.,]\d+)*</code> para que "21.210" sea <strong>un
+   solo token</strong> — y, como veremos, uno de altísimo poder discriminante.</li>
+<li><strong>Ordinales.</strong> <code>º</code> y <code>ª</code> se descomponen a <code>o</code>/<code>a</code> bajo <code>NFKD</code>, de modo que
+   "Nº" terminaría como "no", colisionando con la negación "no" (que en texto
+   legal <strong>sí</strong> importa: "no afecto a IVA" ≠ "afecto a IVA"). Los eliminamos
+   antes de normalizar.</li>
+</ol>
+<p>Sobre <strong>stopwords</strong>: la lista es deliberadamente conservadora. En texto general
+se filtra agresivamente; en legal, palabras como "no", "sin", "menor", "salvo"
+cambian el sentido jurídico. Quitamos solo conectores de altísima frecuencia
+("de", "la", "que") y bajo poder discriminante.</p>
+<blockquote>
+<p>El detalle del punto 3 no es teórico: en la primera corrida, antes del fix,
+"Nº" se convertía en "no" y contaminaba el score del chunk top-1 de la query
+"¿Qué dice la Ley Nº 21.210?" con una contribución espuria de 2.19. Es el tipo
+de bug de tokenización que degrada un retriever sin que nadie lo note.</p>
+</blockquote>
+<h2 id="tf-idf">TF-IDF<a class="headerlink" href="#tf-idf" title="Permanent link">&para;</a></h2>
+<p>La idea de TF-IDF combina dos intuiciones:</p>
+<ul>
+<li><strong>TF (term frequency):</strong> un término que aparece muchas veces en un documento
+  es más representativo de ese documento.</li>
+<li><strong>IDF (inverse document frequency):</strong> un término que aparece en <em>pocos</em>
+  documentos discrimina más. "IVA" en una circular tributaria dice poco (está en
+  todas); "21.210" dice mucho (está en una).</li>
+</ul>
+<h3 id="formulas-las-que-implementamos">Fórmulas (las que implementamos)<a class="headerlink" href="#formulas-las-que-implementamos" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tf(t, d)  = frecuencia bruta del término t en el documento d
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>idf(t)    = log(N / df(t)) + 1          # df(t) = nº de docs que contienen t
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>peso(t,d) = tf(t, d) · idf(t)
+</code></pre></div>
+<p>El vector de un documento es <code>[peso(t₁,d), peso(t₂,d), …]</code> sobre el vocabulario.
+Lo <strong>normalizamos a norma L2</strong>, de modo que el score entre query y documento es
+el <strong>coseno</strong> entre sus vectores (producto punto de vectores unitarios). La
+normalización L2 es clave: sin ella, los documentos largos (más términos, más
+peso acumulado) dominarían solo por tamaño.</p>
+<h3 id="idf-sobre-el-corpus-real">IDF sobre el corpus real<a class="headerlink" href="#idf-sobre-el-corpus-real" title="Permanent link">&para;</a></h3>
+<p>Corriendo <code>01-ir-clasico.py</code> sobre los 4 documentos (68 chunks), el IDF de BM25
+de algunos términos:</p>
+<table>
+<thead>
+<tr>
+<th>Término</th>
+<th>IDF</th>
+<th>Lectura</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>20.730</code> (Ley de Lobby)</td>
+<td>3.83</td>
+<td>Aparece en 1 doc → máximo poder discriminante</td>
+</tr>
+<tr>
+<td><code>vacunas</code></td>
+<td>3.83</td>
+<td>Idem, término muy localizado</td>
+</tr>
+<tr>
+<td><code>21.210</code> (Ley IVA digital)</td>
+<td>3.32</td>
+<td>Referencia normativa, muy localizada</td>
+</tr>
+<tr>
+<td><code>iva</code></td>
+<td>2.73</td>
+<td>Frecuente dentro de la circular</td>
+</tr>
+<tr>
+<td><code>lobby</code></td>
+<td>2.73</td>
+<td>Concentrado en un doc pero repetido</td>
+</tr>
+<tr>
+<td><code>subvencion</code></td>
+<td>2.22</td>
+<td>Aparece en el decreto, repetido</td>
+</tr>
+<tr>
+<td><code>salud</code></td>
+<td>2.09</td>
+<td>El más "diluido" de los siete</td>
+</tr>
+</tbody>
+</table>
+<p>La lección de fondo: <strong>las referencias normativas exactas son tokens de IDF
+altísimo</strong>. Eso es exactamente lo que las hace recuperables con precisión
+quirúrgica por métodos léxicos — y, como veremos en la sección 2, lo que las hace
+<em>invisibles</em> para los embeddings densos, que casi no las vieron en
+pre-entrenamiento.</p>
+<h2 id="bm25-lo-que-tf-idf-no-tiene">BM25: lo que TF-IDF no tiene<a class="headerlink" href="#bm25-lo-que-tf-idf-no-tiene" title="Permanent link">&para;</a></h2>
+<p>BM25 mantiene la estructura <code>Σ idf(t) · (algo con tf)</code> pero arregla dos defectos
+de TF-IDF que importan en documentos reales.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>score(q, d) = Σ_{t ∈ q}  idf(t) · [ f(t,d) · (k₁ + 1) ] / [ f(t,d) + k₁ · (1 − b + b · |d|/avgdl) ]
+</code></pre></div>
+<p>donde <code>f(t,d)</code> es la frecuencia de <code>t</code> en <code>d</code>, <code>|d|</code> la longitud del documento,
+<code>avgdl</code> la longitud promedio del corpus, y <code>k₁</code>, <code>b</code> hiperparámetros (usamos los
+estándar <code>k₁=1.5</code>, <code>b=0.75</code>).</p>
+<h3 id="idea-1-saturacion-k1-utilidad-marginal-decreciente">Idea 1 — Saturación (k₁): utilidad marginal decreciente<a class="headerlink" href="#idea-1-saturacion-k1-utilidad-marginal-decreciente" title="Permanent link">&para;</a></h3>
+<p>En TF-IDF, si un término aparece 20 veces, contribuye 20×. BM25 dice: la 1ª
+aparición confirma que el tema está presente; la 20ª aporta casi nada nuevo. La
+contribución <strong>satura</strong>. Esto es, literalmente, utilidad marginal decreciente —
+un concepto que como economista ya tienes internalizado.</p>
+<p>Números (contribución de un término con <code>idf=1</code>, doc de longitud media, <code>k₁=1.5</code>):</p>
+<table>
+<thead>
+<tr>
+<th><code>tf</code></th>
+<th>BM25</th>
+<th>TF-IDF (lineal)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1.000</td>
+<td>1.000</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1.429</td>
+<td>2.000</td>
+</tr>
+<tr>
+<td>5</td>
+<td>1.923</td>
+<td>5.000</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2.174</td>
+<td>10.000</td>
+</tr>
+<tr>
+<td>20</td>
+<td>2.326</td>
+<td>20.000</td>
+</tr>
+</tbody>
+</table>
+<p>La 20ª aparición en BM25 ya casi no mueve el score (2.33 vs 2.17 en tf=10);
+en TF-IDF sigue sumando 1.0 cada vez. El hiperparámetro <code>k₁</code> controla la curvatura:</p>
+<p><img alt="Saturación de BM25 vs TF-IDF lineal" src="../../diagrams/bm25-saturacion.png" /></p>
+<p><code>k₁</code> bajo (0.5) satura agresivamente —casi binario, "está o no está"—; <code>k₁</code> alto
+(3.0) se parece más a contar linealmente. El default 1.5 es un punto medio
+robusto. Esta curva es, en una imagen, <strong>por qué BM25 le gana a TF-IDF en
+documentos donde los términos se repiten mucho</strong> (spam de keywords, documentos
+largos repetitivos): no se deja engañar por la repetición.</p>
+<h3 id="idea-2-normalizacion-por-longitud-b">Idea 2 — Normalización por longitud (b)<a class="headerlink" href="#idea-2-normalizacion-por-longitud-b" title="Permanent link">&para;</a></h3>
+<p>El término <code>(1 − b + b · |d|/avgdl)</code> penaliza a los documentos más largos que el
+promedio. Sin esto, un documento extenso tendría ventaja injusta solo por
+contener más palabras (más oportunidades de match). Con <code>b=0.75</code>, la
+normalización es parcial: corrige el sesgo de longitud sin sobre-penalizar a los
+documentos largos que son legítimamente más informativos. <code>b=0</code> la desactiva;
+<code>b=1</code> normaliza completamente.</p>
+<h2 id="demostracion-sobre-el-corpus-chileno">Demostración sobre el corpus chileno<a class="headerlink" href="#demostracion-sobre-el-corpus-chileno" title="Permanent link">&para;</a></h2>
+<p>Todos los números siguientes salen de <code>uv run python 02-retrieval/code/01-ir-clasico.py</code>.</p>
+<h3 id="caso-1-bm25-clava-la-referencia-normativa">Caso 1 — BM25 clava la referencia normativa<a class="headerlink" href="#caso-1-bm25-clava-la-referencia-normativa" title="Permanent link">&para;</a></h3>
+<p>Query: <em>"¿Qué dice la Ley Nº 21.210?"</em></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>1. [4.431] circular#2  MATERIA: ...aplicación del IVA... modificaciones por la Ley Nº 21.210...
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>2. [4.082] circular#4  La Ley Nº 21.210, publicada en el Diario Oficial el 24 de febrero de 2020...
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>3. [2.766] decreto#1   APRUEBA REGLAMENTO DE LA LEY Nº 20.248...
+</code></pre></div>
+<p>Los dos primeros resultados son los chunks de la circular que mencionan
+explícitamente la 21.210. La descomposición del score del top-1 muestra de dónde
+viene:</p>
+<table>
+<thead>
+<tr>
+<th>Término</th>
+<th>Contribución</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>21.210</code></td>
+<td>2.471</td>
+</tr>
+<tr>
+<td><code>ley</code></td>
+<td>1.961</td>
+</tr>
+</tbody>
+</table>
+<p>El token <code>21.210</code>, con su IDF de 3.32, hace casi la mitad del trabajo. <strong>Ningún
+embedding denso le dará a esa cadena de dígitos el peso que merece</strong>, porque para
+el modelo "21.210" y "21.211" son casi el mismo vector (sección 2). Para una
+query de cita normativa, esto es exactamente lo que quieres.</p>
+<h3 id="caso-2-bm25-y-tf-idf-rankean-igual-por-razones-distintas">Caso 2 — BM25 y TF-IDF rankean igual, por razones distintas<a class="headerlink" href="#caso-2-bm25-y-tf-idf-rankean-igual-por-razones-distintas" title="Permanent link">&para;</a></h3>
+<p>Query: <em>"obligaciones del prestador de servicios digitales extranjero"</em></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>BM25                                    TF-IDF
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>1. [13.340] circular#11 IV. OBLIGACIONES...   1. [0.674] circular#11 IV. OBLIGACIONES...
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>2. [10.547] circular#12 Los prestadores...    2. [0.474] circular#12 Los prestadores...
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>3. [ 4.874] circular#2  MATERIA...            3. [0.194] circular#2  MATERIA...
+</code></pre></div>
+<p>Mismo orden. Las escalas son incomparables (BM25 no está normalizado a [0,1];
+TF-IDF sí, por el coseno) — <strong>una razón clave por la que en la sección 3 no
+podremos fusionar híbrido sumando scores, sino fusionando rankings (RRF)</strong>.</p>
+<p>¿Por qué coinciden aquí? Porque nuestros chunks son cortos (15 tokens en
+promedio) y de longitud pareja: las dos ventajas de BM25 (saturación y
+normalización por longitud) no tienen sobre qué actuar. En documentos largos y
+heterogéneos —contratos, leyes completas sin chunkear— BM25 se separa de TF-IDF.
+Lección de diseño: <strong>las ventajas de BM25 dependen de tu estrategia de chunking</strong>
+(sección 4).</p>
+<h3 id="caso-3-el-talon-de-aquiles-brecha-de-vocabulario">Caso 3 — El talón de Aquiles: brecha de vocabulario<a class="headerlink" href="#caso-3-el-talon-de-aquiles-brecha-de-vocabulario" title="Permanent link">&para;</a></h3>
+<p>Query: <em>"¿Cuántas USE recibe un alumno prioritario de 3º básico?"</em></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>1. [9.067] decreto#7  a) Alumnos prioritarios de primer y segundo nivel... 1º a 6º básico: 1,694 USE...
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>2. [6.376] decreto#10 Artículo 2º.- La calidad de alumno prioritario...
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>3. [6.093] decreto#6  ...el monto de la subvención escolar preferencial...
+</code></pre></div>
+<p>BM25 recupera el chunk correcto (el #7 contiene la respuesta: 1,694 USE). Pero
+mira <em>por qué</em>: el texto dice <strong>"1º a 6º básico"</strong>, nunca <strong>"3º"</strong>. BM25 no tiene
+forma de saber que 3 ∈ [1, 6]. Acertó por los <strong>otros</strong> términos compartidos
+(<code>use</code>, <code>alumno</code>, <code>prioritario</code>, <code>basico</code>), no porque entendiera el rango.</p>
+<p>Esto funcionó por suerte —los demás términos bastaron—. Pero generaliza al
+defecto estructural del matching léxico: <strong>no captura significado, solo
+coincidencia de superficie</strong>. Una query parafraseada ("ayuda estatal para niños
+vulnerables de primaria") que no comparta tokens con la norma haría que BM25
+fallara por completo. Ahí es donde entran los embeddings densos (sección 2), y
+por qué el futuro es híbrido (sección 3), no uno u otro.</p>
+<h2 id="metricas-sobre-el-golden-dataset">Métricas sobre el golden dataset<a class="headerlink" href="#metricas-sobre-el-golden-dataset" title="Permanent link">&para;</a></h2>
+<p>Reusamos las 25 queries con fuente conocida del golden de 01-evals (excluyendo
+las 5 de abstención, que se tratan aparte) y las métricas Recall@k y MRR de
+<code>01-evals/theory/05</code>, medidas a <strong>nivel documento</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>k</th>
+<th>BM25 Recall@k</th>
+<th>BM25 MRR</th>
+<th>TF-IDF Recall@k</th>
+<th>TF-IDF MRR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.926</td>
+<td>0.963</td>
+<td>0.926</td>
+<td>0.963</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.926</td>
+<td>0.963</td>
+<td>0.926</td>
+<td>0.963</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0.944</td>
+<td>0.963</td>
+<td>0.944</td>
+<td>0.963</td>
+</tr>
+</tbody>
+</table>
+<p>Dos lecturas, una técnica y una honesta:</p>
+<ul>
+<li><strong>Técnica:</strong> ambos retrievers identifican el documento correcto en el ~93% de
+  las queries ya en la posición 1 (MRR 0.963 ≈ casi siempre top-1). Para un
+  corpus de referencias normativas con jerga específica, BM25 puro es un baseline
+  fortísimo. Esto es el primer dato concreto contra el reflejo "necesito un
+  vector store".</li>
+<li><strong>Honesta:</strong> con <strong>solo 4 documentos</strong>, acertar el doc correcto es fácil
+  (hay 1 entre 4). El recall a nivel-doc tiene techo bajo y casi no discrimina
+  entre arquitecturas. Por eso la sección 2 en adelante <strong>expande el corpus</strong> y
+  la sección 8 mide a <strong>nivel chunk</strong>, donde recuperar el pasaje exacto entre
+  decenas de candidatos sí separa a los buenos retrievers de los malos.</li>
+</ul>
+<h2 id="cuando-bm25-es-la-respuesta-correcta-y-no-un-paso-previo">Cuándo BM25 es la respuesta correcta (y no un paso previo)<a class="headerlink" href="#cuando-bm25-es-la-respuesta-correcta-y-no-un-paso-previo" title="Permanent link">&para;</a></h2>
+<p>No siempre se necesita lo siguiente en el pipeline. BM25 puro gana, en calidad
+<em>y</em> costo, cuando:</p>
+<table>
+<thead>
+<tr>
+<th>Situación</th>
+<th>Por qué BM25 gana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Queries con referencias exactas ("artículo 5º Ley 20.730")</td>
+<td>IDF alto premia el token raro; el denso lo aplana</td>
+</tr>
+<tr>
+<td>Jerga/identificadores de dominio ("USE", "PRAIS", "DL 825")</td>
+<td>Tokens fuera de la distribución de pre-entrenamiento del embedder</td>
+</tr>
+<tr>
+<td>Corpus chico y vocabulario controlado</td>
+<td>El costo y la complejidad de un vector store no se justifican</td>
+</tr>
+<tr>
+<td>Necesitas explicabilidad ("¿por qué salió este doc?")</td>
+<td><code>explain()</code> da la contribución por término; el coseno denso es opaco</td>
+</tr>
+<tr>
+<td>Restricción de costo/latencia/infra</td>
+<td>BM25 corre en CPU, sin API, sin GPU, en microsegundos</td>
+</tr>
+</tbody>
+</table>
+<p>BM25 <strong>no</strong> basta cuando la query y el documento usan vocabularios distintos
+(paráfrasis, sinonimia, traducción de registro coloquial↔técnico). Ese es el
+hueco que llena la sección 2, y la razón por la que el default moderno no es
+"BM25 o denso" sino <strong>"BM25 y denso"</strong> (sección 3).</p>
+<h2 id="estado-del-arte">Estado del arte<a class="headerlink" href="#estado-del-arte" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Estado</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BM25 como baseline</td>
+<td>✅ Vigente</td>
+<td>Sigue siendo el baseline a batir en benchmarks de IR (BEIR, 2021–2026)</td>
+</tr>
+<tr>
+<td>TF-IDF en producción</td>
+<td>🟡 En retirada</td>
+<td>Desplazado por BM25 salvo en sistemas legacy o muy simples</td>
+</tr>
+<tr>
+<td>Tokenización de dominio</td>
+<td>🟡 Artesanal</td>
+<td>No hay estándar; cada dominio (legal, médico, código) requiere reglas propias</td>
+</tr>
+<tr>
+<td>BM25 + filtros estructurados</td>
+<td>✅ Subvalorado</td>
+<td>Resuelve más queries reales de las que la industria de "vector DB" admite</td>
+</tr>
+<tr>
+<td>Variantes (BM25F, BM25+)</td>
+<td>✅ Resueltas</td>
+<td>Extensiones para campos múltiples y corrección de saturación; rara vez necesarias en RAG</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conexiones">Conexiones<a class="headerlink" href="#conexiones" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Sección 2 (embeddings densos):</strong> el reverso de esta moneda. Donde BM25 falla
+  (paráfrasis, sinonimia), el denso brilla; donde BM25 brilla (referencias
+  exactas, jerga), el denso falla. La tabla de IDF de aquí es el setup del
+  contraste.</li>
+<li><strong>Sección 3 (hybrid):</strong> combinar ambos. El detalle de que las escalas de BM25
+  y TF-IDF/coseno son incomparables (Caso 2) es justo por lo que se fusiona con
+  RRF sobre rankings, no sumando scores.</li>
+<li><strong>Sección 4 (chunking):</strong> las ventajas de BM25 (saturación, normalización por
+  longitud) dependen de cómo se corten los documentos.</li>
+<li><strong>Sección 8 (evaluación):</strong> las métricas a nivel-doc de aquí son el piso;
+  allí se mide a nivel-chunk con intervalos de confianza para comparar
+  arquitecturas con rigor.</li>
+<li><strong>01-evals/theory/05:</strong> las definiciones de Recall@k y MRR que usamos vienen
+  de allí; esta masterclass es "qué cambiar en el retriever para moverlas".</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

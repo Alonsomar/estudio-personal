@@ -1,0 +1,2503 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../03-hybrid-search/">
+      
+      
+        <link rel="next" href="../05-query-rewriting/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>04 — Chunking serio para documentos legales largos - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#04-chunking-serio-para-documentos-legales-largos" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              04 — Chunking serio para documentos legales largos
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../01-evals/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/01-por-que-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/03-analisis-errores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/05-metricas-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-ir-pre-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#la-decision-silenciosa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La decisión silenciosa
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-trade-off-central-precision-vs-contexto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El trade-off central: precisión vs contexto
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cinco-estrategias-implementadas-en-retrieval_lib" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cinco estrategias, implementadas en retrieval_lib
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cinco estrategias, implementadas en retrieval_lib">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-fixed-size-ventana-deslizante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Fixed-size (ventana deslizante)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-simple-linea-en-blanco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Simple (línea en blanco)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-structural-por-encabezados-del-dominio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Structural (por encabezados del dominio)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-semantic-donde-el-coseno-cae" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Semantic (donde el coseno cae)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-hierarchical-parent-child" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Hierarchical (parent / child)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-late-chunking-y-lo-que-si-podemos-hacer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Late chunking — y lo que SÍ podemos hacer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#los-numeros-sobre-el-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Los números, sobre el corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#por-que-los-numeros-no-cuentan-toda-la-historia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué los números no cuentan toda la historia
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#que-chunking-usar-un-arbol-de-decision-honesto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ¿Qué chunking usar? Un árbol de decisión honesto
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-reranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../03-produccion/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/07-despliegue-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#la-decision-silenciosa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La decisión silenciosa
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-trade-off-central-precision-vs-contexto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El trade-off central: precisión vs contexto
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cinco-estrategias-implementadas-en-retrieval_lib" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cinco estrategias, implementadas en retrieval_lib
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cinco estrategias, implementadas en retrieval_lib">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-fixed-size-ventana-deslizante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Fixed-size (ventana deslizante)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-simple-linea-en-blanco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Simple (línea en blanco)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-structural-por-encabezados-del-dominio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Structural (por encabezados del dominio)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-semantic-donde-el-coseno-cae" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Semantic (donde el coseno cae)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-hierarchical-parent-child" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Hierarchical (parent / child)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-late-chunking-y-lo-que-si-podemos-hacer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Late chunking — y lo que SÍ podemos hacer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#los-numeros-sobre-el-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Los números, sobre el corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#por-que-los-numeros-no-cuentan-toda-la-historia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué los números no cuentan toda la historia
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#que-chunking-usar-un-arbol-de-decision-honesto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ¿Qué chunking usar? Un árbol de decisión honesto
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="04-chunking-serio-para-documentos-legales-largos">04 — Chunking serio para documentos legales largos<a class="headerlink" href="#04-chunking-serio-para-documentos-legales-largos" title="Permanent link">&para;</a></h1>
+<h2 id="la-decision-silenciosa">La decisión silenciosa<a class="headerlink" href="#la-decision-silenciosa" title="Permanent link">&para;</a></h2>
+<p>Los retrievers de las secciones 1-3 trabajan sobre <strong>chunks</strong>, no sobre
+documentos. Eso significa que toda la calidad de tu sistema RAG depende, antes
+que de cualquier modelo, de una decisión que casi nadie discute: <em>cómo cortar el
+documento</em>. Un chunk demasiado chico no tiene contexto suficiente; uno demasiado
+grande mezcla temas y diluye el match. Un chunk que parte una tabla la
+destruye; uno que parte un artículo legal lo deja sin antecedente. <strong>Si un
+término no cabe en un chunk indexable, no se puede recuperar</strong> — punto, da
+igual qué tan bueno sea tu BM25 o tu embedder.</p>
+<p><strong>Analogía económica.</strong> Chunking es decidir la <strong>unidad de análisis</strong> antes de
+estimar nada. Si analizas inflación con datos <em>mensuales</em> ves cosas que con
+datos <em>trimestrales</em> desaparecen, y viceversa: ninguna de las dos elecciones es
+neutra. Lo mismo aquí: la unidad de chunkeo define qué hipótesis (qué queries)
+puedes responder y cuáles quedan estructuralmente fuera del alcance.</p>
+<h2 id="el-trade-off-central-precision-vs-contexto">El trade-off central: precisión vs contexto<a class="headerlink" href="#el-trade-off-central-precision-vs-contexto" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph LR
+    subgraph "Chunks chicos"
+        A1["sentencia / 50 chars"] --&gt;|"match preciso"| A2["alta recall@k"]
+        A1 --&gt;|"poco contexto"| A3["generador descontextualizado"]
+    end
+    subgraph "Chunks grandes"
+        B1["artículo / 1000 chars"] --&gt;|"contexto rico"| B2["respuesta completa"]
+        B1 --&gt;|"señal diluida"| B3["match menos preciso"]
+    end</code></pre>
+<p>Cuanto <strong>más chico</strong> el chunk, <strong>más precisa</strong> la coincidencia (cada chunk es
+una unidad temática estrecha que matchea o no matchea limpiamente), pero
+<strong>menos contexto</strong> lleva al generador. Cuanto <strong>más grande</strong>, lo opuesto. Las
+cinco estrategias siguientes son distintos puntos de esa frontera, más una
+sexta (jerárquica) que intenta tener las dos cosas a la vez.</p>
+<h2 id="cinco-estrategias-implementadas-en-retrieval_lib">Cinco estrategias, implementadas en <code>retrieval_lib</code><a class="headerlink" href="#cinco-estrategias-implementadas-en-retrieval_lib" title="Permanent link">&para;</a></h2>
+<h3 id="1-fixed-size-ventana-deslizante">1. Fixed-size (ventana deslizante)<a class="headerlink" href="#1-fixed-size-ventana-deslizante" title="Permanent link">&para;</a></h3>
+<p>El más ingenuo: corta cada N caracteres con solape O. No respeta nada: parte
+artículos, oraciones, tablas, donde caiga. Es la elección de defecto cuando no
+hay estructura confiable o cuando no quieres invertir tiempo en la decisión.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">fixed_chunk</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">overlap</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</code></pre></div>
+<p>Hiperparámetros: <code>size</code> (típico 200-1000), <code>overlap</code> (10-20% del size) para que
+ningún hecho quede partido sin redundancia.</p>
+<h3 id="2-simple-linea-en-blanco">2. Simple (línea en blanco)<a class="headerlink" href="#2-simple-linea-en-blanco" title="Permanent link">&para;</a></h3>
+<p>Lo que veníamos usando. Aprovecha que los documentos legales chilenos tienen
+párrafos visualmente separados. Es un proxy <em>barato</em> de estructura.</p>
+<h3 id="3-structural-por-encabezados-del-dominio">3. Structural (por encabezados del dominio)<a class="headerlink" href="#3-structural-por-encabezados-del-dominio" title="Permanent link">&para;</a></h3>
+<p>Detecta encabezados específicos del español jurídico chileno —<code>Artículo Nº</code>,
+<code>Glosa N:</code>, <code>TÍTULO</code>, <code>PÁRRAFO</code>, <code>CAPÍTULO</code>, numerales romanos— y agrupa todo
+el texto bajo cada encabezado en un solo chunk. Un artículo completo queda
+indivisible; una glosa entera también.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">structural_chunk</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">)</span>   <span class="c1"># usa _LEGAL_HEADER, regex en retrieval_lib</span>
+</code></pre></div>
+<p>Ventaja: la unidad recuperada es la unidad <strong>citable</strong> ("Artículo 3º del decreto
+1.423"). Costo: chunks más largos y con menor poder de discriminación.</p>
+<h3 id="4-semantic-donde-el-coseno-cae">4. Semantic (donde el coseno cae)<a class="headerlink" href="#4-semantic-donde-el-coseno-cae" title="Permanent link">&para;</a></h3>
+<p>Parte el texto en oraciones, embebe cada una, y empieza un nuevo chunk cuando
+el coseno entre oraciones consecutivas cae bajo un umbral. Idea: mantener
+juntas oraciones que hablan de lo mismo, separar al cambio de tema.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">semantic_chunk</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">,</span> <span class="n">embedder</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.55</span><span class="p">)</span>
+</code></pre></div>
+<p>Requiere embeddings de oraciones (costo extra) y elegir <code>threshold</code>. Demasiado
+alto → fragmenta de más; demasiado bajo → no fragmenta.</p>
+<h3 id="5-hierarchical-parent-child">5. Hierarchical (parent / child)<a class="headerlink" href="#5-hierarchical-parent-child" title="Permanent link">&para;</a></h3>
+<p>Combina dos granos. Los <strong>hijos</strong> son chunks chicos (en nuestra implementación,
+oraciones); los <strong>padres</strong> son los bloques estructurales que los contienen.
+Indexas y recuperas por hijo (precisión); devuelves el padre al generador
+(contexto).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">hierarchical_chunk</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># devuelve hijos con meta={&#39;parent_id&#39;, &#39;parent_text&#39;}</span>
+</code></pre></div>
+<p>Es el patrón con mejor relación precisión-contexto en la práctica. Su talón de
+Aquiles aparece cuando el hijo matchea por sentido pero el padre no es el
+correcto (lo veremos en los números).</p>
+<h3 id="6-late-chunking-y-lo-que-si-podemos-hacer">6. Late chunking — y lo que SÍ podemos hacer<a class="headerlink" href="#6-late-chunking-y-lo-que-si-podemos-hacer" title="Permanent link">&para;</a></h3>
+<p><strong>True late chunking</strong> (Günther et al., 2024) embebe el documento <em>entero</em> con
+un encoder de contexto largo y luego hace <code>mean-pool</code> de los embeddings
+token-level sobre el rango de cada chunk. El resultado: la representación de
+cada chunk "vio" el documento completo al codificarse. Es atractivo para
+docs legales donde una glosa al final tiene sentido por el título al inicio.</p>
+<p><strong>Lo que no podemos hacer aquí</strong>: la API de OpenAI Embeddings devuelve <strong>un
+vector por input</strong>, no token-level. Esa es la barrera técnica. Late chunking
+real requiere un encoder local (Jina v2/v3, BGE-M3) con acceso al pooling.</p>
+<p><strong>Lo que sí podemos hacer</strong>: la técnica de Anthropic (2024) llamada <em>contextual
+chunking</em> ataca el mismo problema (chunks descontextualizados) desde otro
+ángulo: a cada chunk se le <strong>prepone una descripción del documento</strong> antes de
+embeberlo. Es compatible con cualquier embedder. Lo implementamos en
+<code>contextual_chunk</code> y aparece como una fila más en los números.</p>
+<h2 id="los-numeros-sobre-el-corpus">Los números, sobre el corpus<a class="headerlink" href="#los-numeros-sobre-el-corpus" title="Permanent link">&para;</a></h2>
+<p>Recall@k denso por estrategia (golden, 25 queries con fuente):</p>
+<table>
+<thead>
+<tr>
+<th>Estrategia</th>
+<th>nº chunks</th>
+<th>avg chars</th>
+<th>@1</th>
+<th>@3</th>
+<th>@5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fixed-400</td>
+<td>111</td>
+<td>372</td>
+<td>0.833</td>
+<td>0.944</td>
+<td>0.963</td>
+</tr>
+<tr>
+<td>fixed-1000</td>
+<td>48</td>
+<td>829</td>
+<td><strong>0.907</strong></td>
+<td>0.944</td>
+<td><strong>0.981</strong></td>
+</tr>
+<tr>
+<td>simple</td>
+<td>234</td>
+<td>154</td>
+<td>0.796</td>
+<td><strong>0.963</strong></td>
+<td>0.963</td>
+</tr>
+<tr>
+<td>structural</td>
+<td>106</td>
+<td>344</td>
+<td><strong>0.907</strong></td>
+<td>0.944</td>
+<td>0.963</td>
+</tr>
+<tr>
+<td>semantic</td>
+<td>666</td>
+<td>52</td>
+<td>0.815</td>
+<td><strong>0.963</strong></td>
+<td><strong>0.981</strong></td>
+</tr>
+<tr>
+<td>hierarchical</td>
+<td>740</td>
+<td>47</td>
+<td>0.852</td>
+<td><strong>0.963</strong></td>
+<td><strong>0.981</strong></td>
+</tr>
+<tr>
+<td>contextual</td>
+<td>106</td>
+<td>420</td>
+<td><strong>0.907</strong></td>
+<td>0.944</td>
+<td>0.963</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Recall@3 vs longitud media del chunk" src="../../diagrams/chunking-recall-vs-tamano.png" /></p>
+<p>Lecturas honestas:</p>
+<ul>
+<li><strong>Hay dos grupos claros.</strong> Estrategias de chunk grande (<code>fixed-1000</code>,
+  <code>structural</code>, <code>contextual</code>) ganan en <code>@1</code> (0.907) pero se quedan en 0.944 en
+  <code>@3</code>. Estrategias de chunk chico (<code>simple</code>, <code>semantic</code>, <code>hierarchical</code>) ganan
+  en <code>@3</code> y <code>@5</code> (hasta 0.981) pero pierden en <code>@1</code>. Es el trade-off del
+  comienzo, en números.</li>
+<li><strong>Contextual chunking no movió la aguja aquí.</strong> En este corpus chico y con
+  golden mayoritariamente dentro de un solo doc, prefijar el doc no aporta. Su
+  beneficio documentado en la literatura aparece en queries cross-doc y con
+  chunks que pierden referente — lo veremos mejor cuando construyamos el golden
+  a nivel chunk en §8.</li>
+<li><strong>El recall@3 está cerca de techo en todas (0.94–0.96).</strong> Como en §3, hay
+  efecto techo: la mayoría de queries del golden se resuelven independiente de
+  la estrategia de chunkeo. Para discriminar de verdad necesitamos métricas a
+  nivel chunk con expected_chunks como ground truth (§8).</li>
+</ul>
+<h2 id="por-que-los-numeros-no-cuentan-toda-la-historia">Por qué los números no cuentan toda la historia<a class="headerlink" href="#por-que-los-numeros-no-cuentan-toda-la-historia" title="Permanent link">&para;</a></h2>
+<p>Recall@k a nivel doc dice "el doc correcto está en el top-k", pero no "el chunk
+devuelto contiene la respuesta". Esto último depende fuertemente de la
+estrategia. Misma query, <em>"¿Cuántas USE recibe un alumno prioritario de 3º
+básico?"</em> (respuesta: <strong>1.694 USE</strong>), top-1 de cada estrategia:</p>
+<table>
+<thead>
+<tr>
+<th>Estrategia</th>
+<th>Contiene "1.694 USE"</th>
+<th>Qué devuelve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fixed-400</td>
+<td>✓</td>
+<td>Fragmento que parte a media palabra pero incluye los rates</td>
+</tr>
+<tr>
+<td>fixed-1000</td>
+<td>✓</td>
+<td>Ventana grande con todos los rates por nivel</td>
+</tr>
+<tr>
+<td>simple</td>
+<td>✓</td>
+<td>Bloque limpio con la lista completa</td>
+</tr>
+<tr>
+<td><strong>structural</strong></td>
+<td><strong>✗</strong></td>
+<td>Artículo 1º (procedimiento), no Artículo 3 (rates)</td>
+</tr>
+<tr>
+<td>semantic</td>
+<td>✓</td>
+<td>Lista de rates como un bloque semántico</td>
+</tr>
+<tr>
+<td><strong>hierarchical</strong></td>
+<td><strong>✗</strong></td>
+<td>Oración "b) 7º y 8º básico: 1.130 USE" — <strong>tramo equivocado</strong></td>
+</tr>
+<tr>
+<td><strong>contextual</strong></td>
+<td><strong>✗</strong></td>
+<td>Artículo 2º (criterios JUNAEB), no el de rates</td>
+</tr>
+</tbody>
+</table>
+<p><code>hierarchical</code> falló de forma instructiva: la oración correcta dice "1º a 6º
+básico" y la incorrecta dice "7º y 8º básico". Para el embedder son
+semánticamente casi idénticas (ambas listan tramos escolares con valores USE),
+y eligió la equivocada. El embedder <strong>no hace aritmética</strong>: no entiende que 3º
+está en [1º, 6º]. Esto es la brecha de la sección 2 (denso vs siglas/números),
+reaparecida a nivel chunk.</p>
+<p>Pero <code>hierarchical</code> brilla cuando devolvemos el padre. Query <em>"declarar el IVA
+dentro de los primeros 20 días del mes siguiente"</em>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>HIJO (indexado, matchea):  60 chars
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  &quot;b) Declarar y pagar trimestralmente el IVA devengado, dentro&quot;
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>PADRE (devuelto al generador):  633 chars
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>  IV. OBLIGACIONES DEL PRESTADOR EXTRANJERO
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>  Los prestadores de servicios digitales domiciliados o residentes
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>  en el extranjero deberán:
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>     a) Registrarse ante el Servicio de Impuestos Internos...
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>     b) Declarar y pagar trimestralmente el IVA devengado, dentro
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>        de los primeros 20 días del mes siguiente al término del
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>        trimestre respectivo.
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>     c) Emitir un comprobante de pago al usuario por cada transacción...
+</code></pre></div>
+<p>El hijo da precisión de match; el padre da contexto completo (todas las
+obligaciones del artículo IV, no solo la trimestral). Es el patrón "small to
+big retrieval" del estado del arte.</p>
+<h2 id="que-chunking-usar-un-arbol-de-decision-honesto">¿Qué chunking usar? Un árbol de decisión honesto<a class="headerlink" href="#que-chunking-usar-un-arbol-de-decision-honesto" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TD
+    Q1{"¿Documentos&lt;br/&gt;con estructura&lt;br/&gt;jurídica clara?"}
+    Q1 --&gt;|"Sí (decretos, leyes, glosas)"| Q2{"¿El generador&lt;br/&gt;necesita el&lt;br/&gt;artículo entero?"}
+    Q1 --&gt;|"No (PDFs OCR, texto sucio)"| FIX["fixed-size&lt;br/&gt;(400-800 chars,&lt;br/&gt;overlap 10-20%)"]
+
+    Q2 --&gt;|"Sí (responde con citas legales)"| HIER["hierarchical&lt;br/&gt;(child=oración,&lt;br/&gt;parent=artículo)"]
+    Q2 --&gt;|"No (respuestas cortas)"| Q3{"¿Vale la pena&lt;br/&gt;el costo extra&lt;br/&gt;de embedder?"}
+
+    Q3 --&gt;|"Sí"| SEM["semantic&lt;br/&gt;(threshold 0.5-0.6)"]
+    Q3 --&gt;|"No"| STR["structural&lt;br/&gt;(por encabezados)"]
+
+    style HIER fill:#bdf,stroke:#333,color:#1a1a1a</code></pre>
+<p>Defaults para corpus regulatorio chileno: empieza con <strong>hierarchical</strong>; si el
+costo de embedder es prohibitivo, cae a <strong>structural</strong>; si los docs vienen de
+OCR sucio sin encabezados confiables, <strong>fixed-400 con overlap 50</strong>. Evita
+<code>semantic</code> con <code>threshold</code> agresivo (≥0.7) en este dominio: el español jurídico
+repite tanto formato que parte de más.</p>
+<h2 id="estado-del-arte">Estado del arte<a class="headerlink" href="#estado-del-arte" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Estado</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fixed-size como default</td>
+<td>✅ Funcional</td>
+<td>Funciona "bastante bien" en RAG genérico; rara vez óptimo en dominios estructurados</td>
+</tr>
+<tr>
+<td>Hierarchical / small-to-big</td>
+<td>✅ Patrón dominante</td>
+<td>Estándar de facto en 2026 cuando hay estructura</td>
+</tr>
+<tr>
+<td>Semantic chunking</td>
+<td>🟡 Caso a caso</td>
+<td>Útil en docs sin estructura visible; sensible al threshold</td>
+</tr>
+<tr>
+<td>Late chunking real</td>
+<td>🟡 En adopción</td>
+<td>Requiere encoder con token embeddings (Jina v2/v3, BGE-M3); gran promesa, integración lenta</td>
+</tr>
+<tr>
+<td>Contextual chunking (Anthropic)</td>
+<td>✅ Producción</td>
+<td>Compatible con cualquier embedder; costo: 1 LLM call por chunk al indexar</td>
+</tr>
+<tr>
+<td>Chunking de tablas en PDFs</td>
+<td>🔴 Sin solución estándar</td>
+<td>Sección 9 le dedica espacio explícito</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conexiones">Conexiones<a class="headerlink" href="#conexiones" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Sección 1 y 2:</strong> las ventajas de BM25 (saturación, normalización por
+  longitud) y la geometría densa dependen del <em>tamaño</em> de la unidad indexable.
+  Los números de §1 (chunks de 15 tokens) y §2 (mismos chunks) son una elección
+  de chunking entre muchas.</li>
+<li><strong>Sección 3 (hybrid):</strong> el techo de recall@3 que vimos (≈0.96) sigue acá. La
+  fusión y el chunking no se sustituyen; se combinan.</li>
+<li><strong>Sección 6 (reranking):</strong> las fallas de <code>hierarchical</code> ("7º y 8º básico" en
+  vez de "1º a 6º") son exactamente lo que un cross-encoder corrige al
+  reordenar el top-k del retriever.</li>
+<li><strong>Sección 8 (evaluación):</strong> el efecto techo de recall@k a nivel doc invita a
+  construir ground truth a nivel chunk. Lo hacemos ahí.</li>
+<li><strong>Sección 9 (casos límite):</strong> chunking de <strong>tablas</strong> en PDFs queda explícito
+  como caso límite del dominio; aquí lo dejamos planteado.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

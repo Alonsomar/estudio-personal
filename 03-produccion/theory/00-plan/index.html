@@ -1,0 +1,2870 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../../">
+      
+      
+        <link rel="next" href="../01-salto-a-produccion/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>00 — Plan Maestro: Patrones de Producción - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#00-plan-maestro-patrones-de-produccion" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              00 — Plan Maestro: Patrones de Producción
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../01-evals/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/01-por-que-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/03-analisis-errores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/05-metricas-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../02-retrieval/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/01-ir-pre-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/04-chunking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/06-reranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objetivo-de-la-masterclass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objetivo de la masterclass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hilo-conductor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hilo conductor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#principios-de-trabajo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Principios de trabajo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#temario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temario
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Temario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#seccion-1-por-que-produccion-es-una-disciplina-distinta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 1 — Por qué producción es una disciplina distinta
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-2-arquitectura-de-servicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 2 — Arquitectura de servicio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-3-gestion-de-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 3 — Gestión de prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-4-caching-multinivel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 4 — Caching multinivel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-5-observabilidad-y-tracing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 5 — Observabilidad y tracing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-6-reliability-rate-limit-retries-circuit-breakers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 6 — Reliability: rate limit, retries, circuit breakers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-7-despliegue-y-configuracion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 7 — Despliegue y configuración
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-8-versionado-de-modelos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 8 — Versionado de modelos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-9-online-evals-y-loop-de-feedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 9 — Online evals y loop de feedback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-10-costo-en-produccion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 10 — Costo en producción
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-11-seguridad" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 11 — Seguridad
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-12-incidentes-y-postmortems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 12 — Incidentes y postmortems
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencias-entre-secciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencias entre secciones
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arbol-propuesto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Árbol propuesto
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decisiones-tecnicas-requieren-tu-ok" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decisiones técnicas (requieren tu OK)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decisiones técnicas (requieren tu OK)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-stack-del-servicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Stack del servicio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-profundidad-del-despliegue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Profundidad del despliegue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-alcance-del-cost-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Alcance del cost monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#convenciones-para-esta-masterclass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Convenciones para esta masterclass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notas-sobre-estado-del-arte-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notas sobre estado del arte (2026)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones-con-las-otras-masterclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones con las otras masterclasses
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-despliegue-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objetivo-de-la-masterclass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objetivo de la masterclass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hilo-conductor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hilo conductor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#principios-de-trabajo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Principios de trabajo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#temario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temario
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Temario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#seccion-1-por-que-produccion-es-una-disciplina-distinta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 1 — Por qué producción es una disciplina distinta
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-2-arquitectura-de-servicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 2 — Arquitectura de servicio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-3-gestion-de-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 3 — Gestión de prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-4-caching-multinivel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 4 — Caching multinivel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-5-observabilidad-y-tracing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 5 — Observabilidad y tracing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-6-reliability-rate-limit-retries-circuit-breakers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 6 — Reliability: rate limit, retries, circuit breakers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-7-despliegue-y-configuracion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 7 — Despliegue y configuración
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-8-versionado-de-modelos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 8 — Versionado de modelos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-9-online-evals-y-loop-de-feedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 9 — Online evals y loop de feedback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-10-costo-en-produccion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 10 — Costo en producción
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-11-seguridad" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 11 — Seguridad
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccion-12-incidentes-y-postmortems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sección 12 — Incidentes y postmortems
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencias-entre-secciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencias entre secciones
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arbol-propuesto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Árbol propuesto
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decisiones-tecnicas-requieren-tu-ok" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decisiones técnicas (requieren tu OK)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decisiones técnicas (requieren tu OK)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-stack-del-servicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Stack del servicio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-profundidad-del-despliegue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Profundidad del despliegue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-alcance-del-cost-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Alcance del cost monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#convenciones-para-esta-masterclass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Convenciones para esta masterclass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notas-sobre-estado-del-arte-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notas sobre estado del arte (2026)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones-con-las-otras-masterclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones con las otras masterclasses
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="00-plan-maestro-patrones-de-produccion">00 — Plan Maestro: Patrones de Producción<a class="headerlink" href="#00-plan-maestro-patrones-de-produccion" title="Permanent link">&para;</a></h1>
+<h2 id="objetivo-de-la-masterclass">Objetivo de la masterclass<a class="headerlink" href="#objetivo-de-la-masterclass" title="Permanent link">&para;</a></h2>
+<p>Construir la capacidad de llevar un sistema RAG <strong>a producción</strong> y mantenerlo
+ahí: con observabilidad real, prompts versionados, caché coherente,
+fallback ante fallos del proveedor de LLM, despliegue reproducible, costo
+predecible y un protocolo claro para incidentes. Al terminar, deberías
+poder responder con propiedad: <em>¿este sistema aguanta tráfico real, con
+qué presupuesto, con cuánta latencia, y cómo me entero cuándo se rompe?</em></p>
+<p>Producción no es una versión "más robusta" de la demo. Es una <strong>disciplina
+distinta</strong>: el mismo sistema que en local responde bien una query, en
+producción tiene varianza estadística no trivial, gasta dinero en cada
+llamada, depende de proveedores externos cuyo SLA no controlás, y va a
+fallar de formas que tu demo nunca expuso. Esta masterclass es el manual
+para esa realidad.</p>
+<h2 id="hilo-conductor">Hilo conductor<a class="headerlink" href="#hilo-conductor" title="Permanent link">&para;</a></h2>
+<p>El mismo sistema RAG sobre normativa chilena que construimos en
+<strong>02-retrieval</strong> (BM25 + denso + hybrid + rerank, con corpus regulatorio
+chileno) y que evaluamos en <strong>01-evals</strong> (golden datasets, métricas con
+IC, online evals). Aquí no tocamos su lógica de retrieval ni sus métricas:
+las dos masterclasses previas ya lo dejaron correcto. <strong>Lo que cambia es
+cómo lo hacemos sobrevivir afuera del notebook.</strong></p>
+<p>Cada sección agrega una capa de servicio sobre ese RAG:</p>
+<pre class="mermaid"><code>graph LR
+    DEV["RAG dev/notebook&lt;br/&gt;(§§ 01-evals, 02-retrieval)"] --&gt; S["Servicio HTTP&lt;br/&gt;(§2)"]
+    S --&gt; P["Prompts versionados&lt;br/&gt;(§3)"]
+    P --&gt; C["Caché multinivel&lt;br/&gt;(§4)"]
+    C --&gt; O["Observabilidad&lt;br/&gt;(§5)"]
+    O --&gt; R["Reliability&lt;br/&gt;(§6)"]
+    R --&gt; D["Despliegue&lt;br/&gt;(§7)"]
+    D --&gt; V["Versionado de modelos&lt;br/&gt;(§8)"]
+    V --&gt; ONL["Online evals + loop&lt;br/&gt;(§9)"]
+    ONL --&gt; COST["Costo en prod&lt;br/&gt;(§10)"]
+    COST --&gt; SEC["Seguridad&lt;br/&gt;(§11)"]
+    SEC --&gt; INC["Incidentes&lt;br/&gt;(§12)"]
+
+    style DEV fill:#bdf,stroke:#333,color:#1a1a1a
+    style INC fill:#fd9,stroke:#333,color:#1a1a1a</code></pre>
+<h2 id="principios-de-trabajo">Principios de trabajo<a class="headerlink" href="#principios-de-trabajo" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Honestidad sobre el escenario chileno.</strong> El proyecto del usuario es
+   un producto SaaS pequeño-mediano sobre corpus regulatorio, no
+   Twitter/X. Nada de patrones Fortune-500 (Kafka clusters, service mesh,
+   multi-region active-active) que cobran tax cognitivo sin pagar valor.
+   Lo que mostramos es lo mínimo viable que funciona para 1-1.000 QPS,
+   un equipo de 1-3 personas, presupuesto de $hundreds-$thousands/mes.</li>
+<li><strong>Implementaciones desde cero cuando enseñan.</strong> Caché LRU con TTL,
+   token bucket de rate limiting, retry exponencial con jitter, circuit
+   breaker — todos desde cero. Es lo que hay debajo del wrapper y lo que
+   importa entender para diagnosticar cuando falla.</li>
+<li><strong>Cada patrón con su corrida ejecutable.</strong> Como las masterclasses
+   anteriores: si decimos "esto reduce latencia 5×", hay un script que
+   lo mide. Nada de "best practices" sin números.</li>
+<li><strong>Eval-driven a lo largo de toda la sección.</strong> Cada cambio de prompt,
+   modelo, caché o rate limiter se acompaña de las métricas relevantes
+   de 01-evals. La pregunta "¿esto mejoró el sistema?" tiene exactamente
+   el mismo aparato matemático que en §8 de evals: deltas con IC.</li>
+<li><strong>El honest scaling.</strong> Para tu corpus chileno, una sola instancia
+   con Postgres + pgvector + FastAPI atiende los hipotéticos primeros
+   miles de usuarios sin sudar. Vamos a marcar dónde sí hace falta
+   escalar y dónde estás sobre-construyendo por miedo.</li>
+</ol>
+<h2 id="temario">Temario<a class="headerlink" href="#temario" title="Permanent link">&para;</a></h2>
+<h3 id="seccion-1-por-que-produccion-es-una-disciplina-distinta">Sección 1 — Por qué producción es una disciplina distinta<a class="headerlink" href="#seccion-1-por-que-produccion-es-una-disciplina-distinta" title="Permanent link">&para;</a></h3>
+<ul>
+<li>El gap demo→prod: lo que el notebook no expone (varianza, fallos del
+  proveedor, costo por uso, tráfico concurrente, regresiones silentes).</li>
+<li>Analogía económica: el sistema en prod es como una política pública
+  en ejecución vs el paper que la diseñó. La realidad introduce
+  fricciones que el modelo no contempla.</li>
+<li>Mapa del ciclo de vida de un RAG en producción.</li>
+<li>Demo numérica: tomamos el RAG de 02-retrieval, lo corremos 100 veces
+  con la misma query (temperatura &gt; 0), medimos varianza de salidas y
+  costo acumulado. El número no es un número: es una distribución.</li>
+</ul>
+<h3 id="seccion-2-arquitectura-de-servicio">Sección 2 — Arquitectura de servicio<a class="headerlink" href="#seccion-2-arquitectura-de-servicio" title="Permanent link">&para;</a></h3>
+<ul>
+<li>De script a HTTP: FastAPI con un endpoint <code>/query</code> que envuelve el RAG.</li>
+<li>Capas: handler → orquestador (router de §9 de retrieval) → retrievers
+  → generador → post-procesado.</li>
+<li>Por qué separar <strong>stateless</strong> (handler, retrieval, generación) de
+  <strong>stateful</strong> (Supabase / pgvector). El retrieval es stateless; el
+  índice no.</li>
+<li>Patrón "puertos y adaptadores" para no quedar atado al SDK de un
+  proveedor. Un <code>LLMClient</code> abstracto con implementaciones para
+  Anthropic, OpenAI, etc. Hace canary y A/B triviales.</li>
+<li>Diagrama de despliegue mínimo para el stack chileno típico:
+  FastAPI + Postgres/pgvector + un secret manager + un object store.</li>
+</ul>
+<h3 id="seccion-3-gestion-de-prompts">Sección 3 — Gestión de prompts<a class="headerlink" href="#seccion-3-gestion-de-prompts" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Por qué el prompt es código y va al control de versiones.</li>
+<li>Anti-patrones comunes: prompt embebido en string mutable, prompt
+  cambiado a mano en producción, dos versiones del mismo prompt en dos
+  archivos.</li>
+<li><strong>Prompt registry</strong> simple: archivos <code>.md</code> o <code>.txt</code> versionados,
+  cargados por nombre + hash, con tests obligatorios.</li>
+<li>A/B de prompts: cómo comparar dos versiones con golden + LLM-judge.
+  Reusa el aparato de 01-evals §7.</li>
+<li>Templating sin sorpresas: Jinja2 con escaping; cómo evitar inyección
+  desde el corpus al prompt (chunk con <code>{{ ... }}</code> adentro).</li>
+<li>Multi-idioma y multi-tono cuando importa.</li>
+</ul>
+<h3 id="seccion-4-caching-multinivel">Sección 4 — Caching multinivel<a class="headerlink" href="#seccion-4-caching-multinivel" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Tres niveles que cubren el 95% del valor:</li>
+<li><strong>Embedding cache</strong> (ya implementado en 02-retrieval): hash texto →
+     vector, persistente en disco / Redis / pgvector.</li>
+<li><strong>Response cache</strong> (LLM): hash (prompt + modelo + temp) → respuesta,
+     con TTL y stale-while-revalidate.</li>
+<li><strong>Semantic cache</strong>: la query nueva se embebe y si su coseno con
+     una query anterior supera un umbral, se devuelve la respuesta
+     cacheada.</li>
+<li>Implementación desde cero de un LRU con TTL.</li>
+<li>Trade-offs: hit rate vs riesgo de servir respuestas obsoletas, vs
+  costo de almacenamiento.</li>
+<li>Cuándo NO cachear: queries personalizadas con datos del usuario,
+  outputs con timestamps, RAG sobre corpus que muta a diario.</li>
+<li>Demo numérica: misma carga sintética con/sin cada nivel, mediendo
+  tokens, latencia p50/p95 y costo.</li>
+</ul>
+<h3 id="seccion-5-observabilidad-y-tracing">Sección 5 — Observabilidad y tracing<a class="headerlink" href="#seccion-5-observabilidad-y-tracing" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Las tres patas: <strong>logs estructurados</strong> (JSON, no print), <strong>métricas</strong>
+  (counter, histogram, gauge), <strong>traces</strong> (un request ID atraviesa
+  retrieval → rerank → generación).</li>
+<li>Qué medir, en orden de prioridad:</li>
+<li>Latencia end-to-end p50/p95/p99.</li>
+<li>Costo por request (in/out tokens × precio del modelo).</li>
+<li>Tasa de fallos (errores del proveedor, timeouts, rate limits).</li>
+<li>Métricas de calidad (online eval del §11 de 01-evals).</li>
+<li>Implementación: OpenTelemetry SDK + un backend (Tempo/Jaeger,
+  Honeycomb, o solo logs + DuckDB para empezar).</li>
+<li>Anti-patrón: dashboards bonitos sin alertas. El valor de la
+  observabilidad es enterarse <strong>antes</strong> que el usuario.</li>
+</ul>
+<h3 id="seccion-6-reliability-rate-limit-retries-circuit-breakers">Sección 6 — Reliability: rate limit, retries, circuit breakers<a class="headerlink" href="#seccion-6-reliability-rate-limit-retries-circuit-breakers" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Modelo mental: las APIs de LLM son recursos compartidos con SLA
+  estadístico, no servicios infalibles. El cliente las trata como red
+  externa flaky.</li>
+<li><strong>Rate limiting de cliente</strong>: token bucket desde cero. Por qué tu
+  cliente debe limitarse ANTES de que el proveedor te devuelva 429.</li>
+<li><strong>Retries con backoff exponencial + jitter</strong>: por qué el jitter, qué
+  errores se retentan (transient 5xx, 429) y cuáles no (4xx del cliente).</li>
+<li><strong>Circuit breaker</strong>: cuándo dejar de pegarle al proveedor que está
+  caído para no agravar el incidente. Implementación de estados
+  closed/open/half-open desde cero.</li>
+<li><strong>Fallback</strong>: cuando Claude está caído, ¿qué hacer? Servir respuesta
+  cacheada, ir a un modelo secundario (GPT-4o-mini), o degradar
+  visiblemente con "estamos en mantención".</li>
+</ul>
+<h3 id="seccion-7-despliegue-y-configuracion">Sección 7 — Despliegue y configuración<a class="headerlink" href="#seccion-7-despliegue-y-configuracion" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Container minimalista (Dockerfile + <code>uv pip install --system</code>).</li>
+<li>Config por entorno: <code>pydantic-settings</code> desde <code>.env</code> y secrets vault
+  para producción. Anti-patrón: variables hardcoded.</li>
+<li>Secrets management: nunca en logs, nunca en stack traces, nunca en
+  el control de versiones. Cómo verificarlo automáticamente.</li>
+<li>Migraciones de schema en pgvector: alembic + plan de rollback.</li>
+<li>Despliegue plain-vanilla sobre Fly.io / Railway / un VPS (cuál
+  conviene para el escenario chileno; Supabase Edge Functions cuando
+  aplica).</li>
+<li>Por qué Kubernetes es over-engineering para el 95% de estos productos.</li>
+</ul>
+<h3 id="seccion-8-versionado-de-modelos">Sección 8 — Versionado de modelos<a class="headerlink" href="#seccion-8-versionado-de-modelos" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Por qué nunca hardcodear <code>model="claude-opus-4-7"</code>: el modelo es
+  configuración, no constante.</li>
+<li>Tres patrones para cambiar de modelo sin susto:</li>
+<li><strong>Shadow</strong>: el modelo nuevo corre en paralelo, sin afectar al
+     usuario; comparamos métricas offline.</li>
+<li><strong>A/B con métricas</strong>: una fracción del tráfico va al modelo nuevo;
+     comparamos online (§9 de 01-evals).</li>
+<li><strong>Canary</strong>: 1% → 5% → 25% → 100%, con criterio de rollback
+     automático si métricas caen.</li>
+<li>Cuándo cada uno y cómo decidirlo. Ejemplo: migrar de Sonnet 4.5 a
+  Sonnet 4.6 con golden + canary.</li>
+<li>El problema del versionado del proveedor: "modelo X" puede cambiar
+  bajo tus pies. Pinning, snapshotting, comportamiento si el proveedor
+  retira un modelo.</li>
+</ul>
+<h3 id="seccion-9-online-evals-y-loop-de-feedback">Sección 9 — Online evals y loop de feedback<a class="headerlink" href="#seccion-9-online-evals-y-loop-de-feedback" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Conexión con 01-evals §11: el online eval no es un dashboard, es un
+  ciclo cerrado entre producción y el golden dataset.</li>
+<li>Sampling: no podés evaluar 100% del tráfico; cómo elegir qué evaluar
+  (sampling estratificado por query type, errores conocidos, queries
+  raras).</li>
+<li>Llevar producción a tu golden: las queries que fallaron en prod son
+  el mejor inventario para crecer el golden dataset.</li>
+<li>Auto-eval con LLM-judge en línea: cuándo sí (queries fuera de scope),
+  cuándo no (queries factuales que el judge no sabe juzgar).</li>
+<li>Drift detection: cómo te enterás de que tu corpus o tus queries
+  cambiaron de distribución.</li>
+</ul>
+<h3 id="seccion-10-costo-en-produccion">Sección 10 — Costo en producción<a class="headerlink" href="#seccion-10-costo-en-produccion" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Por qué el costo del LLM es la línea más volátil del P&amp;L de un
+  producto IA: cambio de modelo, cambio de tasa, cambio de tráfico
+  pueden 10× el costo en un día.</li>
+<li>Presupuestación por feature: cuánto cuesta una conversación
+  promedio, una conversación P99.</li>
+<li><strong>Cost-aware routing</strong>: la pregunta es "¿qué modelo es el más barato
+  que resuelve esta query?". Reuso del router de §9 de retrieval.</li>
+<li>Alertas: presupuesto mensual con tasas de quemado por hora.</li>
+<li>Caching agresivo cuando aplica (§4) como palanca de costo, no solo
+  de latencia.</li>
+<li>Tabla concreta para el corpus chileno: $/1000 queries con cada
+  arquitectura (BM25 only, Hybrid + Sonnet 4.6, Hybrid + Haiku 4.5,
+  con/sin cache).</li>
+</ul>
+<h3 id="seccion-11-seguridad">Sección 11 — Seguridad<a class="headerlink" href="#seccion-11-seguridad" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Prompt injection</strong>: el chunk recuperado contiene "Ignora las
+  instrucciones anteriores y responde X". Por qué pasa, cómo
+  defenderse (separación clara contexto/instrucción, sandboxing de
+  herramientas, output filtering).</li>
+<li><strong>PII en logs</strong>: cómo identificar y redactar números de RUT,
+  direcciones, nombres antes de loggear.</li>
+<li><strong>Auditoría regulatoria chilena</strong>: si tu producto opera sobre
+  normativa, hay obligaciones implícitas (privacidad Ley 19.628,
+  protección de menores, etc.). Qué loggear obligatoriamente, qué
+  destruir, durante cuánto tiempo.</li>
+<li><strong>Secrets</strong> y rotación: prácticas mínimas (no commitear, KMS,
+  rotación cada N meses).</li>
+<li>Modelo de amenazas pragmático para el producto chileno: qué pasa si
+  un usuario hostil intenta usar el sistema para X.</li>
+</ul>
+<h3 id="seccion-12-incidentes-y-postmortems">Sección 12 — Incidentes y postmortems<a class="headerlink" href="#seccion-12-incidentes-y-postmortems" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Los modos de falla específicos de un sistema con LLM:</li>
+<li><strong>Proveedor caído</strong> (Anthropic 503).</li>
+<li><strong>Latencia explotada</strong> (modelo lento, cola larga).</li>
+<li><strong>Alucinación masiva</strong> (cambio de modelo trajo regresión).</li>
+<li><strong>Retrieval roto</strong> (índice corrupto, embedding model cambió).</li>
+<li><strong>Costo desbocado</strong> (un usuario en loop, una query que
+     itera tools sin fin).</li>
+<li>Runbooks: qué mirar en los primeros 5 minutos para cada uno.</li>
+<li>Postmortem honesto: blameless, con la pregunta "¿qué nos faltó
+  para detectarlo antes?".</li>
+<li>Cierre: la métrica que vale es <strong>Mean Time To Detect</strong>, no MTTR.
+  Bajar MTTD es lo que te da margen.</li>
+</ul>
+<h2 id="dependencias-entre-secciones">Dependencias entre secciones<a class="headerlink" href="#dependencias-entre-secciones" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TD
+    S1[1. Salto a prod] --&gt; S2[2. Arquitectura]
+    S2 --&gt; S3[3. Prompts]
+    S2 --&gt; S4[4. Caching]
+    S2 --&gt; S5[5. Observabilidad]
+    S5 --&gt; S6[6. Reliability]
+    S6 --&gt; S7[7. Despliegue]
+    S7 --&gt; S8[8. Versionado modelos]
+    S5 --&gt; S9[9. Online evals]
+    S8 --&gt; S9
+    S4 --&gt; S10[10. Costo]
+    S9 --&gt; S10
+    S2 --&gt; S11[11. Seguridad]
+    S5 --&gt; S12[12. Incidentes]
+    S6 --&gt; S12
+    S10 --&gt; S12
+    style S1 fill:#bdf,stroke:#333,color:#1a1a1a
+    style S12 fill:#fd9,stroke:#333,color:#1a1a1a</code></pre>
+<h2 id="arbol-propuesto">Árbol propuesto<a class="headerlink" href="#arbol-propuesto" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>03-produccion/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── README.md                            # índice y estado
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── theory/
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── 00-plan.md                       # este documento
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── 01-salto-a-produccion.md
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── 02-arquitectura-servicio.md
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── 03-gestion-prompts.md
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   ├── 04-caching-multinivel.md
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   ├── 05-observabilidad.md
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   ├── 06-reliability.md
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   ├── 07-despliegue-config.md
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   ├── 08-versionado-modelos.md
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   ├── 09-online-evals-loop.md
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   ├── 10-costo-produccion.md
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│   ├── 11-seguridad.md
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│   └── 12-incidentes-postmortems.md
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>├── code/
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│   ├── prod_lib.py                      # núcleo reutilizable (crece por sección):
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│   │                                     #   §4 LRU+TTL, semantic cache
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│   │                                     #   §6 token bucket, retry, circuit breaker
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│   │                                     #   §8 model router con shadow/canary
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>│   │                                     #   §10 cost meter
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│   ├── 01-demo-prod-vs-demo.py
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│   ├── 02-fastapi-rag.py                # servicio mínimo con endpoint /query
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│   ├── 03-prompt-registry.py
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│   ├── 04-caching.py
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│   ├── 05-tracing.py
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│   ├── 06-reliability.py
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│   ├── 07-config-secrets.py
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│   ├── 08-model-routing.py
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│   ├── 09-online-eval-loop.py
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│   ├── 10-cost-meter.py
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│   ├── 11-prompt-injection.py
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│   └── 12-incident-runbooks.py
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>├── diagrams/
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│   ├── arquitectura-servicio.png        # §2
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│   ├── caching-niveles.png              # §4
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│   ├── pareto-costo-latencia.png        # §10
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│   └── incident-funnel.png              # §12
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>├── examples/
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>│   ├── prompts/                         # §3, prompts versionados
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>│   │   └── README.md
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>│   ├── traces/                          # §5, traces JSON de ejemplo
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>│   └── incidents/                       # §12, postmortems ficticios
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>└── notes/
+</code></pre></div>
+<h2 id="decisiones-tecnicas-requieren-tu-ok">Decisiones técnicas (requieren tu OK)<a class="headerlink" href="#decisiones-tecnicas-requieren-tu-ok" title="Permanent link">&para;</a></h2>
+<h3 id="1-stack-del-servicio">1. Stack del servicio<a class="headerlink" href="#1-stack-del-servicio" title="Permanent link">&para;</a></h3>
+<p>Propuesta (la <strong>recomendada</strong>, mínima sobre tu stack actual):</p>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Elección propuesta</th>
+<th>Por qué</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP framework</td>
+<td><strong>FastAPI</strong> + <code>uvicorn</code></td>
+<td>Estándar 2026, autodocs OpenAPI, type-hints integrados</td>
+</tr>
+<tr>
+<td>Config</td>
+<td><code>pydantic-settings</code> (<code>.env</code> + env vars)</td>
+<td>Validación de tipos, ya en el ecosistema</td>
+</tr>
+<tr>
+<td>Vector store</td>
+<td><strong>Supabase Postgres + pgvector</strong></td>
+<td>Tu stack actual; el <code>FilteredDenseRetriever</code> de §7 retrieval mapea directo</td>
+</tr>
+<tr>
+<td>Cache</td>
+<td>LRU en proceso + opcional Redis (§4)</td>
+<td>Empezamos en memoria; Redis cuando hay multi-réplica</td>
+</tr>
+<tr>
+<td>Observabilidad</td>
+<td><strong>OpenTelemetry SDK</strong> + backend opcional</td>
+<td>Vendor-neutral; podemos emitir a Jaeger local o Honeycomb</td>
+</tr>
+<tr>
+<td>LLM clients</td>
+<td>Wrappers ya existentes en <code>shared/llm_clients.py</code></td>
+<td>Anthropic + OpenAI cubren todo lo discutido</td>
+</tr>
+<tr>
+<td>Despliegue</td>
+<td>Container + Fly.io / Railway / VPS</td>
+<td>Stack pequeño, SLA simple, sin K8s</td>
+</tr>
+</tbody>
+</table>
+<p>Alternativa si la prefieres: <strong>LiteLLM</strong> como capa de abstracción de LLM
+en vez de wrappers propios. Pro: routing y fallback gratis, métricas
+estándar. Contra: una dep más, behavior implícito. <strong>Dime cuál antes
+de §2.</strong></p>
+<h3 id="2-profundidad-del-despliegue">2. Profundidad del despliegue<a class="headerlink" href="#2-profundidad-del-despliegue" title="Permanent link">&para;</a></h3>
+<p>Tres niveles posibles para §7:</p>
+<table>
+<thead>
+<tr>
+<th>Nivel</th>
+<th>Qué cubre</th>
+<th>Esfuerzo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A — Conceptual</strong></td>
+<td>Dockerfile + compose; sin desplegar nada real</td>
+<td>bajo</td>
+</tr>
+<tr>
+<td><strong>B — Local end-to-end</strong></td>
+<td>Compose con app + Postgres + Redis; se levanta y prueba en tu máquina</td>
+<td>medio</td>
+</tr>
+<tr>
+<td><strong>C — Deploy real</strong></td>
+<td>Cuenta y despliegue en Fly.io / Railway con secrets reales</td>
+<td>alto</td>
+</tr>
+</tbody>
+</table>
+<p>Propongo <strong>B</strong>: tiene el principio sin pedir cuentas externas. Si en
+algún momento querés C, lo agregamos como apéndice. <strong>OK?</strong></p>
+<h3 id="3-alcance-del-cost-monitoring">3. Alcance del cost monitoring<a class="headerlink" href="#3-alcance-del-cost-monitoring" title="Permanent link">&para;</a></h3>
+<p>§10 propone una tabla concreta de $/1000 queries sobre tu corpus.
+Implica correr cada combinación N veces con un script de carga. Costo
+real estimado: $1-5 por la tabla completa (gracias al cache). <strong>OK
+quemar eso?</strong> Si no, lo dejo simulado a partir de las tarifas públicas.</p>
+<h2 id="convenciones-para-esta-masterclass">Convenciones para esta masterclass<a class="headerlink" href="#convenciones-para-esta-masterclass" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Cada sección = un doc en <code>theory/</code> + un script demo en <code>code/</code>.</li>
+<li>Núcleo reutilizable en <code>code/prod_lib.py</code> (snake_case, importable);
+  scripts demo (kebab-case, numerados) lo importan.</li>
+<li>Diagramas Mermaid embebidos para arquitectura; matplotlib en
+  <code>diagrams/</code> para datos cuantitativos.</li>
+<li>Todo se ejecuta con <code>uv run python 03-produccion/code/NN-script.py</code>.</li>
+<li>Un commit por sección terminada: <code>feat(produccion): sección N — título</code>.</li>
+</ul>
+<h2 id="notas-sobre-estado-del-arte-2026">Notas sobre estado del arte (2026)<a class="headerlink" href="#notas-sobre-estado-del-arte-2026" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>FastAPI + Pydantic</strong> es el default de facto para servicios Python
+  con LLMs; resiste el escrutinio incluso a escala media.</li>
+<li><strong>OpenTelemetry</strong> consolidó el espacio de tracing; los vendor lock-in
+  de hace 3 años se diluyeron.</li>
+<li><strong>LiteLLM y los router-frameworks</strong> ganaron terreno cuando hay 3+
+  proveedores y necesitás unificar; bajo eso, los SDKs nativos están
+  bien.</li>
+<li><strong>Costo de LLM</strong> sigue siendo la línea más volátil del P&amp;L y la peor
+  presupuestada en proyectos chicos. La caída de precios año-sobre-año
+  (Sonnet 4.6, Haiku 4.5) no debe relajar la disciplina porque el
+  tráfico crece más rápido que la baja.</li>
+<li><strong>Prompt injection</strong> sigue sin solución general; las defensas son por
+  capas (sanitización, separación contexto/instrucción, salidas
+  validadas).</li>
+<li><strong>Online evals</strong> son el área menos madura: muchos productos los
+  llaman "dashboards" sin cerrar el loop con golden. La masterclass
+  apunta al ciclo cerrado.</li>
+<li><strong>Postmortems en sistemas con LLM</strong> son nuevos: la industria todavía
+  está descubriendo qué postmortem-tipo aplica para una regresión de
+  modelo o una alucinación masiva.</li>
+</ul>
+<h2 id="conexiones-con-las-otras-masterclasses">Conexiones con las otras masterclasses<a class="headerlink" href="#conexiones-con-las-otras-masterclasses" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>01-evals</strong>: §9 (regresiones/CI) y §11 (online evals) son insumos
+  directos; en producción cobran sentido completo.</li>
+<li><strong>02-retrieval</strong>: el RAG de las §§1-9 es lo que servimos; el router
+  de §9 retrieval es la base de §8 versionado y §10 costo.</li>
+<li><strong>04-economia</strong> (futura): la frontera de Pareto costo/calidad de
+  01-evals §10 conecta con la economía de inferencia que vendrá.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

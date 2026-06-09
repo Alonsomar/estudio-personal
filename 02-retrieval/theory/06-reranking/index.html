@@ -1,0 +1,2565 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../05-query-rewriting/">
+      
+      
+        <link rel="next" href="../07-metadata-estructurado/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#06-reranking-cross-encoders-colbert-y-llm-as-reranker" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../01-evals/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/01-por-que-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/03-analisis-errores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/05-metricas-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-ir-pre-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-chunking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#por-que-un-segundo-paso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué un segundo paso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tres-arquitecturas-con-costos-muy-distintos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tres arquitecturas con costos muy distintos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cross-encoder-ilustrado-con-un-caso-del-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-encoder, ilustrado con un caso del corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#colbert-late-interaction-ilustrado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ColBERT / Late interaction, ilustrado
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ColBERT / Late interaction, ilustrado">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-numerico-toy-no-del-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ejemplo numérico (toy, no del corpus)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#honestidad-sobre-la-aproximacion-sentence-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Honestidad sobre la aproximación sentence-level
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-as-reranker-la-opcion-de-nuestro-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM-as-reranker: la opción de nuestro stack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#los-numeros-el-llm-tiene-su-propia-idea-de-relevancia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Los números: el LLM tiene su propia idea de relevancia
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Los números: el LLM tiene su propia idea de relevancia">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-rescate-que-no-fue-gd-005" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El rescate que no fue: gd-005
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#costo-y-latencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Costo y latencia
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuando-cada-arquitectura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo cada arquitectura
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../03-produccion/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/07-despliegue-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#por-que-un-segundo-paso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué un segundo paso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tres-arquitecturas-con-costos-muy-distintos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tres arquitecturas con costos muy distintos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cross-encoder-ilustrado-con-un-caso-del-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-encoder, ilustrado con un caso del corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#colbert-late-interaction-ilustrado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ColBERT / Late interaction, ilustrado
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ColBERT / Late interaction, ilustrado">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-numerico-toy-no-del-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ejemplo numérico (toy, no del corpus)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#honestidad-sobre-la-aproximacion-sentence-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Honestidad sobre la aproximación sentence-level
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-as-reranker-la-opcion-de-nuestro-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM-as-reranker: la opción de nuestro stack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#los-numeros-el-llm-tiene-su-propia-idea-de-relevancia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Los números: el LLM tiene su propia idea de relevancia
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Los números: el LLM tiene su propia idea de relevancia">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-rescate-que-no-fue-gd-005" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El rescate que no fue: gd-005
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#costo-y-latencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Costo y latencia
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuando-cada-arquitectura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo cada arquitectura
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="06-reranking-cross-encoders-colbert-y-llm-as-reranker">06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker<a class="headerlink" href="#06-reranking-cross-encoders-colbert-y-llm-as-reranker" title="Permanent link">&para;</a></h1>
+<h2 id="por-que-un-segundo-paso">Por qué un segundo paso<a class="headerlink" href="#por-que-un-segundo-paso" title="Permanent link">&para;</a></h2>
+<p>La sección 3 nos dejó con una arquitectura híbrida que <strong>maximizaba recall@k
+grande</strong> (RRF @5 = 0.981) pero no ordenaba bien el top: el recall@1 quedaba en
+0.870, abajo del 0.907 de BM25 puro. Esa es la división de trabajo clásica en
+RAG moderno: el <strong>retriever</strong> asegura cobertura amplia (que lo relevante esté
+en algún lugar del pool); el <strong>reranker</strong> asegura precisión en el tope
+(reordenar el pool para que lo relevante quede en las primeras posiciones).</p>
+<pre class="mermaid"><code>graph LR
+    Q["Query"] --&gt; R["Retriever&lt;br/&gt;(híbrido / BM25 / denso)"]
+    R --&gt;|"pool top-N&lt;br/&gt;(N=10..100)&lt;br/&gt;alto recall"| RR["Reranker&lt;br/&gt;(cross-encoder /&lt;br/&gt;ColBERT / LLM)"]
+    RR --&gt;|"top-k reordenado&lt;br/&gt;alta precisión"| OUT["Contexto al generador"]</code></pre>
+<p>El reranker <strong>reordena</strong>, no <strong>busca</strong>: si el doc correcto no entró al pool, ya
+no lo recupera. De ahí que en §3 cerráramos el ciclo: maximizar recall@k del
+retriever ES alimentar al reranker con el pool más denso posible.</p>
+<p><strong>El techo del reranker, en nuestro corpus</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>recall@N de Hybrid-RRF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>0.981</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0.981</td>
+</tr>
+<tr>
+<td>20</td>
+<td><strong>1.000</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Si rerankeamos los top-20, el doc correcto está SIEMPRE ahí. Un reranker
+perfecto entonces conseguiría recall@1 = 1.000. El reto es cuánto de esa brecha
+(0.870 → 1.000) puede cubrir un reranker real, y a qué costo.</p>
+<h2 id="tres-arquitecturas-con-costos-muy-distintos">Tres arquitecturas con costos muy distintos<a class="headerlink" href="#tres-arquitecturas-con-costos-muy-distintos" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Bi-encoder (§2)</th>
+<th>Cross-encoder</th>
+<th>ColBERT / Late interaction</th>
+<th>LLM-as-reranker</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Codificación</strong></td>
+<td>query y doc por separado</td>
+<td>query y doc <strong>juntos</strong></td>
+<td>query y doc por token, juntos al final</td>
+<td>query y doc en prompt</td>
+</tr>
+<tr>
+<td><strong>Score</strong></td>
+<td><code>cos(v_q, v_d)</code></td>
+<td><code>Transformer(q [SEP] d)</code></td>
+<td><code>Σ_i max_j cos(q_i, d_j)</code> (MaxSim)</td>
+<td>LLM lee y opina</td>
+</tr>
+<tr>
+<td><strong>Precomputable</strong></td>
+<td>✅ doc indexable</td>
+<td>❌ requiere par (q, d)</td>
+<td>🟡 doc tokenizable, query al vuelo</td>
+<td>❌ requiere par (q, d)</td>
+</tr>
+<tr>
+<td><strong>Costo retrieval</strong></td>
+<td>barato (O(corpus))</td>
+<td>caro (O(pool) por query)</td>
+<td>medio (índices PLAID)</td>
+<td>medio-caro (1 API call por candidato o por pool)</td>
+</tr>
+<tr>
+<td><strong>Precisión típica</strong></td>
+<td>media</td>
+<td>alta</td>
+<td>alta</td>
+<td>alta (variable según modelo)</td>
+</tr>
+</tbody>
+</table>
+<p>El punto clave: el cross-encoder es preciso porque <strong>la query y el documento
+nunca se ven hasta que entran juntos al transformer</strong>, así que la atención
+cruzada captura señales que un bi-encoder pierde. Pero ese mismo
+"juntos" significa que no puedes precomputar nada — un forward pass por par.
+Por eso solo se usa para REORDENAR un pool ya filtrado (10-100 docs).</p>
+<h2 id="cross-encoder-ilustrado-con-un-caso-del-corpus">Cross-encoder, ilustrado con un caso del corpus<a class="headerlink" href="#cross-encoder-ilustrado-con-un-caso-del-corpus" title="Permanent link">&para;</a></h2>
+<p>No corremos un cross-encoder real (la API de OpenAI no expone uno y no
+agregamos <code>sentence-transformers</code> con torch al stack). Pero podemos mostrar
+<strong>el problema que arregla</strong> con un caso real de §2-3.</p>
+<p>Query: <em>"Ley Nº 21.210"</em>. Con el bi-encoder denso (text-embedding-3-small),
+los cosenos contra los dos pasajes candidatos son:</p>
+<table>
+<thead>
+<tr>
+<th>Pasaje</th>
+<th>Coseno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ley-02 <em>(LEY 21.210 MODERNIZA…)</em> — <strong>el correcto</strong></td>
+<td>0.649</td>
+</tr>
+<tr>
+<td>ley-01 <em>(TEXTO PREVIO A LA LEY 21.210)</em> — distractor</td>
+<td><strong>0.658</strong></td>
+</tr>
+</tbody>
+</table>
+<p>El distractor gana por 0.009. El bi-encoder no puede distinguir "la ley X" de
+"el texto previo a la ley X" porque codifica cada pasaje <strong>sin ver la query</strong>;
+ambos son semánticamente "sobre la 21.210". Un cross-encoder leería los dos
+pasajes con la query en su mismo paso de atención y notaría la relación
+lingüística <em>"previo a"</em> vs <em>"modifica"</em>. Esa es exactamente la operación que
+un bi-encoder no hace y un cross-encoder sí.</p>
+<h2 id="colbert-late-interaction-ilustrado">ColBERT / Late interaction, ilustrado<a class="headerlink" href="#colbert-late-interaction-ilustrado" title="Permanent link">&para;</a></h2>
+<p>ColBERT (Khattab &amp; Zaharia, 2020) es el punto medio. Como un bi-encoder,
+<strong>precomputa</strong>: pero un vector <strong>por token</strong> del documento, no uno por
+documento. Como un cross-encoder, la <strong>query también se descompone en
+tokens</strong>. El score se calcula con <strong>MaxSim</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>MaxSim(q, d) = Σ_i  max_j  cos(q_i, d_j)
+</code></pre></div>
+<p>Cada token de la query "vota" por su mejor match en el doc; los votos se
+suman. Es como decir: "para que un doc sea relevante, cada palabra clave de la
+query debe encontrar a SU palabra en el doc".</p>
+<h3 id="ejemplo-numerico-toy-no-del-corpus">Ejemplo numérico (toy, no del corpus)<a class="headerlink" href="#ejemplo-numerico-toy-no-del-corpus" title="Permanent link">&para;</a></h3>
+<p>Query con 3 tokens: <code>q = ["IVA", "servicios", "digital"]</code>.
+Doc1 con 3 tokens: <code>d1 = ["IVA", "servicios", "digital"]</code> (matches perfectos).
+Doc2 con 3 tokens: <code>d2 = ["IVA", "renta", "boleta"]</code> (un solo match).</p>
+<p>Si cos(token igual, token igual) = 1.0 y cos(token distinto, token distinto)
+= 0.3, entonces:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>MaxSim(q, d1) = 1.0 + 1.0 + 1.0 = 3.0
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>MaxSim(q, d2) = 1.0 + 0.3 + 0.3 = 1.6
+</code></pre></div>
+<p>Más interesante: un bi-encoder que <strong>promedia</strong> los tokens vería los dos docs
+muy parecidos (ambos contienen "IVA"). MaxSim premia que <strong>cada</strong> token de la
+query tenga match, no solo el promedio. Esa es la ganancia conceptual.</p>
+<h3 id="honestidad-sobre-la-aproximacion-sentence-level">Honestidad sobre la aproximación sentence-level<a class="headerlink" href="#honestidad-sobre-la-aproximacion-sentence-level" title="Permanent link">&para;</a></h3>
+<p>En el demo intenté ilustrar MaxSim partiendo el documento en <em>oraciones</em> (no
+tokens, porque no tenemos token embeddings). Para la query "Ley Nº 21.210" sobre
+los dos pasajes candidatos:</p>
+<table>
+<thead>
+<tr>
+<th>Pasaje</th>
+<th>bi-encoder cos</th>
+<th>MaxSim sentence-level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ley-02 (correcto)</td>
+<td>0.577</td>
+<td>0.631</td>
+</tr>
+<tr>
+<td>ley-01 (distractor)</td>
+<td><strong>0.618</strong></td>
+<td><strong>0.651</strong></td>
+</tr>
+</tbody>
+</table>
+<p>La aproximación a nivel oración <strong>tampoco</strong> separó este caso: el distractor
+sigue arriba. Es honesto: ColBERT real (token level) puede ayudar cuando la
+query tiene varios tokens distintivos que distribuyen sus "votos" en el doc
+correcto; con una query de 3 tokens dominada por la cifra "21.210" que ambos
+docs contienen literalmente, la late interaction no separa más que el
+bi-encoder. Para este caso, la separación fina solo la trae un modelo que
+entienda <em>relaciones</em> entre frases — cross-encoder o LLM.</p>
+<h2 id="llm-as-reranker-la-opcion-de-nuestro-stack">LLM-as-reranker: la opción de nuestro stack<a class="headerlink" href="#llm-as-reranker-la-opcion-de-nuestro-stack" title="Permanent link">&para;</a></h2>
+<p><code>LLMReranker</code> en <code>retrieval_lib</code> implementa dos variantes desde cero:</p>
+<ul>
+<li><strong>Pointwise</strong>: para cada candidato, le pedimos al LLM un score 0-10 de
+  relevancia. N llamadas por query; cara y "honesta" (cada par juzgado
+  individualmente).</li>
+<li><strong>Listwise</strong>: enviamos los N candidatos numerados al LLM en un solo prompt y
+  le pedimos un orden de relevancia. 1 llamada por query; barata, con la
+  ventaja de comparación global y la desventaja de cargar más contexto.</li>
+</ul>
+<p>Ambas cachean las respuestas a disco (<code>cache-rerank.json</code>), igual que §5.</p>
+<h2 id="los-numeros-el-llm-tiene-su-propia-idea-de-relevancia">Los números: el LLM tiene su propia idea de relevancia<a class="headerlink" href="#los-numeros-el-llm-tiene-su-propia-idea-de-relevancia" title="Permanent link">&para;</a></h2>
+<p>Recall@k sobre el golden, con Hybrid-RRF como base y reranker sobre el top-10:</p>
+<table>
+<thead>
+<tr>
+<th>Sistema</th>
+<th>recall@1</th>
+<th>recall@3</th>
+<th>recall@5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BM25</td>
+<td><strong>0.907</strong></td>
+<td>0.907</td>
+<td>0.907</td>
+</tr>
+<tr>
+<td>Denso</td>
+<td>0.796</td>
+<td>0.963</td>
+<td>0.963</td>
+</tr>
+<tr>
+<td>Hybrid-RRF (base)</td>
+<td>0.870</td>
+<td>0.907</td>
+<td><strong>0.981</strong></td>
+</tr>
+<tr>
+<td>Hybrid-RRF + LLM pointwise</td>
+<td>0.815</td>
+<td><strong>0.963</strong></td>
+<td>0.963</td>
+</tr>
+<tr>
+<td>Hybrid-RRF + LLM listwise</td>
+<td>0.833</td>
+<td><strong>0.963</strong></td>
+<td>0.963</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Recall por sistema, reranking" src="../../diagrams/reranking-recall.png" /></p>
+<p>Lecturas, ninguna trivial:</p>
+<ul>
+<li><strong>El reranker MEJORA recall@3</strong> (0.907 → 0.963): empareja al denso/dense del
+  techo, llevando lo relevante del puesto 4-5 al top-3 con frecuencia.</li>
+<li><strong>El reranker HIERE recall@1</strong> (0.870 → 0.815/0.833): saca el doc correcto
+  del primer puesto en algunas queries.</li>
+<li><strong>El reranker baja levemente recall@5</strong> (0.981 → 0.963): en algunos casos
+  reordena el top-10 demoviendo un relevante de la posición 5 a la 6+.</li>
+</ul>
+<p>Esto <strong>contradice</strong> la literatura estándar de "agrega un reranker y todo
+mejora". Lo que está pasando se ve nítido en un caso cualitativo.</p>
+<h3 id="el-rescate-que-no-fue-gd-005">El rescate que no fue: gd-005<a class="headerlink" href="#el-rescate-que-no-fue-gd-005" title="Permanent link">&para;</a></h3>
+<p>Query: <em>"Un proveedor de SaaS con sede en Irlanda vende a empresas chilenas.
+¿Debe registrarse ante el SII? ¿Cada cuánto declara?"</em> (gd-005 del golden).
+<code>expected_docs = [circular-01-sii-iva-digital.txt]</code>.</p>
+<p><strong>Top-5 de Hybrid-RRF (entrada al reranker):</strong>
+1. <strong>circular-01</strong> "a) Registrarse ante el SII a través del portal..."
+2. ley-02 "2. Establécese que dichos prestadores extranjeros..."
+3. norma-01 lobby (distractor)
+4. norma-02 probidad (distractor)
+5. <strong>circular-01</strong> "MATERIA: Instruye sobre la aplicación del IVA..."</p>
+<p><strong>Top-5 tras LLM-reranker listwise:</strong>
+1. <strong>ley-02</strong> ← el LLM la sube al #1
+2. <strong>circular-01</strong> ← demovida al #2
+3. <strong>circular-01</strong> (otro chunk)
+4. ley-02 (otro chunk)
+5. circular-02-renta-propyme</p>
+<p>¿El reranker se equivocó? No exactamente. La Ley 21.210 es <strong>la fuente
+normativa primaria</strong> del régimen de IVA digital; la circular del SII solo lo
+<em>instruye</em>. Un abogado tributario probablemente diría que ley-02 es <strong>más</strong>
+relevante que circular-01 para "¿debe registrarse?". El LLM eligió bien por
+criterio jurídico — pero el golden lista solo circular-01 como expected, así
+que la métrica lo marca como falla en @1.</p>
+<p>Lo que esto revela:</p>
+<ol>
+<li><strong>El golden está incompleto</strong>. Cuando varios docs son legítimamente
+   relevantes, listar solo uno hace que cualquier reranker razonable parezca
+   peor de lo que es. Es el problema que motivamos en §3 al hablar del techo
+   y que atacaremos en §8 con ground truth a nivel chunk.</li>
+<li><strong>El LLM-reranker tiene su propia teoría de relevancia</strong>, y no
+   necesariamente coincide con la del golden. Eso no es un bug — es la
+   naturaleza del juicio LLM.</li>
+<li><strong>Si tu golden es escaso, el reranker puede empeorar tus métricas mientras
+   mejora la experiencia real del usuario</strong>. Honestidad incómoda pero real.</li>
+</ol>
+<h2 id="costo-y-latencia">Costo y latencia<a class="headerlink" href="#costo-y-latencia" title="Permanent link">&para;</a></h2>
+<p>Para nuestro experimento (25 queries × 10 candidatos × pointwise + 25 listwise):</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Calls LLM</th>
+<th>Tokens aprox.</th>
+<th>Latencia añadida</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pointwise</td>
+<td>250</td>
+<td>~25K in + ~250 out</td>
+<td>~250 × 0.5s ≈ 2 min total</td>
+</tr>
+<tr>
+<td>Listwise</td>
+<td>25</td>
+<td>~50K in + ~500 out</td>
+<td>~25 × 1s ≈ 25 s total</td>
+</tr>
+</tbody>
+</table>
+<p>Cuando hay que elegir entre los dos: <strong>listwise gana en costo</strong> (10× menos
+calls) y, en nuestros datos, <strong>empata o supera al pointwise en recall</strong>
+(0.833 vs 0.815 en @1). El sesgo posicional del LLM (puede preferir los
+primeros candidatos del listado) es un riesgo real pero corregible (shuffle
+del input).</p>
+<h2 id="cuando-cada-arquitectura">Cuándo cada arquitectura<a class="headerlink" href="#cuando-cada-arquitectura" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Situación</th>
+<th>Arquitectura recomendada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAG en producción con latencia ajustada y stack LLM ya existente</td>
+<td><strong>LLM-as-reranker listwise</strong> sobre top-10 del híbrido</td>
+</tr>
+<tr>
+<td>Pipeline crítico que requiere precisión maximal, GPU disponible</td>
+<td><strong>Cross-encoder</strong> (ms-marco MiniLM, BGE reranker) sobre top-50-100</td>
+</tr>
+<tr>
+<td>Volumen alto, queries diversas, infra ML madura</td>
+<td><strong>ColBERT / PLAID</strong> integrado a nivel retrieval (no solo rerank)</td>
+</tr>
+<tr>
+<td>Solo necesitas filtrar los obvio-irrelevantes</td>
+<td>Pointwise simple con umbral, no listwise</td>
+</tr>
+<tr>
+<td>Tu golden es escaso</td>
+<td><strong>No optimices reranker contra esa métrica</strong> — confunde mejora de UX con mejora medible</td>
+</tr>
+</tbody>
+</table>
+<h2 id="estado-del-arte">Estado del arte<a class="headerlink" href="#estado-del-arte" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Estado</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cross-encoder reranking</td>
+<td>✅ Estándar</td>
+<td>ms-marco MiniLM, BGE reranker; bien soportados, baratos en GPU</td>
+</tr>
+<tr>
+<td>ColBERT v2 / PLAID</td>
+<td>✅ Maduro</td>
+<td>Especialmente competitivo en multilingual y dominio largo</td>
+</tr>
+<tr>
+<td>LLM-as-reranker</td>
+<td>✅ En adopción</td>
+<td>Variante listwise gana por costo; mantente atento al sesgo posicional</td>
+</tr>
+<tr>
+<td>Métricas con golden incompleto</td>
+<td>🔴 Problema abierto</td>
+<td>Cualquier reranker que mejore el sistema puede degradar las métricas</td>
+</tr>
+<tr>
+<td>Reranker fine-tuneado para dominio legal/fiscal en español</td>
+<td>🔴 Sin solución de estante</td>
+<td>Brecha de modelos de dominio (igual que §2)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conexiones">Conexiones<a class="headerlink" href="#conexiones" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Sección 2 (bi-encoder):</strong> el ejemplo de "Ley 21.210" donde el denso fallaba
+  es el caso de manual de "necesita cross-encoder" — la red debe leer query y
+  doc juntos para entender la diferencia.</li>
+<li><strong>Sección 3 (hybrid):</strong> el reranker es el complemento natural. RRF maximiza
+  recall@k; el reranker enfoca el top. Pero el resultado empírico aquí muestra
+  que la sinergia no es automática.</li>
+<li><strong>Sección 5 (query rewriting):</strong> rewriting amplía el pool desde el lado de la
+  query; reranking lo enfoca desde el lado del scoring. Componibles.</li>
+<li><strong>Sección 8 (evaluación):</strong> el episodio gd-005 (golden incompleto que hace
+  parecer mal al reranker) motiva la construcción de ground truth a nivel
+  chunk allí. Sin eso, no podemos diferenciar "el reranker empeoró" de "el
+  golden está mal".</li>
+<li><strong>01-evals §7 (LLM-as-judge):</strong> los sesgos documentados del LLM-as-judge
+  (position, verbosity, anchoring) aplican también al LLM-as-reranker: el
+  listwise sufre position bias. Las mismas mitigaciones (shuffle, multi-pass)
+  sirven.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2381 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../06-reliability/">
+      
+      
+        <link rel="next" href="../08-versionado-modelos/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>07 — Despliegue y configuración - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#07-despliegue-y-configuracion" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              07 — Despliegue y configuración
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../01-evals/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/01-por-que-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/03-analisis-errores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/05-metricas-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../02-retrieval/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/01-ir-pre-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/04-chunking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/06-reranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#de-uv-run-python-a-un-servicio-reproducible" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        De uv run python a un servicio reproducible
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="De uv run python a un servicio reproducible">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analogia-institucionalizar-un-piloto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analogía: institucionalizar un piloto
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-por-entorno-la-regla-de-los-12-factores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config por entorno: la regla de los 12 factores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secretos-nunca-en-logs-en-traces-ni-en-el-repo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secretos: nunca en logs, en traces, ni en el repo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-contenedor-minimalista" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El contenedor minimalista
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nivel-b-el-stack-completo-en-tu-maquina" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nivel B: el stack completo en tu máquina
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migraciones-de-schema-alembic-y-el-plan-de-rollback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migraciones de schema: alembic y el plan de rollback
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#donde-desplegar-escenario-chileno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dónde desplegar (escenario chileno)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dónde desplegar (escenario chileno)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#por-que-k8s-es-over-engineering-para-el-95" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué K8s es over-engineering para el 95%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte (2026)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lo-que-viene-en-las-proximas-secciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo que viene en las próximas secciones
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#de-uv-run-python-a-un-servicio-reproducible" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        De uv run python a un servicio reproducible
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="De uv run python a un servicio reproducible">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analogia-institucionalizar-un-piloto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analogía: institucionalizar un piloto
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-por-entorno-la-regla-de-los-12-factores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config por entorno: la regla de los 12 factores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secretos-nunca-en-logs-en-traces-ni-en-el-repo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secretos: nunca en logs, en traces, ni en el repo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-contenedor-minimalista" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El contenedor minimalista
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nivel-b-el-stack-completo-en-tu-maquina" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nivel B: el stack completo en tu máquina
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migraciones-de-schema-alembic-y-el-plan-de-rollback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migraciones de schema: alembic y el plan de rollback
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#donde-desplegar-escenario-chileno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dónde desplegar (escenario chileno)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dónde desplegar (escenario chileno)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#por-que-k8s-es-over-engineering-para-el-95" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué K8s es over-engineering para el 95%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte (2026)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lo-que-viene-en-las-proximas-secciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo que viene en las próximas secciones
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="07-despliegue-y-configuracion">07 — Despliegue y configuración<a class="headerlink" href="#07-despliegue-y-configuracion" title="Permanent link">&para;</a></h1>
+<h2 id="de-uv-run-python-a-un-servicio-reproducible">De <code>uv run python</code> a un servicio reproducible<a class="headerlink" href="#de-uv-run-python-a-un-servicio-reproducible" title="Permanent link">&para;</a></h2>
+<p>Hasta acá el servicio se levantaba con <code>uv run python 02-fastapi-rag.py</code>, con la
+config viviendo en el <code>.env</code> de tu máquina y los índices en memoria. Eso corre
+en tu laptop. "Desplegarlo" significa que corra <strong>igual</strong> en otra máquina, sin
+vos presente, con la config que ese entorno necesita, sin que un secreto se
+filtre, y de forma reversible si algo sale mal. Esta sección es ese empaque.</p>
+<h3 id="analogia-institucionalizar-un-piloto">Analogía: institucionalizar un piloto<a class="headerlink" href="#analogia-institucionalizar-un-piloto" title="Permanent link">&para;</a></h3>
+<p>Un script que corre en tu máquina es un <strong>plan piloto</strong>: funciona porque vos
+estás ahí ajustándolo. Desplegarlo es <strong>institucionalizarlo</strong>: que el programa
+corra con su presupuesto, sus reglas escritas y su personal, reproducible sin
+depender de quién lo echó a andar. La diferencia entre un piloto exitoso y una
+política que escala es exactamente la diferencia entre <code>python script.py</code> y un
+contenedor con su config externalizada, sus secretos en un vault y sus
+migraciones versionadas.</p>
+<h2 id="config-por-entorno-la-regla-de-los-12-factores">Config por entorno: la regla de los 12 factores<a class="headerlink" href="#config-por-entorno-la-regla-de-los-12-factores" title="Permanent link">&para;</a></h2>
+<p>El principio: <strong>la config es entrada del entorno, no constantes en el código.</strong>
+El mismo artefacto (la imagen) corre en dev, staging y prod; lo que cambia es el
+entorno que lo alimenta. <code>ServiceSettings</code> (en <a href="../../code/prod_lib.py"><code>prod_lib.py</code></a>)
+centraliza <strong>todos</strong> los knobs que las secciones anteriores fueron acumulando:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ServiceSettings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">llm_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o-mini&quot;</span>          <span class="c1"># §2</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">openai_api_key</span><span class="p">:</span> <span class="n">SecretStr</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">k_default</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>  <span class="c1"># §2, validado</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">semantic_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>   <span class="c1"># §4</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>                 <span class="c1"># §6</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">llm_timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>                 <span class="c1"># cierra el &quot;sin timeout&quot; de §2</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">...</span>
+</code></pre></div>
+<p>El anti-patrón que reemplaza:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span>    <span class="c1"># explota en el primer request si falta</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">))</span>          <span class="c1"># parsing a mano, sin validación, regado</span>
+</code></pre></div>
+<p>Con <code>ServiceSettings</code>, la precedencia es <strong>argumentos &gt; variables de entorno &gt;
+<code>.env</code> &gt; defaults</strong>, y la validación corre <strong>al arrancar</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>intento de arrancar con k_default=999 (fuera de rango 1..20):
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  ✗ ValidationError: k_default → Input should be less than or equal to 20
+</code></pre></div>
+<p>Un valor inválido tira el proceso <strong>al startup</strong>, con un mensaje claro, no a las
+3 AM cuando un request toca esa rama. Es la misma idea de "validación en el
+borde" de §2 (Pydantic en el request), aplicada a la config.</p>
+<h2 id="secretos-nunca-en-logs-en-traces-ni-en-el-repo">Secretos: nunca en logs, en traces, ni en el repo<a class="headerlink" href="#secretos-nunca-en-logs-en-traces-ni-en-el-repo" title="Permanent link">&para;</a></h2>
+<p>Tres lugares donde un secreto se filtra sin que lo notes: un <code>print(settings)</code>,
+un stack trace que incluye variables locales, y un <code>git commit</code> del <code>.env</code>. Las
+defensas:</p>
+<ul>
+<li><strong>Tipo <code>SecretStr</code></strong>: su <code>repr</code> es <code>**********</code>. Un <code>print</code>, un log o un stack
+  trace nunca muestran el valor.
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>repr(openai_api_key) = SecretStr(&#39;**********&#39;)
+</code></pre></div></li>
+<li><strong><code>.env</code> en <code>.gitignore</code></strong>: solo se commitea <code>.env.example</code> (plantilla con
+  placeholders). El <code>docker-compose.yml</code> toma las credenciales de <code>.env</code>, no las
+  tiene inline — el archivo versionado no contiene un solo secreto.</li>
+<li><strong>Verificación automática</strong> (<code>scan_for_secrets</code>): un escáner de patrones
+  (claves <code>sk-…</code>, URLs con password, tokens) que corre en CI sobre diffs, dumps
+  de config y logs de ejemplo, y <strong>falla el build</strong> si encuentra algo:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>scan(public_dict): LIMPIO ✓
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>scan(log naive): 2 secretos detectados → CI debería FALLAR
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  redactado: ...OPENAI_API_KEY=***REDACTED*** a postgresql://***:***@db:5432/x
+</code></pre></div></li>
+<li><strong>Defensa en profundidad en el logger</strong>: el <code>StructuredLogger</code> de §5 ahora
+  redacta por defecto (<code>redact=True</code>). Aunque alguien loguee un campo con un key
+  por error, no llega al archivo:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>StructuredLogger(redact=True): ¿se filtró el key al log? False
+</code></pre></div></li>
+</ul>
+<p>El secreto vive en un <strong>secret manager</strong> (variables de entorno del PaaS, o un
+vault) que lo inyecta en runtime. Nunca toca el control de versiones.</p>
+<h2 id="el-contenedor-minimalista">El contenedor minimalista<a class="headerlink" href="#el-contenedor-minimalista" title="Permanent link">&para;</a></h2>
+<p>El <a href="../../examples/deploy/Dockerfile"><code>Dockerfile</code></a> empaca el servicio en una
+imagen reproducible. Las decisiones que importan:</p>
+<ul>
+<li><strong>uv adentro</strong>, el mismo de local: deps reproducibles desde <code>uv.lock</code>, sin
+  sorpresas "en mi máquina andaba".</li>
+<li><strong>Capas ordenadas por volatilidad</strong>: primero <code>pyproject.toml</code> + <code>uv.lock</code> y
+  <code>uv sync</code> (capa que se reusa mientras las deps no cambien), después el código.
+  Un cambio de código no reinstala las dependencias.</li>
+<li><strong>Usuario no-root</strong>: si el proceso se compromete, el atacante no es root del
+  contenedor.</li>
+<li><strong>Healthcheck</strong> contra el <code>/healthz</code> de §2: el orquestador sabe si el proceso
+  está vivo.</li>
+</ul>
+<h2 id="nivel-b-el-stack-completo-en-tu-maquina">Nivel B: el stack completo en tu máquina<a class="headerlink" href="#nivel-b-el-stack-completo-en-tu-maquina" title="Permanent link">&para;</a></h2>
+<p>El <a href="../../examples/deploy/docker-compose.yml"><code>docker-compose.yml</code></a> levanta los tres
+componentes del escenario chileno típico, sin cuentas cloud:</p>
+<pre class="mermaid"><code>graph LR
+    C["curl / frontend"] --&gt;|":8000"| APP["app&lt;br/&gt;(FastAPI + uv)"]
+    APP --&gt;|"DATABASE_URL"| DB[("db&lt;br/&gt;Postgres + pgvector")]
+    APP --&gt;|"REDIS_URL"| R[("cache&lt;br/&gt;Redis")]
+    ENV[".env&lt;br/&gt;(secretos, gitignored)"] -.-&gt;|env_file| APP
+    INIT["initdb/0001_init.sql"] -.-&gt;|primer arranque| DB
+
+    style APP fill:#bdf,stroke:#333,color:#1a1a1a
+    style ENV fill:#f39c12,stroke:#333,color:#1a1a1a
+    style DB fill:#bfb,stroke:#333,color:#1a1a1a
+    style R fill:#bfb,stroke:#333,color:#1a1a1a</code></pre>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env<span class="w">      </span><span class="c1"># completá OPENAI_API_KEY</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build
+</code></pre></div>
+<p><code>app</code> espera (<code>depends_on</code> + <code>healthcheck</code>) a que Postgres acepte conexiones
+antes de arrancar — el patrón readiness de §2 aplicado a las dependencias. El
+nivel B tiene el principio completo (servicio + estado externo) sin pedir una
+tarjeta de crédito.</p>
+<h2 id="migraciones-de-schema-alembic-y-el-plan-de-rollback">Migraciones de schema: alembic y el plan de rollback<a class="headerlink" href="#migraciones-de-schema-alembic-y-el-plan-de-rollback" title="Permanent link">&para;</a></h2>
+<p>El índice en memoria de §2 funciona para 234 chunks; a escala, el corpus vive en
+Postgres+pgvector. Cambiar ese schema en producción —agregar una columna,
+cambiar un índice— se hace con <strong>migraciones versionadas</strong>, no con SQL a mano.</p>
+<p>Cada migración alembic (<a href="../../examples/deploy/alembic/versions/0001_init.py">ejemplo</a>)
+tiene dos mitades:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">upgrade</span><span class="p">():</span>    <span class="c1"># aplicar: CREATE EXTENSION vector; CREATE TABLE chunks ...</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">downgrade</span><span class="p">():</span>  <span class="c1"># revertir: DROP TABLE chunks; DROP INDEX ...</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>alembic<span class="w"> </span>upgrade<span class="w"> </span>head<span class="w">     </span><span class="c1"># aplica las pendientes</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>alembic<span class="w"> </span>downgrade<span class="w"> </span>-1<span class="w">     </span><span class="c1"># rollback de la última</span>
+</code></pre></div>
+<p>El <code>downgrade()</code> <strong>es</strong> el plan de rollback. Sin él, "la migración rompió
+producción" se resuelve restaurando un backup a mano, con downtime. Con él, es
+un comando determinista. Para el nivel B local, el atajo es el
+<a href="../../examples/deploy/initdb/0001_init.sql"><code>initdb/0001_init.sql</code></a> que Postgres
+corre al crear el volumen; crea el mismo schema, sin el versionado.</p>
+<blockquote>
+<p>⚠️ El <code>downgrade</code> de pgvector no dropea la extensión <code>vector</code>: podría usarla
+otra tabla. Las migraciones destructivas (drop de columna con datos) necesitan
+un plan de dos pasos: primero dejar de escribir, después dropear en una
+migración posterior, para que el rollback intermedio no pierda datos.</p>
+</blockquote>
+<h2 id="donde-desplegar-escenario-chileno">Dónde desplegar (escenario chileno)<a class="headerlink" href="#donde-desplegar-escenario-chileno" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Opción</th>
+<th>Cuándo</th>
+<th>Nota</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fly.io / Railway</strong></td>
+<td>Default para SaaS chico-mediano</td>
+<td>Deploy desde el Dockerfile, secrets manager incluido, escala simple</td>
+</tr>
+<tr>
+<td><strong>VPS (Hetzner, DigitalOcean)</strong></td>
+<td>Querés control y costo fijo</td>
+<td>Más trabajo de ops; docker-compose en una VM alcanza mucho tiempo</td>
+</tr>
+<tr>
+<td><strong>Supabase</strong> (ya lo usás)</td>
+<td>El Postgres+pgvector ya vive ahí</td>
+<td>Edge Functions para lógica liviana; el servicio Python va aparte</td>
+</tr>
+<tr>
+<td><strong>Kubernetes</strong></td>
+<td><strong>Casi nunca</strong> a esta escala</td>
+<td>Ver abajo</td>
+</tr>
+</tbody>
+</table>
+<h3 id="por-que-k8s-es-over-engineering-para-el-95">Por qué K8s es over-engineering para el 95%<a class="headerlink" href="#por-que-k8s-es-over-engineering-para-el-95" title="Permanent link">&para;</a></h3>
+<p>Kubernetes resuelve el problema de <strong>decenas de servicios y un equipo de
+plataforma</strong>. Para un SaaS chileno de 1-3 personas y miles de usuarios, agrega un
+plano de control, YAML por capas, y un costo operativo permanente que no paga
+valor. Una sola instancia (o dos para redundancia) detrás de un load balancer
+del PaaS atiende ese tráfico sin sudar. K8s antes de necesitarlo es complejidad
+por miedo, no por escala. La señal de que <strong>sí</strong> lo necesitás: cuando coordinar
+los despliegues de tus servicios a mano se volvió el cuello de botella — y eso
+llega mucho después de los primeros miles de usuarios.</p>
+<h2 id="estado-del-arte-2026">Estado del arte (2026)<a class="headerlink" href="#estado-del-arte-2026" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Estado</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Config por entorno (12-factor)</td>
+<td>✅ Estándar</td>
+<td><code>pydantic-settings</code> es el default en Python; tipado + validación gratis</td>
+</tr>
+<tr>
+<td>Secretos en vault, no en repo</td>
+<td>✅ No negociable</td>
+<td>Scanners (gitleaks, trufflehog) en CI son práctica mínima</td>
+</tr>
+<tr>
+<td><code>SecretStr</code> / redacción en logs</td>
+<td>🟢 Best practice</td>
+<td>Defensa en profundidad; barato de cablear</td>
+</tr>
+<tr>
+<td>uv en el contenedor</td>
+<td>🟢 En auge</td>
+<td>Builds reproducibles y rápidos; reemplaza pip/poetry en imágenes nuevas</td>
+</tr>
+<tr>
+<td>PaaS (Fly/Railway) sobre K8s</td>
+<td>🟢 Consenso para equipos chicos</td>
+<td>El péndulo volvió de "k8s para todo" a "k8s cuando hace falta"</td>
+</tr>
+<tr>
+<td>Migraciones versionadas (alembic)</td>
+<td>✅ Estándar</td>
+<td>El <code>downgrade</code> como plan de rollback es lo que falta en muchos proyectos</td>
+</tr>
+<tr>
+<td>pgvector como vector store</td>
+<td>🟢 Maduro</td>
+<td>"Un Postgres más" en vez de una base vectorial aparte; suficiente a esta escala</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lo-que-viene-en-las-proximas-secciones">Lo que viene en las próximas secciones<a class="headerlink" href="#lo-que-viene-en-las-proximas-secciones" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>§8 versionado de modelos</strong>: <code>llm_model</code> ya es config (no constante); shadow y
+  canary cambian ese valor para una fracción del tráfico sin redeploy.</li>
+<li><strong>§10 costo</strong>: la config de modelo y caché es lo que se mueve para optimizar el
+  costo por entorno; el presupuesto se setea por variable de entorno.</li>
+<li><strong>§12 incidentes</strong>: el rollback de una migración y el redeploy de una versión
+  anterior son dos de las acciones del runbook.</li>
+</ul>
+<h2 id="conexiones">Conexiones<a class="headerlink" href="#conexiones" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>§2 arquitectura</strong>: el <code>lifespan</code>, el <code>/healthz</code> y el <code>/readyz</code> son lo que el
+  Dockerfile y el compose usan para arrancar y chequear; el <code>_serve</code> ahora lee
+  <code>HOST</code>/<code>PORT</code> del entorno para escuchar en <code>0.0.0.0</code> dentro del contenedor.</li>
+<li><strong>§4/§5/§6</strong>: todos sus knobs (TTL de caché, umbral semántico, rate, umbral del
+  breaker, nivel de log) viven ahora en <code>ServiceSettings</code>, configurables por
+  entorno sin tocar código.</li>
+<li><strong>02-retrieval §7 (metadata)</strong>: el schema de <code>chunks</code> con <code>doc_id</code> y <code>metadata</code>
+  JSONB es lo que habilita el filtrado estructurado de esa sección en pgvector.</li>
+<li><strong>01-evals §9 (CI)</strong>: el <code>scan_for_secrets</code> es un check de CI más, en la misma
+  familia que los tests de regresión que esa sección monta.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,3050 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../04-golden-datasets/">
+      
+      
+        <link rel="next" href="../06-metricas-generacion/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>05 — Métricas de retrieval - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#05-metricas-de-retrieval" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              05 — Métricas de retrieval
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-por-que-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-analisis-errores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#el-retrieval-como-primer-eslabon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El retrieval como primer eslabón
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#las-tres-metricas-fundamentales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Las tres métricas fundamentales
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recallk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recall@k
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recall@k">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definicion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definición
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-numerico-queries-sobre-normativa-chilena" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ejemplo numérico: queries sobre normativa chilena
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpretacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpretación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cuando-importa-el-valor-de-k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo importa el valor de k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitaciones
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mrr-mean-reciprocal-rank" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MRR (Mean Reciprocal Rank)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MRR (Mean Reciprocal Rank)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definicion_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definición
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-numerico-mismos-datos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ejemplo numérico (mismos datos)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpretacion_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpretación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cuando-preferir-mrr-sobre-recallk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo preferir MRR sobre Recall@k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitaciones_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitaciones
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ndcg-normalized-discounted-cumulative-gain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nDCG (Normalized Discounted Cumulative Gain)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="nDCG (Normalized Discounted Cumulative Gain)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definicion_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definición
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-numerico-detallado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ejemplo numérico detallado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpretacion_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpretación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cuando-usar-ndcg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo usar nDCG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitaciones_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitaciones
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparacion-directa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparación directa
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Comparación directa">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#que-metricas-usar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué métrica(s) usar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#precisionk-y-f1-donde-quedan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Precision@k y F1: ¿dónde quedan?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metricas-a-nivel-de-corpus-vs-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métricas a nivel de corpus vs query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexion-con-secciones-anteriores-y-siguientes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexión con secciones anteriores y siguientes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../02-retrieval/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/01-ir-pre-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/04-chunking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/06-reranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../03-produccion/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/07-despliegue-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#el-retrieval-como-primer-eslabon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El retrieval como primer eslabón
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#las-tres-metricas-fundamentales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Las tres métricas fundamentales
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recallk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recall@k
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recall@k">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definicion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definición
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-numerico-queries-sobre-normativa-chilena" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ejemplo numérico: queries sobre normativa chilena
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpretacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpretación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cuando-importa-el-valor-de-k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo importa el valor de k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitaciones
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mrr-mean-reciprocal-rank" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MRR (Mean Reciprocal Rank)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MRR (Mean Reciprocal Rank)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definicion_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definición
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-numerico-mismos-datos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ejemplo numérico (mismos datos)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpretacion_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpretación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cuando-preferir-mrr-sobre-recallk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo preferir MRR sobre Recall@k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitaciones_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitaciones
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ndcg-normalized-discounted-cumulative-gain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nDCG (Normalized Discounted Cumulative Gain)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="nDCG (Normalized Discounted Cumulative Gain)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definicion_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definición
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-numerico-detallado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ejemplo numérico detallado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpretacion_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpretación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cuando-usar-ndcg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo usar nDCG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitaciones_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitaciones
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparacion-directa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparación directa
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Comparación directa">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#que-metricas-usar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué métrica(s) usar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#precisionk-y-f1-donde-quedan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Precision@k y F1: ¿dónde quedan?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metricas-a-nivel-de-corpus-vs-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métricas a nivel de corpus vs query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexion-con-secciones-anteriores-y-siguientes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexión con secciones anteriores y siguientes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="05-metricas-de-retrieval">05 — Métricas de retrieval<a class="headerlink" href="#05-metricas-de-retrieval" title="Permanent link">&para;</a></h1>
+<h2 id="el-retrieval-como-primer-eslabon">El retrieval como primer eslabón<a class="headerlink" href="#el-retrieval-como-primer-eslabon" title="Permanent link">&para;</a></h2>
+<p>En un pipeline RAG, el retriever es el primer filtro. Si falla, todo lo
+que sigue — reranking, generación, postprocesamiento — trabaja con
+material incorrecto. Es como una cadena de suministro: si la materia
+prima está equivocada, no importa qué tan buena sea la fábrica.</p>
+<p>Analogía económica: el retriever es el proceso de selección de datos
+para un modelo econométrico. Si tus datos están mal (variable proxy
+equivocada, período incorrecto, fuente contaminada), el modelo puede
+ser sofisticadísimo y la conclusión será basura. Garbage in, garbage out.</p>
+<p>Las métricas de retrieval responden una pregunta simple: <strong>¿el sistema
+encontró los documentos correctos?</strong> Pero "correcto" tiene matices que
+las distintas métricas capturan de forma diferente.</p>
+<h2 id="las-tres-metricas-fundamentales">Las tres métricas fundamentales<a class="headerlink" href="#las-tres-metricas-fundamentales" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph LR
+    subgraph "La pregunta"
+        Q["¿Encontró los&lt;br/&gt;docs correctos?"]
+    end
+    subgraph "Tres ángulos"
+        R["Recall@k&lt;br/&gt;¿Están ahí?"]
+        M["MRR&lt;br/&gt;¿Están arriba?"]
+        N["nDCG&lt;br/&gt;¿Están en&lt;br/&gt;buen orden?"]
+    end
+
+    Q --&gt; R
+    Q --&gt; M
+    Q --&gt; N</code></pre>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Pregunta que responde</th>
+<th>Sensible a posición</th>
+<th>Cuándo usarla</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Recall@k</strong></td>
+<td>¿El doc relevante está en los top-k resultados?</td>
+<td>No — solo importa si está o no</td>
+<td>Cuando el generador puede usar cualquier chunk del top-k</td>
+</tr>
+<tr>
+<td><strong>MRR</strong></td>
+<td>¿Qué tan arriba está el primer doc relevante?</td>
+<td>Sí — premia posición alta</td>
+<td>Cuando el usuario ve un ranking o el generador prioriza el top-1</td>
+</tr>
+<tr>
+<td><strong>nDCG</strong></td>
+<td>¿Qué tan bueno es el ordenamiento completo?</td>
+<td>Sí — premia orden global</td>
+<td>Cuando hay múltiples docs relevantes con distinta importancia</td>
+</tr>
+</tbody>
+</table>
+<h2 id="recallk">Recall@k<a class="headerlink" href="#recallk" title="Permanent link">&para;</a></h2>
+<h3 id="definicion">Definición<a class="headerlink" href="#definicion" title="Permanent link">&para;</a></h3>
+<p>Para una query q con un conjunto de documentos relevantes R(q):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Recall@k(q) = |{docs relevantes en top-k}| / |R(q)|
+</code></pre></div>
+<p>En palabras: de todos los documentos que <strong>deberían</strong> aparecer, ¿qué
+fracción efectivamente apareció en los primeros k resultados?</p>
+<h3 id="ejemplo-numerico-queries-sobre-normativa-chilena">Ejemplo numérico: queries sobre normativa chilena<a class="headerlink" href="#ejemplo-numerico-queries-sobre-normativa-chilena" title="Permanent link">&para;</a></h3>
+<p>Supongamos k=3 (recuperamos 3 chunks por query):</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Docs relevantes R(q)</th>
+<th>Top-3 recuperados</th>
+<th>Relevantes en top-3</th>
+<th>Recall@3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"¿Tasa de IVA digital?"</td>
+<td>{circular-chunk-5}</td>
+<td>[circular-chunk-5, circular-chunk-1, decreto-chunk-2]</td>
+<td>{circular-chunk-5}</td>
+<td>1/1 = <strong>1.00</strong></td>
+</tr>
+<tr>
+<td>"¿Criterios alumno prioritario?"</td>
+<td>{decreto-chunk-4, decreto-chunk-5}</td>
+<td>[decreto-chunk-4, glosa-chunk-1, norma-chunk-3]</td>
+<td>{decreto-chunk-4}</td>
+<td>1/2 = <strong>0.50</strong></td>
+</tr>
+<tr>
+<td>"¿Multa Ley de Lobby?"</td>
+<td>{norma-chunk-8}</td>
+<td>[decreto-chunk-1, circular-chunk-3, glosa-chunk-2]</td>
+<td>{}</td>
+<td>0/1 = <strong>0.00</strong></td>
+</tr>
+<tr>
+<td>"¿Presupuesto inmunizaciones?"</td>
+<td>{glosa-chunk-2}</td>
+<td>[glosa-chunk-2, glosa-chunk-4, norma-chunk-1]</td>
+<td>{glosa-chunk-2}</td>
+<td>1/1 = <strong>1.00</strong></td>
+</tr>
+<tr>
+<td>"¿Sujetos pasivos lobby?"</td>
+<td>{norma-chunk-3, norma-chunk-4}</td>
+<td>[norma-chunk-3, norma-chunk-4, circular-chunk-1]</td>
+<td>{norma-chunk-3, norma-chunk-4}</td>
+<td>2/2 = <strong>1.00</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recall@3 promedio</strong> = (1.00 + 0.50 + 0.00 + 1.00 + 1.00) / 5 = <strong>0.70</strong></p>
+<h3 id="interpretacion">Interpretación<a class="headerlink" href="#interpretacion" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Recall@3 = 0.70 significa que, en promedio, el retriever encuentra el
+  70% de los documentos relevantes dentro de los top-3.</li>
+<li>El 30% restante se pierde — nunca llega al generador.</li>
+<li>Un recall@3 perfecto (1.00) no garantiza buenas respuestas (el
+  generador puede fallar), pero un recall@3 bajo garantiza malas
+  respuestas para esas queries.</li>
+</ul>
+<h3 id="cuando-importa-el-valor-de-k">Cuándo importa el valor de k<a class="headerlink" href="#cuando-importa-el-valor-de-k" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>k</th>
+<th>Escenario</th>
+<th>Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k=1</td>
+<td>Solo usas el top-1 resultado</td>
+<td>Muy exigente — cualquier error es fatal</td>
+</tr>
+<tr>
+<td>k=3</td>
+<td>Típico para RAG con contexto limitado</td>
+<td>Buen balance costo/cobertura</td>
+</tr>
+<tr>
+<td>k=5</td>
+<td>RAG con ventana de contexto amplia</td>
+<td>Más tolerante pero más tokens consumidos</td>
+</tr>
+<tr>
+<td>k=10</td>
+<td>Con reranker posterior</td>
+<td>Recall alto pero depende del reranker para ordenar</td>
+</tr>
+<tr>
+<td>k=20+</td>
+<td>Retrieval inicial antes de reranking</td>
+<td>Se optimiza recall; la precisión la pone el reranker</td>
+</tr>
+</tbody>
+</table>
+<h3 id="limitaciones">Limitaciones<a class="headerlink" href="#limitaciones" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>No distingue posición</strong>: Recall@3 = 1.0 ya sea que el doc relevante
+  esté en posición 1 o en posición 3. Para un generador que pondera
+  más el contexto al inicio, esto importa.</li>
+<li><strong>No distingue relevancia graduada</strong>: trata a todos los docs relevantes
+  como iguales. En la práctica, un chunk que contiene exactamente el
+  artículo citado es más relevante que uno que menciona el tema.</li>
+</ul>
+<h2 id="mrr-mean-reciprocal-rank">MRR (Mean Reciprocal Rank)<a class="headerlink" href="#mrr-mean-reciprocal-rank" title="Permanent link">&para;</a></h2>
+<h3 id="definicion_1">Definición<a class="headerlink" href="#definicion_1" title="Permanent link">&para;</a></h3>
+<p>Para una query q, el Reciprocal Rank es:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>RR(q) = 1 / rank del primer documento relevante
+</code></pre></div>
+<p>Si el primer doc relevante está en posición 1, RR = 1. En posición 2,
+RR = 0.5. En posición 3, RR = 0.33. Si no aparece en top-k, RR = 0.</p>
+<p>MRR es el promedio de RR sobre todas las queries:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>MRR = (1/|Q|) × Σ RR(q)
+</code></pre></div>
+<h3 id="ejemplo-numerico-mismos-datos">Ejemplo numérico (mismos datos)<a class="headerlink" href="#ejemplo-numerico-mismos-datos" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Primer doc relevante</th>
+<th>Posición</th>
+<th>RR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"¿Tasa de IVA digital?"</td>
+<td>circular-chunk-5</td>
+<td>1</td>
+<td>1/1 = <strong>1.000</strong></td>
+</tr>
+<tr>
+<td>"¿Criterios alumno prioritario?"</td>
+<td>decreto-chunk-4</td>
+<td>1</td>
+<td>1/1 = <strong>1.000</strong></td>
+</tr>
+<tr>
+<td>"¿Multa Ley de Lobby?"</td>
+<td>(no encontrado)</td>
+<td>—</td>
+<td><strong>0.000</strong></td>
+</tr>
+<tr>
+<td>"¿Presupuesto inmunizaciones?"</td>
+<td>glosa-chunk-2</td>
+<td>1</td>
+<td>1/1 = <strong>1.000</strong></td>
+</tr>
+<tr>
+<td>"¿Sujetos pasivos lobby?"</td>
+<td>norma-chunk-3</td>
+<td>1</td>
+<td>1/1 = <strong>1.000</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>MRR</strong> = (1.000 + 1.000 + 0.000 + 1.000 + 1.000) / 5 = <strong>0.800</strong></p>
+<h3 id="interpretacion_1">Interpretación<a class="headerlink" href="#interpretacion_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>MRR = 0.80 significa que, en promedio, el primer documento relevante
+  aparece alrededor de la posición 1.25 (1/0.80).</li>
+<li>MRR es más sensible que recall a la <strong>calidad del ranking</strong> — premia
+  que lo relevante esté arriba.</li>
+<li>En el ejemplo, el MRR (0.80) es mayor que el recall@3 (0.70) porque
+  cuando el retriever encuentra el doc, tiende a ponerlo en posición 1.</li>
+</ul>
+<h3 id="cuando-preferir-mrr-sobre-recallk">Cuándo preferir MRR sobre Recall@k<a class="headerlink" href="#cuando-preferir-mrr-sobre-recallk" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>graph TD
+    DEC{"¿El generador usa&lt;br/&gt;todos los top-k&lt;br/&gt;por igual?"}
+    DEC --&gt;|"Sí (ej: concatena&lt;br/&gt;todo como contexto)"| REC["Usa Recall@k&lt;br/&gt;Solo importa que esté"]
+    DEC --&gt;|"No (ej: prioriza&lt;br/&gt;el primero)"| MRR_USE["Usa MRR&lt;br/&gt;Importa la posición"]
+    DEC --&gt;|"El usuario ve&lt;br/&gt;el ranking"| MRR_USE</code></pre>
+<h3 id="limitaciones_1">Limitaciones<a class="headerlink" href="#limitaciones_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Solo mira el primer doc relevante</strong>: si hay 5 docs relevantes y
+  el retriever solo encuentra uno (en posición 1), MRR = 1.0 aunque
+  se perdieron 4 docs. Recall@5 capturaría ese problema.</li>
+<li><strong>No captura el orden más allá del primero</strong>: si los docs relevantes
+  están en posiciones 2, 3 y 4, MRR solo ve al de posición 2.</li>
+</ul>
+<h2 id="ndcg-normalized-discounted-cumulative-gain">nDCG (Normalized Discounted Cumulative Gain)<a class="headerlink" href="#ndcg-normalized-discounted-cumulative-gain" title="Permanent link">&para;</a></h2>
+<h3 id="definicion_2">Definición<a class="headerlink" href="#definicion_2" title="Permanent link">&para;</a></h3>
+<p>nDCG captura la calidad del ranking completo, no solo la presencia o
+posición del primer resultado.</p>
+<p><strong>Paso 1: Relevancia graduada</strong></p>
+<p>Cada documento tiene un score de relevancia (no binario):</p>
+<table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>Altamente relevante — contiene exactamente la respuesta</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Relevante — contiene información útil pero parcial</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Marginalmente relevante — menciona el tema</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Irrelevante</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Paso 2: DCG (Discounted Cumulative Gain)</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>DCG@k = Σᵢ₌₁ᵏ (relᵢ) / log₂(i + 1)
+</code></pre></div>
+<p>La ganancia de cada documento se descuenta por su posición. Un doc
+relevante en posición 1 vale más que el mismo doc en posición 5.</p>
+<p><strong>Paso 3: IDCG (Ideal DCG)</strong></p>
+<p>El DCG del ranking perfecto — si ordenaras los docs de mayor a menor
+relevancia.</p>
+<p><strong>Paso 4: nDCG</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>nDCG@k = DCG@k / IDCG@k
+</code></pre></div>
+<p>Normalizado entre 0 y 1.</p>
+<h3 id="ejemplo-numerico-detallado">Ejemplo numérico detallado<a class="headerlink" href="#ejemplo-numerico-detallado" title="Permanent link">&para;</a></h3>
+<p>Query: "¿Qué obligaciones tiene un prestador de servicios digitales
+extranjero en Chile?"</p>
+<p>Docs relevantes con scores de relevancia:
+- circular-chunk-7 (sección IV, obligaciones): relevancia = 3
+- circular-chunk-5 (sección II, servicios gravados): relevancia = 2
+- circular-chunk-8 (sección V, responsabilidad sustituta): relevancia = 1</p>
+<p>Top-5 recuperados:</p>
+<table>
+<thead>
+<tr>
+<th>Pos (i)</th>
+<th>Documento</th>
+<th>rel</th>
+<th>rel / log₂(i+1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>circular-chunk-5</td>
+<td>2</td>
+<td>2 / 1.000 = <strong>2.000</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>decreto-chunk-3</td>
+<td>0</td>
+<td>0 / 1.585 = <strong>0.000</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>circular-chunk-7</td>
+<td>3</td>
+<td>3 / 2.000 = <strong>1.500</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>norma-chunk-1</td>
+<td>0</td>
+<td>0 / 2.322 = <strong>0.000</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>circular-chunk-8</td>
+<td>1</td>
+<td>1 / 2.585 = <strong>0.387</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>DCG@5</strong> = 2.000 + 0.000 + 1.500 + 0.000 + 0.387 = <strong>3.887</strong></p>
+<p>Ranking ideal (ordenado por relevancia):</p>
+<table>
+<thead>
+<tr>
+<th>Pos (i)</th>
+<th>Documento</th>
+<th>rel</th>
+<th>rel / log₂(i+1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>circular-chunk-7</td>
+<td>3</td>
+<td>3 / 1.000 = <strong>3.000</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>circular-chunk-5</td>
+<td>2</td>
+<td>2 / 1.585 = <strong>1.262</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>circular-chunk-8</td>
+<td>1</td>
+<td>1 / 2.000 = <strong>0.500</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>(no hay más)</td>
+<td>0</td>
+<td><strong>0.000</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>(no hay más)</td>
+<td>0</td>
+<td><strong>0.000</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>IDCG@5</strong> = 3.000 + 1.262 + 0.500 = <strong>4.762</strong></p>
+<p><strong>nDCG@5</strong> = 3.887 / 4.762 = <strong>0.816</strong></p>
+<h3 id="interpretacion_2">Interpretación<a class="headerlink" href="#interpretacion_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>nDCG@5 = 0.816 significa que el ranking captura el 81.6% de la calidad
+  del ranking perfecto.</li>
+<li>El descuento es sustancial: el doc más relevante (rel=3) estaba en
+  posición 3 en lugar de posición 1, lo que penaliza el score.</li>
+<li>Si el chunk-7 hubiera estado en posición 1, el DCG habría sido 4.149 y
+  el nDCG 0.871 — una mejora del 7%.</li>
+</ul>
+<h3 id="cuando-usar-ndcg">Cuándo usar nDCG<a class="headerlink" href="#cuando-usar-ndcg" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>graph TD
+    Q1{"¿Relevancia&lt;br/&gt;binaria o graduada?"}
+    Q1 --&gt;|"Binaria (relevante/no)"| Q2{"¿Importa&lt;br/&gt;la posición?"}
+    Q1 --&gt;|"Graduada (3/2/1/0)"| NDCG["Usa nDCG"]
+
+    Q2 --&gt;|"No"| REC["Usa Recall@k"]
+    Q2 --&gt;|"Sí, solo el primero"| MRR_D["Usa MRR"]
+    Q2 --&gt;|"Sí, todo el ranking"| NDCG
+
+    style NDCG fill:#f9d71c,stroke:#333,color:#1a1a1a</code></pre>
+<h3 id="limitaciones_2">Limitaciones<a class="headerlink" href="#limitaciones_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Requiere anotación de relevancia graduada</strong>: más costoso que la
+  anotación binaria (relevante/no) que usan recall y MRR.</li>
+<li><strong>Sensible a la escala de relevancia</strong>: ¿3 niveles? ¿5? ¿10? La
+  elección afecta el score y no hay estándar.</li>
+<li><strong>Más difícil de interpretar</strong>: "nDCG = 0.816" es menos intuitivo que
+  "recall@3 = 0.70" para un stakeholder no técnico.</li>
+</ul>
+<h2 id="comparacion-directa">Comparación directa<a class="headerlink" href="#comparacion-directa" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Recall@k</th>
+<th>MRR</th>
+<th>nDCG@k</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Relevancia</strong></td>
+<td>Binaria</td>
+<td>Binaria</td>
+<td>Graduada</td>
+</tr>
+<tr>
+<td><strong>Sensible a posición</strong></td>
+<td>No</td>
+<td>Solo al 1º</td>
+<td>A todos</td>
+</tr>
+<tr>
+<td><strong>Complejidad de anotación</strong></td>
+<td>Baja</td>
+<td>Baja</td>
+<td>Media-alta</td>
+</tr>
+<tr>
+<td><strong>Interpretabilidad</strong></td>
+<td>Alta</td>
+<td>Alta</td>
+<td>Media</td>
+</tr>
+<tr>
+<td><strong>Mejor para</strong></td>
+<td>"¿Lo encontró?"</td>
+<td>"¿Lo encontró rápido?"</td>
+<td>"¿El orden es bueno?"</td>
+</tr>
+<tr>
+<td><strong>Típico en RAG</strong></td>
+<td>Sí, la más común</td>
+<td>Sí, complementaria</td>
+<td>Menos común, más en IR clásico</td>
+</tr>
+</tbody>
+</table>
+<h3 id="que-metricas-usar">Qué métrica(s) usar<a class="headerlink" href="#que-metricas-usar" title="Permanent link">&para;</a></h3>
+<p>La respuesta pragmática para un RAG sobre corpus fiscal:</p>
+<ol>
+<li><strong>Siempre reporta Recall@k</strong> — es la línea base. Si el recall es bajo,
+   nada más importa.</li>
+<li><strong>Agrega MRR</strong> si tu generador pondera posición o si el usuario ve
+   una lista de resultados.</li>
+<li><strong>Agrega nDCG</strong> si tienes anotación graduada y quieres optimizar el
+   orden fino del ranking (típicamente después de agregar un reranker).</li>
+</ol>
+<pre class="mermaid"><code>graph LR
+    subgraph "Mínimo viable"
+        R["Recall@k"]
+    end
+    subgraph "Recomendado"
+        R2["Recall@k"] --&gt; M2["MRR"]
+    end
+    subgraph "Completo"
+        R3["Recall@k"] --&gt; M3["MRR"] --&gt; N3["nDCG@k"]
+    end</code></pre>
+<h2 id="precisionk-y-f1-donde-quedan">Precision@k y F1: ¿dónde quedan?<a class="headerlink" href="#precisionk-y-f1-donde-quedan" title="Permanent link">&para;</a></h2>
+<p><strong>Precision@k</strong> = |relevantes en top-k| / k — qué fracción de los
+resultados recuperados son relevantes.</p>
+<p>En RAG, precision@k es menos útil que recall@k porque:</p>
+<ul>
+<li>El generador recibe todos los top-k como contexto. Un doc irrelevante
+  en el contexto degrada menos que un doc relevante que no está.</li>
+<li>Con k fijo y pequeño (3-5), precision y recall están fuertemente
+  correlacionados.</li>
+</ul>
+<p><strong>F1@k</strong> = media armónica de precision@k y recall@k. Útil cuando k es
+grande (&gt;10) y quieres penalizar tanto el ruido como la omisión. Para
+k=3-5 en RAG, recall@k suele bastar.</p>
+<h2 id="metricas-a-nivel-de-corpus-vs-query">Métricas a nivel de corpus vs query<a class="headerlink" href="#metricas-a-nivel-de-corpus-vs-query" title="Permanent link">&para;</a></h2>
+<p>Todas las métricas anteriores se calculan <strong>por query</strong> y luego se
+promedian. Pero el promedio esconde distribución:</p>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Promedio</th>
+<th>Mediana</th>
+<th>p10</th>
+<th>p90</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recall@3</td>
+<td>0.70</td>
+<td>1.00</td>
+<td>0.00</td>
+<td>1.00</td>
+</tr>
+</tbody>
+</table>
+<p>Un recall@3 promedio de 0.70 puede significar:
+- <strong>Escenario A</strong>: 70% de las queries tienen recall = 1.0, 30% tienen 0.0
+  → distribución bimodal, 30% de queries completamente rotas.
+- <strong>Escenario B</strong>: todas las queries tienen recall ≈ 0.70 → degradación
+  uniforme, quizás un problema de chunking.</p>
+<p>Siempre reporta la distribución, no solo el promedio. Un histograma
+o los percentiles (p10, p25, p50, p75, p90) dan mucha más información.</p>
+<h2 id="estado-del-arte">Estado del arte<a class="headerlink" href="#estado-del-arte" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Estado</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recall@k, MRR, nDCG</td>
+<td>✅ Resuelto</td>
+<td>Métricas estándar de IR desde los años 90, bien entendidas</td>
+</tr>
+<tr>
+<td>Relevancia binaria vs graduada</td>
+<td>✅ Resuelto</td>
+<td>La teoría es clara; la elección depende del presupuesto de anotación</td>
+</tr>
+<tr>
+<td>Métricas para multi-hop retrieval</td>
+<td>🟡 En progreso</td>
+<td>Cuando la respuesta requiere cruzar N documentos, recall@k por doc no captura la combinatoria</td>
+</tr>
+<tr>
+<td>Evaluación de chunking</td>
+<td>🔴 Incipiente</td>
+<td>No hay métricas estándar para evaluar si el chunking fue bueno independientemente del retrieval</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conexion-con-secciones-anteriores-y-siguientes">Conexión con secciones anteriores y siguientes<a class="headerlink" href="#conexion-con-secciones-anteriores-y-siguientes" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Sección 4 (golden datasets)</strong>: los campos <code>expected_docs</code> y
+  <code>expected_chunks</code> del golden dataset son el insumo para calcular
+  estas métricas.</li>
+<li><strong>Sección 6 (métricas de generación)</strong>: retrieval y generación se
+  evalúan por separado. Un recall perfecto con faithfulness bajo =
+  problema de generación. Un recall bajo con faithfulness alta =
+  el modelo fue fiel a un contexto equivocado (peor).</li>
+<li><strong>Sección 8 (estadística)</strong>: estas métricas tienen varianza. Con
+  50 queries puedes tener recall@3 = 0.70 ± 0.13. ¿Es mejor que
+  0.65? Necesitas bootstrapping para responder (sección 8).</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

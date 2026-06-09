@@ -1,0 +1,2761 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../02-taxonomia/">
+      
+      
+        <link rel="next" href="../04-golden-datasets/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>03 — Análisis de errores - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#03-analisis-de-errores" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              03 — Análisis de errores
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-por-que-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#no-disenes-lo-que-no-has-observado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No diseñes lo que no has observado
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#taxonomia-de-errores-en-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Taxonomía de errores en RAG
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Taxonomía de errores en RAG">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#errores-de-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errores de retrieval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errores-de-generacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errores de generación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errores-de-comportamiento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errores de comportamiento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mapa-visual-de-la-taxonomia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapa visual de la taxonomía
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protocolo-de-revision-manual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protocolo de revisión manual
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Protocolo de revisión manual">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cuantos-outputs-revisar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ¿Cuántos outputs revisar?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#de-donde-sacar-las-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        De dónde sacar las queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#que-anotar-por-cada-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué anotar por cada output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formato-de-registro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formato de registro
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#de-observaciones-a-patrones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        De observaciones a patrones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="De observaciones a patrones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#paso-1-distribucion-de-frecuencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 1: Distribución de frecuencias
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paso-2-analisis-de-pareto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 2: Análisis de Pareto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paso-3-analisis-de-co-ocurrencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 3: Análisis de co-ocurrencia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paso-4-segmentacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 4: Segmentación
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#de-patrones-a-golden-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        De patrones a golden dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuando-repetir-el-analisis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo repetir el análisis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexion-con-secciones-anteriores-y-siguientes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexión con secciones anteriores y siguientes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-metricas-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../02-retrieval/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/01-ir-pre-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/04-chunking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/06-reranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../03-produccion/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/07-despliegue-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#no-disenes-lo-que-no-has-observado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No diseñes lo que no has observado
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#taxonomia-de-errores-en-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Taxonomía de errores en RAG
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Taxonomía de errores en RAG">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#errores-de-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errores de retrieval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errores-de-generacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errores de generación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errores-de-comportamiento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errores de comportamiento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mapa-visual-de-la-taxonomia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapa visual de la taxonomía
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protocolo-de-revision-manual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protocolo de revisión manual
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Protocolo de revisión manual">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cuantos-outputs-revisar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ¿Cuántos outputs revisar?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#de-donde-sacar-las-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        De dónde sacar las queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#que-anotar-por-cada-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué anotar por cada output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formato-de-registro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formato de registro
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#de-observaciones-a-patrones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        De observaciones a patrones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="De observaciones a patrones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#paso-1-distribucion-de-frecuencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 1: Distribución de frecuencias
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paso-2-analisis-de-pareto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 2: Análisis de Pareto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paso-3-analisis-de-co-ocurrencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 3: Análisis de co-ocurrencia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paso-4-segmentacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 4: Segmentación
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#de-patrones-a-golden-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        De patrones a golden dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuando-repetir-el-analisis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuándo repetir el análisis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexion-con-secciones-anteriores-y-siguientes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexión con secciones anteriores y siguientes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="03-analisis-de-errores">03 — Análisis de errores<a class="headerlink" href="#03-analisis-de-errores" title="Permanent link">&para;</a></h1>
+<h2 id="no-disenes-lo-que-no-has-observado">No diseñes lo que no has observado<a class="headerlink" href="#no-disenes-lo-que-no-has-observado" title="Permanent link">&para;</a></h2>
+<p>El error más frecuente al construir un sistema de evaluación es empezar
+por las métricas. Suena contraintuitivo — ¿no queremos medir? Sí, pero
+medir <em>qué</em> es la pregunta que la mayoría salta.</p>
+<p>La analogía es directa: un economista que especifica un modelo de regresión
+sin haber hecho análisis exploratorio de datos (EDA) está eligiendo variables
+a ciegas. Puede que su modelo estime algo, pero probablemente esté mal
+especificado — omite variables relevantes, incluye variables irrelevantes,
+o asume una forma funcional equivocada.</p>
+<p>En evals pasa lo mismo. Si diseñas un golden dataset y defines métricas sin
+haber leído 100-200 outputs reales de tu sistema, vas a medir lo que
+<em>imaginas</em> que falla, no lo que <em>de hecho</em> falla.</p>
+<pre class="mermaid"><code>graph LR
+    subgraph "Lo que la mayoría hace"
+        A1[Intuición sobre&lt;br/&gt;qué puede fallar] --&gt; A2[Diseñar golden&lt;br/&gt;dataset] --&gt; A3[Elegir métricas] --&gt; A4[Descubrir que el&lt;br/&gt;dataset no cubre&lt;br/&gt;los fallos reales]
+    end
+    subgraph "Lo que deberías hacer"
+        B1[Generar N outputs&lt;br/&gt;con queries reales] --&gt; B2[Leer y anotar&lt;br/&gt;cada output] --&gt; B3[Identificar&lt;br/&gt;patrones de fallo] --&gt; B4[Diseñar golden&lt;br/&gt;dataset que cubra&lt;br/&gt;esos patrones]
+    end
+
+    style A4 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style B4 fill:#2ecc71,stroke:#333,color:#1a1a1a</code></pre>
+<h2 id="taxonomia-de-errores-en-rag">Taxonomía de errores en RAG<a class="headerlink" href="#taxonomia-de-errores-en-rag" title="Permanent link">&para;</a></h2>
+<p>En la sección 1 vimos una taxonomía breve de fallos silenciosos. Ahora la
+expandimos con la granularidad necesaria para anotar outputs reales.</p>
+<h3 id="errores-de-retrieval">Errores de retrieval<a class="headerlink" href="#errores-de-retrieval" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Nombre</th>
+<th>Descripción</th>
+<th>Ejemplo en dominio fiscal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td><strong>Total miss</strong></td>
+<td>Ningún documento relevante en top-k</td>
+<td>Query sobre IVA digital → recupera decretos de educación</td>
+</tr>
+<tr>
+<td>R2</td>
+<td><strong>Partial miss</strong></td>
+<td>Documento correcto en top-k pero no en top-1</td>
+<td>Circular del SII en posición 4 de 5</td>
+</tr>
+<tr>
+<td>R3</td>
+<td><strong>Wrong chunk</strong></td>
+<td>Documento correcto, chunk equivocado</td>
+<td>Recupera la introducción de la circular en vez de la sección de tasas</td>
+</tr>
+<tr>
+<td>R4</td>
+<td><strong>Stale retrieval</strong></td>
+<td>Recupera versión desactualizada del documento</td>
+<td>Recupera circular de 2018 cuando existe una de 2020 que la reemplaza</td>
+</tr>
+<tr>
+<td>R5</td>
+<td><strong>Distractor dominance</strong></td>
+<td>Un documento irrelevante pero léxicamente similar desplaza al correcto</td>
+<td>"Ley de Transparencia" desplaza a "Ley de Lobby" por overlap de términos</td>
+</tr>
+</tbody>
+</table>
+<h3 id="errores-de-generacion">Errores de generación<a class="headerlink" href="#errores-de-generacion" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Nombre</th>
+<th>Descripción</th>
+<th>Ejemplo en dominio fiscal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1</td>
+<td><strong>Hallucination factual</strong></td>
+<td>Genera datos que no están en el contexto</td>
+<td>Inventa una tasa de "15% para servicios digitales"</td>
+</tr>
+<tr>
+<td>G2</td>
+<td><strong>Hallucination normativa</strong></td>
+<td>Cita un artículo, ley o decreto que no existe</td>
+<td>"Según el Art. 45 bis de la Ley 21.210..." (no existe)</td>
+</tr>
+<tr>
+<td>G3</td>
+<td><strong>Misreading</strong></td>
+<td>El contexto dice X, la respuesta dice Y</td>
+<td>Contexto: "al menos 15% de matrícula" → Respuesta: "más del 50% de matrícula"</td>
+</tr>
+<tr>
+<td>G4</td>
+<td><strong>Omisión material</strong></td>
+<td>La respuesta es correcta pero omite condiciones o excepciones clave</td>
+<td>Responde la tasa de IVA pero omite que aplica solo a proveedores extranjeros</td>
+</tr>
+<tr>
+<td>G5</td>
+<td><strong>Fusión indebida</strong></td>
+<td>Mezcla información de dos documentos distintos creando una afirmación falsa</td>
+<td>Combina montos de dos glosas presupuestarias diferentes en una sola cifra</td>
+</tr>
+<tr>
+<td>G6</td>
+<td><strong>Respuesta genérica</strong></td>
+<td>Respuesta vaga que no aporta valor</td>
+<td>"Depende de varios factores..." sin citar ninguno</td>
+</tr>
+</tbody>
+</table>
+<h3 id="errores-de-comportamiento">Errores de comportamiento<a class="headerlink" href="#errores-de-comportamiento" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Nombre</th>
+<th>Descripción</th>
+<th>Ejemplo en dominio fiscal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td><strong>Falsa confianza</strong></td>
+<td>Responde con certeza cuando debería abstenerse</td>
+<td>Query sobre norma no incluida en el corpus → responde como si la tuviera</td>
+</tr>
+<tr>
+<td>B2</td>
+<td><strong>Abstinencia excesiva</strong></td>
+<td>Se niega a responder cuando sí tiene la información</td>
+<td>"No tengo suficiente información" cuando el chunk relevante está en el contexto</td>
+</tr>
+<tr>
+<td>B3</td>
+<td><strong>Format failure</strong></td>
+<td>Contenido correcto pero formato incorrecto</td>
+<td>No cita el número de ley/artículo, o responde en inglés</td>
+</tr>
+<tr>
+<td>B4</td>
+<td><strong>Inconsistencia</strong></td>
+<td>Misma query, respuestas contradictorias en distintas ejecuciones</td>
+<td>A veces dice 19%, a veces dice 21% para la misma pregunta</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mapa-visual-de-la-taxonomia">Mapa visual de la taxonomía<a class="headerlink" href="#mapa-visual-de-la-taxonomia" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>graph TD
+    ERR[Error observado] --&gt; RT{¿Dónde falla?}
+    RT --&gt;|Retrieval| R[Errores de retrieval]
+    RT --&gt;|Generación| G[Errores de generación]
+    RT --&gt;|Comportamiento| B[Errores de comportamiento]
+
+    R --&gt; R1[R1: Total miss]
+    R --&gt; R2[R2: Partial miss]
+    R --&gt; R3[R3: Wrong chunk]
+    R --&gt; R4[R4: Stale retrieval]
+    R --&gt; R5[R5: Distractor dominance]
+
+    G --&gt; G1[G1: Hallucination factual]
+    G --&gt; G2[G2: Hallucination normativa]
+    G --&gt; G3[G3: Misreading]
+    G --&gt; G4[G4: Omisión material]
+    G --&gt; G5[G5: Fusión indebida]
+    G --&gt; G6[G6: Respuesta genérica]
+
+    B --&gt; B1[B1: Falsa confianza]
+    B --&gt; B2[B2: Abstinencia excesiva]
+    B --&gt; B3[B3: Format failure]
+    B --&gt; B4[B4: Inconsistencia]
+
+    style R1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style G1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style G2 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style B1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style R3 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style G3 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style G4 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style G5 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style B4 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style R2 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style R4 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style R5 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style G6 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style B2 fill:#f1c40f,stroke:#333,color:#1a1a1a
+    style B3 fill:#3498db,stroke:#333,color:#1a1a1a</code></pre>
+<p>Colores: 🔴 crítico (puede causar daño), 🟠 alto (respuesta incorrecta),
+🟡 medio (respuesta degradada), 🔵 bajo (cosmético).</p>
+<h2 id="protocolo-de-revision-manual">Protocolo de revisión manual<a class="headerlink" href="#protocolo-de-revision-manual" title="Permanent link">&para;</a></h2>
+<h3 id="cuantos-outputs-revisar">¿Cuántos outputs revisar?<a class="headerlink" href="#cuantos-outputs-revisar" title="Permanent link">&para;</a></h3>
+<p>La respuesta corta: <strong>mínimo 100, idealmente 200</strong>.</p>
+<p>La justificación estadística: si un tipo de error ocurre con frecuencia
+real del 5%, necesitas revisar al menos ~60 outputs para tener &gt;95% de
+probabilidad de observarlo al menos una vez (distribución binomial).
+Para capturar errores del 2%, necesitas ~150. Para tener estimaciones
+estables de la <em>proporción</em> de cada tipo de error, 200 es un buen número.</p>
+<table>
+<thead>
+<tr>
+<th>Frecuencia real del error</th>
+<th>P(observar ≥1 en 50 outputs)</th>
+<th>P(observar ≥1 en 100)</th>
+<th>P(observar ≥1 en 200)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10%</td>
+<td>99.5%</td>
+<td>~100%</td>
+<td>~100%</td>
+</tr>
+<tr>
+<td>5%</td>
+<td>92.3%</td>
+<td>99.4%</td>
+<td>~100%</td>
+</tr>
+<tr>
+<td>2%</td>
+<td>63.6%</td>
+<td>86.7%</td>
+<td>98.2%</td>
+</tr>
+<tr>
+<td>1%</td>
+<td>39.5%</td>
+<td>63.4%</td>
+<td>86.6%</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Estos números vienen de P(X ≥ 1) = 1 - (1-p)^n con distribución binomial.
+No son estimados — son cálculo exacto.</p>
+</blockquote>
+<h3 id="de-donde-sacar-las-queries">De dónde sacar las queries<a class="headerlink" href="#de-donde-sacar-las-queries" title="Permanent link">&para;</a></h3>
+<p>El orden de preferencia:</p>
+<ol>
+<li><strong>Logs reales de producción</strong> (si existes en producción) — la fuente
+   definitiva de qué preguntan los usuarios.</li>
+<li><strong>Queries de beta testers o stakeholders</strong> — no tan representativas
+   como logs, pero reales.</li>
+<li><strong>Queries generadas por el equipo</strong> — último recurso. El sesgo es
+   inevitable: el equipo pregunta lo que sabe que el sistema puede
+   responder.</li>
+<li><strong>Queries generadas por LLM</strong> — útil para volumen, pero con
+   alto riesgo de sesgo de distribución. Úsalo solo como complemento,
+   nunca como fuente principal.</li>
+</ol>
+<h3 id="que-anotar-por-cada-output">Qué anotar por cada output<a class="headerlink" href="#que-anotar-por-cada-output" title="Permanent link">&para;</a></h3>
+<p>Para cada par (query, output), registra:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. query_id:           Identificador único
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>2. query_text:         La pregunta exacta
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>3. retrieved_docs:     Lista de documentos/chunks recuperados
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>4. generated_answer:   La respuesta generada
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>5. error_code:         R1-R5, G1-G6, B1-B4, o &quot;OK&quot;
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>6. error_severity:     critical / high / medium / low
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>7. correct_answer:     Respuesta correcta (si la conoces)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>8. correct_doc:        Documento que debería haberse recuperado
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>9. notes:              Observaciones libres
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>10. annotator:         Quién anotó (para inter-annotator agreement)
+</code></pre></div>
+<h3 id="formato-de-registro">Formato de registro<a class="headerlink" href="#formato-de-registro" title="Permanent link">&para;</a></h3>
+<p>Usa un JSON Lines (<code>.jsonl</code>) — una línea por output anotado. Es el formato
+más práctico: fácil de leer con scripts, fácil de agregar líneas, fácil
+de versionar con git.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;query_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;q001&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;query_text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;¿Cuál es la tasa de IVA para servicios digitales?&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;retrieved_docs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;circular-01-sii-iva-digital.txt&quot;</span><span class="p">],</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;generated_answer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;La tasa es del 19%...&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">&quot;error_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OK&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">&quot;error_severity&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">&quot;correct_answer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;19%, Circular Nº 42 SII&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="nt">&quot;correct_doc&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;circular-01-sii-iva-digital.txt&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="nt">&quot;notes&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nt">&quot;annotator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alonso&quot;</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="de-observaciones-a-patrones">De observaciones a patrones<a class="headerlink" href="#de-observaciones-a-patrones" title="Permanent link">&para;</a></h2>
+<p>Después de anotar 100-200 outputs, el análisis sigue estos pasos:</p>
+<h3 id="paso-1-distribucion-de-frecuencias">Paso 1: Distribución de frecuencias<a class="headerlink" href="#paso-1-distribucion-de-frecuencias" title="Permanent link">&para;</a></h3>
+<p>Cuenta cuántos outputs caen en cada categoría de error. Esto te da la
+<strong>línea base</strong> — la fotografía de dónde está tu sistema hoy.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>OK:                   62% (124/200)
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>R1 - Total miss:      8%  (16/200)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>R3 - Wrong chunk:     6%  (12/200)
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>G1 - Hallucination:   5%  (10/200)
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>G4 - Omisión:         5%  (10/200)
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>B1 - Falsa confianza: 4%  (8/200)
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>G3 - Misreading:      3%  (6/200)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>...otros:             7%  (14/200)
+</code></pre></div>
+<blockquote>
+<p>⚠️ No verificado: los números de arriba son ilustrativos, no provienen
+de un sistema real. La distribución real depende del dominio, la calidad
+del retriever y el modelo.</p>
+</blockquote>
+<h3 id="paso-2-analisis-de-pareto">Paso 2: Análisis de Pareto<a class="headerlink" href="#paso-2-analisis-de-pareto" title="Permanent link">&para;</a></h3>
+<p>Ordena los errores por frecuencia × severidad. El principio de Pareto
+aplica casi siempre: un 20% de los tipos de error causan el 80% del daño.</p>
+<pre class="mermaid"><code>graph LR
+    subgraph "80% del daño"
+        E1["R1: Total miss&lt;br/&gt;8% freq × critical"]
+        E2["G1: Hallucination&lt;br/&gt;5% freq × critical"]
+        E3["B1: Falsa confianza&lt;br/&gt;4% freq × critical"]
+    end
+    subgraph "20% del daño"
+        E4["R3: Wrong chunk&lt;br/&gt;6% freq × high"]
+        E5["G4: Omisión&lt;br/&gt;5% freq × high"]
+        E6["G3: Misreading&lt;br/&gt;3% freq × high"]
+        E7["...otros"]
+    end
+
+    E1 --&gt; FIX1["Prioridad 1:&lt;br/&gt;Mejorar retrieval"]
+    E2 --&gt; FIX2["Prioridad 2:&lt;br/&gt;Grounding más estricto"]
+    E3 --&gt; FIX3["Prioridad 3:&lt;br/&gt;Calibrar abstención"]
+
+    style E1 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style E2 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style E3 fill:#e74c3c,stroke:#333,color:#1a1a1a</code></pre>
+<h3 id="paso-3-analisis-de-co-ocurrencia">Paso 3: Análisis de co-ocurrencia<a class="headerlink" href="#paso-3-analisis-de-co-ocurrencia" title="Permanent link">&para;</a></h3>
+<p>Algunos errores se causan mutuamente:</p>
+<table>
+<thead>
+<tr>
+<th>Si observas...</th>
+<th>Probablemente también verás...</th>
+<th>Porque...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1 (total miss)</td>
+<td>G1 (hallucination)</td>
+<td>Sin contexto relevante, el LLM inventa</td>
+</tr>
+<tr>
+<td>R1 (total miss)</td>
+<td>B1 (falsa confianza)</td>
+<td>El LLM no sabe que no tiene información</td>
+</tr>
+<tr>
+<td>R3 (wrong chunk)</td>
+<td>G4 (omisión)</td>
+<td>El chunk tiene info parcial, la respuesta es incompleta</td>
+</tr>
+<tr>
+<td>R5 (distractor)</td>
+<td>G5 (fusión indebida)</td>
+<td>Mezcla info del distractor con la del doc correcto</td>
+</tr>
+</tbody>
+</table>
+<p>La co-ocurrencia te dice dónde intervenir. Si R1 causa G1 y B1, entonces
+<strong>mejorar el retriever reduce tres tipos de error de golpe</strong>. Eso es
+alto leverage — un concepto que como economista conoces bien.</p>
+<h3 id="paso-4-segmentacion">Paso 4: Segmentación<a class="headerlink" href="#paso-4-segmentacion" title="Permanent link">&para;</a></h3>
+<p>No todos los errores se distribuyen uniformemente. Segmenta por:</p>
+<ul>
+<li><strong>Tipo de documento</strong>: ¿fallan más las queries sobre glosas presupuestarias
+  que sobre decretos? (Probablemente sí — las glosas tienen estructura
+  tabular más difícil de chunkear.)</li>
+<li><strong>Tipo de pregunta</strong>: ¿fallan más las preguntas de "cuánto" (numéricas)
+  que las de "quién" (entidades)? (Probablemente sí — los números son
+  más frágiles.)</li>
+<li><strong>Complejidad</strong>: ¿fallan más las preguntas que requieren cruzar dos
+  documentos? (Casi seguro sí.)</li>
+</ul>
+<pre class="mermaid"><code>graph TD
+    SEG[Segmentación] --&gt; T[Por tipo de doc]
+    SEG --&gt; Q[Por tipo de query]
+    SEG --&gt; C[Por complejidad]
+
+    T --&gt; T1["Decretos: 72% ok"]
+    T --&gt; T2["Circulares: 65% ok"]
+    T --&gt; T3["Glosas: 48% ok"]
+
+    Q --&gt; Q1["Quién/qué: 75% ok"]
+    Q --&gt; Q2["Cuánto: 55% ok"]
+    Q --&gt; Q3["Multi-doc: 35% ok"]
+
+    style T3 fill:#e74c3c,stroke:#333,color:#1a1a1a
+    style Q2 fill:#f39c12,stroke:#333,color:#1a1a1a
+    style Q3 fill:#e74c3c,stroke:#333,color:#1a1a1a</code></pre>
+<p>La segmentación te dice <strong>para qué</strong> es bueno tu sistema y para qué no.
+Esto informa directamente qué debe cubrir tu golden dataset (sección 4).</p>
+<h2 id="de-patrones-a-golden-dataset">De patrones a golden dataset<a class="headerlink" href="#de-patrones-a-golden-dataset" title="Permanent link">&para;</a></h2>
+<p>El análisis de errores produce tres entregables que alimentan la sección
+siguiente:</p>
+<table>
+<thead>
+<tr>
+<th>Entregable</th>
+<th>Qué contiene</th>
+<th>Para qué sirve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Distribución de errores</strong></td>
+<td>Frecuencia de cada tipo de error</td>
+<td>Define qué <em>proporciones</em> de queries incluir en el golden dataset</td>
+</tr>
+<tr>
+<td><strong>Queries difíciles</strong></td>
+<td>Las queries concretas donde el sistema falla</td>
+<td>Se convierten directamente en items del golden dataset</td>
+</tr>
+<tr>
+<td><strong>Ejes de segmentación</strong></td>
+<td>Tipo de doc, tipo de query, complejidad</td>
+<td>Define las <em>dimensiones</em> de cobertura del golden dataset</td>
+</tr>
+</tbody>
+</table>
+<p>Sin estos tres entregables, tu golden dataset es un tiro a ciegas.</p>
+<h2 id="cuando-repetir-el-analisis">Cuándo repetir el análisis<a class="headerlink" href="#cuando-repetir-el-analisis" title="Permanent link">&para;</a></h2>
+<p>El análisis de errores no es un ejercicio de una sola vez. Repítelo cuando:</p>
+<ol>
+<li><strong>Cambias el modelo base</strong> — la distribución de errores puede cambiar
+   drásticamente.</li>
+<li><strong>Cambias la estrategia de chunking</strong> — afecta R1-R5 directamente.</li>
+<li><strong>Agregas documentos al corpus</strong> — nuevos documentos pueden introducir
+   distractores (R5).</li>
+<li><strong>Las métricas online muestran degradación</strong> — algo cambió, necesitas
+   entender qué.</li>
+</ol>
+<h2 id="conexion-con-secciones-anteriores-y-siguientes">Conexión con secciones anteriores y siguientes<a class="headerlink" href="#conexion-con-secciones-anteriores-y-siguientes" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Sección 2 (taxonomía)</strong>: el análisis de errores te dice qué <em>tipo</em>
+  de eval necesitas para cada categoría de error. Un R1 se detecta con
+  component eval reference-based; un G1 se detecta con system eval
+  reference-free.</li>
+<li><strong>Sección 4 (golden datasets)</strong>: los patrones observados aquí son el
+  input principal para diseñar el golden dataset.</li>
+<li><strong>Sección 7 (LLM-as-judge)</strong>: algunos errores (G1, G4) son candidatos
+  naturales para evaluación con judge; otros (R1, R3) se miden mejor
+  con métricas de retrieval clásicas.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

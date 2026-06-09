@@ -1,0 +1,54 @@
+LEY DE PRESUPUESTOS DEL SECTOR PÚBLICO AÑO 2024
+PARTIDA 09: MINISTERIO DE EDUCACIÓN
+
+CAPÍTULO 01: SUBSECRETARÍA DE EDUCACIÓN
+
+Programa 20: Subvenciones a Establecimientos Educacionales
+
+  Subtítulo 24 - Transferencias Corrientes
+
+  La siguiente tabla resume las asignaciones del programa de
+  subvenciones para el año 2024:
+
+  Asignación  Glosa  Concepto                              Monto (miles $)
+  ----------  -----  ------------------------------------  ---------------
+  001         03     Subvención de Escolaridad                7.842.310.500
+  002         04     Subvención Escolar Preferencial (SEP)    1.984.220.300
+  003         05     Subvención para Educación Especial         612.450.180
+  004         06     Aporte por Gratuidad y Mantenimiento       430.118.900
+  005         07     Subvención de Internado                     58.903.220
+
+  TOTAL Programa 20                                          10.928.003.100
+
+  Glosa 03: Los recursos de la Subvención de Escolaridad se determinan
+  conforme al valor unitario por alumno establecido en el DFL Nº 2, de
+  1998, del Ministerio de Educación, multiplicado por la asistencia
+  media promedio de los tres meses precedentes.
+
+  Glosa 04: La Subvención Escolar Preferencial se rige por la Ley
+  Nº 20.248 y su reglamento. Los sostenedores deberán rendir el uso de
+  estos recursos a la Superintendencia de Educación, conforme al Plan de
+  Mejoramiento Educativo (PME) de cada establecimiento. El monto unitario
+  mensual por alumno prioritario se expresa en unidades de subvención
+  educacional (USE).
+
+  Glosa 05: La Subvención para Educación Especial financiará a los
+  establecimientos que impartan educación diferencial, con un factor
+  incrementado por alumno según el tipo de necesidad educativa especial,
+  permanente o transitoria.
+
+CAPÍTULO 09: JUNTA NACIONAL DE AUXILIO ESCOLAR Y BECAS (JUNAEB)
+
+Programa 01: Atención de Alumnos
+
+  Subtítulo 24 - Transferencias Corrientes
+  Asignación 030 - Programa de Alimentación Escolar (PAE)
+
+  Monto: $1.012.567.400 miles
+
+  Glosa 11: Con cargo a estos recursos, la JUNAEB financiará la entrega
+  diaria de raciones alimenticias a alumnos prioritarios y vulnerables
+  de establecimientos municipales y particulares subvencionados. La
+  determinación de la calidad de alumno prioritario se regirá por los
+  mismos criterios de focalización aplicables a la Subvención Escolar
+  Preferencial.

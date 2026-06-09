@@ -1,0 +1,2434 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../00-plan/">
+      
+      
+        <link rel="next" href="../02-taxonomia/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>01 — Por qué evals es la disciplina más subestimada de LLM engineering - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#01-por-que-evals-es-la-disciplina-mas-subestimada-de-llm-engineering" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              01 — Por qué evals es la disciplina más subestimada de LLM engineering
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#la-ilusion-de-la-demo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La ilusión de la demo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#la-analogia-evals-como-auditoria-financiera" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La analogía: evals como auditoría financiera
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-costo-de-no-evaluar-fallos-silenciosos-en-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El costo de no evaluar: fallos silenciosos en RAG
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="El costo de no evaluar: fallos silenciosos en RAG">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#taxonomia-de-fallos-silenciosos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Taxonomía de fallos silenciosos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-costo-economico-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El costo económico real
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eval-driven-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Eval-driven development
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Eval-driven development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contraste-vibe-driven-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contraste: vibe-driven development
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-mapa-de-esta-masterclass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El mapa de esta masterclass
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="El mapa de esta masterclass">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#que-no-cubre-esta-masterclass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué no cubre esta masterclass
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lo-que-esta-resuelto-y-lo-que-no-2025-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo que está resuelto y lo que no (2025-2026)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-analisis-errores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-metricas-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../02-retrieval/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/01-ir-pre-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/04-chunking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/06-reranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../03-produccion/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/07-despliegue-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#la-ilusion-de-la-demo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La ilusión de la demo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#la-analogia-evals-como-auditoria-financiera" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La analogía: evals como auditoría financiera
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-costo-de-no-evaluar-fallos-silenciosos-en-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El costo de no evaluar: fallos silenciosos en RAG
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="El costo de no evaluar: fallos silenciosos en RAG">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#taxonomia-de-fallos-silenciosos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Taxonomía de fallos silenciosos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-costo-economico-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El costo económico real
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eval-driven-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Eval-driven development
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Eval-driven development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contraste-vibe-driven-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contraste: vibe-driven development
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-mapa-de-esta-masterclass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El mapa de esta masterclass
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="El mapa de esta masterclass">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#que-no-cubre-esta-masterclass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué no cubre esta masterclass
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lo-que-esta-resuelto-y-lo-que-no-2025-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo que está resuelto y lo que no (2025-2026)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="01-por-que-evals-es-la-disciplina-mas-subestimada-de-llm-engineering">01 — Por qué evals es la disciplina más subestimada de LLM engineering<a class="headerlink" href="#01-por-que-evals-es-la-disciplina-mas-subestimada-de-llm-engineering" title="Permanent link">&para;</a></h1>
+<h2 id="la-ilusion-de-la-demo">La ilusión de la demo<a class="headerlink" href="#la-ilusion-de-la-demo" title="Permanent link">&para;</a></h2>
+<p>Un sistema RAG sobre normativa chilena puede verse impresionante en una demo.
+Le preguntas "¿cuánto es la subvención escolar preferencial para un alumno
+prioritario de 3º básico?" y te responde correctamente: 1,694 USE. Todos
+aplauden.</p>
+<p>Pero ese aplauso esconde una trampa estadística: estás evaluando un sistema
+estocástico con una muestra de tamaño <strong>n=1</strong>, seleccionada con sesgo de
+confirmación (elegiste una pregunta que sabías que iba a funcionar), sin
+grupo de control, sin intervalo de confianza, y sin definición previa de
+qué constituye "éxito".</p>
+<p>En econometría esto se llama <em>anecdotal evidence</em> y no pasaría ni el primer
+filtro de un seminario de investigación. Sin embargo, en ingeniería de LLMs,
+equipos enteros toman decisiones de producto basándose exactamente en esto.</p>
+<h2 id="la-analogia-evals-como-auditoria-financiera">La analogía: evals como auditoría financiera<a class="headerlink" href="#la-analogia-evals-como-auditoria-financiera" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TB
+    subgraph "Empresa"
+        P[Producto&lt;br/&gt;genera valor] --&gt; F[Estados financieros&lt;br/&gt;representan el valor]
+        F --&gt; A[Auditoría&lt;br/&gt;verifica la representación]
+    end
+    subgraph "Sistema RAG"
+        R[Pipeline RAG&lt;br/&gt;genera respuestas] --&gt; O[Outputs observados&lt;br/&gt;representan la calidad]
+        O --&gt; E[Evals&lt;br/&gt;verifican la calidad]
+    end
+
+    style A fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style E fill:#f9d71c,stroke:#333,color:#1a1a1a</code></pre>
+<table>
+<thead>
+<tr>
+<th>Auditoría financiera</th>
+<th>Evaluación de sistemas IA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No genera ingresos directamente</td>
+<td>No genera features directamente</td>
+</tr>
+<tr>
+<td>Sin ella, no sabes si los números son reales</td>
+<td>Sin ella, no sabes si la calidad es real</td>
+</tr>
+<tr>
+<td>Tiene estándares (IFRS, GAAP)</td>
+<td>Estándares emergentes, no consolidados</td>
+</tr>
+<tr>
+<td>La evitan quienes tienen algo que esconder</td>
+<td>La evitan quienes no quieren ver los fallos</td>
+</tr>
+<tr>
+<td>Es obligatoria para empresas públicas</td>
+<td>Debería ser obligatoria para sistemas en producción</td>
+</tr>
+<tr>
+<td>Cuesta dinero y tiempo</td>
+<td>Cuesta tokens y tiempo de diseño</td>
+</tr>
+<tr>
+<td>El costo de no hacerla &gt; el costo de hacerla</td>
+<td>Igual</td>
+</tr>
+</tbody>
+</table>
+<p>La diferencia clave: una empresa que no hace auditoría eventualmente enfrenta
+consecuencias legales. Un sistema RAG que no tiene evals simplemente falla en
+silencio hasta que alguien nota un error grave — y para entonces llevas semanas
+o meses con un sistema degradado.</p>
+<h2 id="el-costo-de-no-evaluar-fallos-silenciosos-en-rag">El costo de no evaluar: fallos silenciosos en RAG<a class="headerlink" href="#el-costo-de-no-evaluar-fallos-silenciosos-en-rag" title="Permanent link">&para;</a></h2>
+<p>Un sistema RAG sobre corpus regulatorio chileno puede fallar de muchas formas,
+y la mayoría son <strong>silenciosas</strong> — el sistema produce una respuesta que parece
+correcta, tiene formato profesional, cita artículos, y sin embargo está mal.</p>
+<h3 id="taxonomia-de-fallos-silenciosos">Taxonomía de fallos silenciosos<a class="headerlink" href="#taxonomia-de-fallos-silenciosos" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>graph TD
+    Q[Query del usuario] --&gt; RET{¿Retrieval correcto?}
+    RET --&gt;|No| F1[🔴 Retrieval miss&lt;br/&gt;No encuentra el documento relevante]
+    RET --&gt;|Parcial| F2[🟡 Wrong chunk&lt;br/&gt;Encuentra el doc pero el chunk equivocado]
+    RET --&gt;|Sí| GEN{¿Generación correcta?}
+    GEN --&gt;|No: inventa| F3[🔴 Hallucination&lt;br/&gt;Genera info que no está en el contexto]
+    GEN --&gt;|No: mal lee| F4[🟡 Misreading&lt;br/&gt;El doc dice X, la respuesta dice Y]
+    GEN --&gt;|No: omite| F5[🟡 Incomplete&lt;br/&gt;Responde parcialmente, omite condiciones]
+    GEN --&gt;|Sí| FMT{¿Formato correcto?}
+    FMT --&gt;|No| F6[🟢 Format failure&lt;br/&gt;Contenido correcto, forma incorrecta]
+    FMT --&gt;|Sí| META{¿Debería haber respondido?}
+    META --&gt;|No debía| F7[🔴 False confidence&lt;br/&gt;Responde con certeza algo fuera de scope]
+    META --&gt;|Sí| OK[✅ Respuesta correcta]</code></pre>
+<table>
+<thead>
+<tr>
+<th>Tipo de fallo</th>
+<th>Severidad</th>
+<th>Ejemplo en dominio fiscal</th>
+<th>Detectable sin eval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Retrieval miss</strong></td>
+<td>Alta</td>
+<td>Pregunta sobre IVA digital → recupera doc de IVA a inmuebles</td>
+<td>No — la respuesta suena plausible</td>
+</tr>
+<tr>
+<td><strong>Wrong chunk</strong></td>
+<td>Media</td>
+<td>Recupera la circular correcta pero el chunk de "Introducción", no el de "Servicios gravados"</td>
+<td>No — el doc es correcto</td>
+</tr>
+<tr>
+<td><strong>Hallucination</strong></td>
+<td>Crítica</td>
+<td>"La tasa de IVA para servicios digitales es del 15%" (es 19%)</td>
+<td>No sin verificar contra fuente</td>
+</tr>
+<tr>
+<td><strong>Misreading</strong></td>
+<td>Alta</td>
+<td>Dice "todos los servicios digitales están exentos" cuando el doc dice "están afectos"</td>
+<td>No — parece coherente</td>
+</tr>
+<tr>
+<td><strong>Incomplete</strong></td>
+<td>Media</td>
+<td>Responde sobre la tasa pero omite que aplica solo a proveedores extranjeros</td>
+<td>No — lo que dice es correcto</td>
+</tr>
+<tr>
+<td><strong>Format failure</strong></td>
+<td>Baja</td>
+<td>Responde correctamente pero sin citar el artículo/circular específica</td>
+<td>Parcialmente</td>
+</tr>
+<tr>
+<td><strong>False confidence</strong></td>
+<td>Crítica</td>
+<td>Pregunta sobre una norma de 2025 no incluida en el corpus; responde inventando</td>
+<td>No — el tono es seguro</td>
+</tr>
+</tbody>
+</table>
+<h3 id="el-costo-economico-real">El costo económico real<a class="headerlink" href="#el-costo-economico-real" title="Permanent link">&para;</a></h3>
+<p>Piénsalo así: si un analista fiscal usa tu sistema y obtiene una respuesta
+incorrecta sobre la tasa de IVA aplicable, las consecuencias potenciales son:</p>
+<ol>
+<li><strong>Costo directo</strong>: declaración tributaria incorrecta → multa del SII
+   (Art. 97 Nº 1 del Código Tributario: hasta 20% del impuesto adeudado</li>
+<li>intereses).</li>
+<li><strong>Costo de confianza</strong>: el analista deja de confiar en el sistema →
+   vuelve a hacer todo manualmente → el ROI del producto se va a cero.</li>
+<li><strong>Costo reputacional</strong>: si el error llega al cliente del analista →
+   el daño es exponencial.</li>
+</ol>
+<p>Sin evals, no sabes con qué frecuencia ocurren estos fallos. Podrían ser el
+1% de las queries o el 30%. Literalmente no lo sabes. Es como invertir en un
+portafolio sin conocer la varianza: estás volando a ciegas.</p>
+<h2 id="eval-driven-development">Eval-driven development<a class="headerlink" href="#eval-driven-development" title="Permanent link">&para;</a></h2>
+<p>La alternativa es tratar las evals como lo que son: <strong>la primera cosa que
+construyes</strong>, no la última.</p>
+<pre class="mermaid"><code>graph LR
+    E1[1. Define qué&lt;br/&gt;medir y cómo] --&gt; E2[2. Construye&lt;br/&gt;baseline medible]
+    E2 --&gt; E3[3. Mide el&lt;br/&gt;estado actual]
+    E3 --&gt; E4[4. Identifica el&lt;br/&gt;fallo dominante]
+    E4 --&gt; E5[5. Implementa&lt;br/&gt;mejora específica]
+    E5 --&gt; E6[6. Mide de nuevo&lt;br/&gt;¿mejoró?]
+    E6 --&gt;|Sí| E7[7. Ship con&lt;br/&gt;confianza]
+    E6 --&gt;|No| E4
+    E7 --&gt; E8[8. Monitorea&lt;br/&gt;en producción]
+    E8 --&gt;|Regresión| E4
+
+    style E1 fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style E3 fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style E6 fill:#f9d71c,stroke:#333,color:#1a1a1a
+    style E8 fill:#f9d71c,stroke:#333,color:#1a1a1a</code></pre>
+<p>Los pasos amarillos son evaluación. La mitad del ciclo es evaluar. Esto no es
+un overhead — es el proceso.</p>
+<h3 id="contraste-vibe-driven-development">Contraste: vibe-driven development<a class="headerlink" href="#contraste-vibe-driven-development" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Eval-driven</th>
+<th>Vibe-driven</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Decisión de ship</td>
+<td>"recall@5 pasó de 0.72 a 0.81, CI 95% [0.78, 0.84]"</td>
+<td>"probé 3 preguntas y se ve mejor"</td>
+</tr>
+<tr>
+<td>Detección de regresión</td>
+<td>Alerta automática: "faithfulness cayó 8pp"</td>
+<td>Usuario reporta en 3 semanas: "a veces inventa"</td>
+</tr>
+<tr>
+<td>Priorización de mejoras</td>
+<td>"El 40% de los errores son retrieval miss en glosas"</td>
+<td>"El prompt se siente raro, reescribámoslo"</td>
+</tr>
+<tr>
+<td>Confianza del equipo</td>
+<td>Basada en datos</td>
+<td>Basada en la última demo</td>
+</tr>
+<tr>
+<td>Costo de iteración</td>
+<td>Bajo: sabes exactamente qué medir</td>
+<td>Alto: cada cambio requiere revisión manual</td>
+</tr>
+</tbody>
+</table>
+<h2 id="el-mapa-de-esta-masterclass">El mapa de esta masterclass<a class="headerlink" href="#el-mapa-de-esta-masterclass" title="Permanent link">&para;</a></h2>
+<p>Cada sección de esta masterclass construye una capacidad que se apila sobre
+las anteriores:</p>
+<pre class="mermaid"><code>graph TB
+    subgraph "Fundamentos"
+        S1[1. Por qué evals&lt;br/&gt;&lt;i&gt;Estás aquí&lt;/i&gt;]
+        S2[2. Taxonomía&lt;br/&gt;Qué tipos existen]
+    end
+
+    subgraph "Datos"
+        S3[3. Análisis de errores&lt;br/&gt;Mirar antes de medir]
+        S4[4. Golden datasets&lt;br/&gt;Qué medir]
+    end
+
+    subgraph "Métricas"
+        S5[5. Métricas retrieval&lt;br/&gt;¿Encuentra los docs?]
+        S6[6. Métricas generación&lt;br/&gt;¿Responde bien?]
+        S7[7. LLM-as-judge&lt;br/&gt;¿Quién evalúa al evaluador?]
+    end
+
+    subgraph "Rigor"
+        S8[8. Estadística&lt;br/&gt;¿Es significativo?]
+        S10[10. Costo/Pareto&lt;br/&gt;¿Vale la pena?]
+    end
+
+    subgraph "Producción"
+        S9[9. CI/CD&lt;br/&gt;Automatizar]
+        S11[11. Online evals&lt;br/&gt;Monitorear en vivo]
+    end
+
+    subgraph "Dominio"
+        S12[12. Legal/fiscal&lt;br/&gt;Particularidades]
+    end
+
+    S1 --&gt; S2 --&gt; S3 --&gt; S4
+    S2 --&gt; S5 --&gt; S8
+    S2 --&gt; S6 --&gt; S7
+    S6 --&gt; S8
+    S4 --&gt; S8
+    S8 --&gt; S9 --&gt; S10 --&gt; S11
+    S7 --&gt; S11
+    S11 --&gt; S12
+    S4 --&gt; S12
+    S7 --&gt; S12
+
+    style S1 fill:#f9d71c,stroke:#333,color:#1a1a1a</code></pre>
+<h3 id="que-no-cubre-esta-masterclass">Qué <em>no</em> cubre esta masterclass<a class="headerlink" href="#que-no-cubre-esta-masterclass" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Cómo construir un RAG</strong>: eso es materia de la masterclass 02-retrieval.
+  Aquí asumimos que ya tienes un pipeline y quieres saber si funciona.</li>
+<li><strong>Cómo optimizar costos de inferencia</strong>: eso es masterclass 04-economia.
+  Aquí tocamos costos de evaluación (sección 10), no de servicio.</li>
+<li><strong>Frameworks específicos</strong>: no enseñamos RAGAS ni DeepEval como herramientas.
+  Enseñamos los conceptos que subyacen a todos ellos. Cuando un framework
+  cambie su API (y lo hará), tus conceptos seguirán intactos.</li>
+</ul>
+<h2 id="lo-que-esta-resuelto-y-lo-que-no-2025-2026">Lo que está resuelto y lo que no (2025-2026)<a class="headerlink" href="#lo-que-esta-resuelto-y-lo-que-no-2025-2026" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Estado</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Métricas de retrieval</td>
+<td>✅ Resuelto</td>
+<td>Recall@k, MRR, nDCG son estándar desde IR clásico</td>
+</tr>
+<tr>
+<td>Métricas de generación</td>
+<td>🟡 En progreso</td>
+<td>Faithfulness tiene consenso; el resto varía por dominio</td>
+</tr>
+<tr>
+<td>LLM-as-judge</td>
+<td>🟡 En progreso</td>
+<td>Los sesgos están documentados; las soluciones, menos</td>
+</tr>
+<tr>
+<td>Bootstrapping para LLMs</td>
+<td>✅ Resuelto (en teoría)</td>
+<td>La estadística funciona; la adopción es baja</td>
+</tr>
+<tr>
+<td>Golden datasets</td>
+<td>🟡 Artesanal</td>
+<td>No hay estándares; cada equipo reinventa la rueda</td>
+</tr>
+<tr>
+<td>Online evals</td>
+<td>🔴 Incipiente</td>
+<td>Shadow mode existe; A/B para LLMs es experimental</td>
+</tr>
+<tr>
+<td>Evals para legal/fiscal</td>
+<td>🔴 Escaso</td>
+<td>Literatura genérica; casi nada específico del dominio</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ No verificado: el estado del arte cambia rápido. Esta tabla refleja mi
+mejor comprensión a mayo de 2026. Verificar contra publicaciones recientes
+(HELM, LMSYS, papers de Anthropic/OpenAI sobre evals) antes de citar.</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
