@@ -28,7 +28,7 @@ este módulo.
 | 02 | Modelado del dominio regulatorio chileno      | [theory/02-modelado-del-dominio.md](theory/02-modelado-del-dominio.md) | [code/02-grafo-normativo.py](code/02-grafo-normativo.py) | Terminado |
 | 03 | Cuánto formalismo comprar                     | [theory/03-cuanto-formalismo.md](theory/03-cuanto-formalismo.md) | [code/03-cuanto-formalismo.py](code/03-cuanto-formalismo.py) | Terminado |
 | 04 | Identidad y llaves canónicas                  | [theory/04-identidad-y-llaves.md](theory/04-identidad-y-llaves.md) | [code/04-identidad-y-llaves.py](code/04-identidad-y-llaves.py) | Terminado |
-| 05 | Extraer la ontología del corpus               | — | — | Pendiente |
+| 05 | Extraer la ontología del corpus               | [theory/05-extraccion-llm.md](theory/05-extraccion-llm.md) | [code/05-extraccion-llm.py](code/05-extraccion-llm.py) | Terminado |
 | 06 | Vigencia temporal y versionado normativo      | — | — | Pendiente |
 | 07 | Del grafo al retrieval: GraphRAG y su economía | — | — | Pendiente |
 | 08 | Evaluar un sistema con ontología              | — | — | Pendiente |
@@ -67,11 +67,16 @@ de formalismo inmediatamente anterior al property graph, para medir la
 brecha en vez de solo describirla); §4 sumó `Organismo`, `resolver_organismo`
 (diccionario) y `resolver_organismo_difuso` (similitud de secuencia,
 fallback) — pipeline de entity resolution de dos niveles con orden
-justificado por un falso positivo real y medido.
+justificado por un falso positivo real y medido; §5 sumó `LLMExtractor`
+(structured output vía Pydantic, caché en disco), `resolver_por_numero`
+(nivel intermedio de resolución específico de identificadores legales) y
+`resolver_identificador_norma` (pipeline de tres niveles).
 
 ## Datos
 
 - Corpus regulatorio: `shared/corpus_chileno/` (40 documentos, `B6`).
 - Golden de retrieval (§8, sin modificar): `02-retrieval/examples/golden-retrieval.json`.
+- Verdad fundamental (§2, usada como referencia en §5): [examples/relaciones-manual.json](examples/relaciones-manual.json).
+- Caché de extracción LLM (§5): `examples/cache-extraccion-llm.json` — con caché poblada, el script corre sin API key.
 
 Ver [AGENTS.md](../AGENTS.md) para convenciones completas.

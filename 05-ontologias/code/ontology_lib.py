@@ -5,6 +5,16 @@ Acumula los componentes que las secciones introducen:
   §1  Modelo del clasificador presupuestario como property graph: nodos
       tipados (Partida...Asignación) y el parser que los extrae de los
       documentos de glosa del corpus.
+  §2  Grafo normativo: vocabulario de relaciones tipadas (Norma,
+      RelacionNormativa, TipoRelacion) y recorridos (vecinos_por_relacion,
+      alcance_transitivo).
+  §3  Esquema tipo SKOS (ConceptoSKOS) para medir la brecha entre niveles
+      de formalismo sobre el mismo corpus.
+  §4  Entity resolution de organismos: pipeline de dos niveles (diccionario
+      exacto, luego similitud difusa como fallback).
+  §5  Extracción automática con LLM + structured output (LLMExtractor),
+      y resolución de identificadores de norma reutilizando el pipeline
+      de §4.
 
 Diseño: un property graph con `networkx` + esquema Pydantic, sin base de
 grafos dedicada ni razonador OWL (decisión justificada en §3). Mismo patrón
@@ -493,6 +503,7 @@ def catalogo_organismos_corpus() -> list[Organismo]:
     ]
 
 
+# --------------------------------------------------------------------------- #
 def alcance_transitivo(
     g: nx.DiGraph,
     node_id: str,
@@ -523,3 +534,191 @@ def alcance_transitivo(
     if node_id not in sub:
         return set()
     return nx.descendants(sub, node_id) if direccion == "out" else nx.ancestors(sub, node_id)
+
+
+# --------------------------------------------------------------------------- #
+# §5 Extracción con LLM. Reemplaza la curación manual de §2 por un extractor
+# automático + Pydantic structured output, y reutiliza el pipeline de
+# resolución de identidad de §4 (aplicado acá a IDENTIFICADORES DE NORMA en
+# vez de nombres de organismo — mismo problema, mismo mecanismo).
+# --------------------------------------------------------------------------- #
+class RelacionExtraida(BaseModel):
+    """Lo que el LLM extrae de UN documento: la norma destino en texto
+    libre —tal como el documento la menciona ("Ley Nº 21.210", "DL Nº
+    825")—, no un `doc_id`. El LLM no conoce los nombres de archivo del
+    corpus; resolver el identificador a un `doc_id` es un paso aparte
+    (`resolver_identificador_norma`), deliberadamente separado de la
+    extracción para poder medir el error de cada etapa por separado.
+    """
+
+    identificador_destino: str
+    tipo: TipoRelacion
+    fundamento: str
+
+
+class ExtraccionDocumento(BaseModel):
+    """La salida estructurada completa para un documento: cero o más
+    relaciones detectadas."""
+
+    relaciones: list[RelacionExtraida]
+
+
+_PROMPT_EXTRACCION = """\
+Eres un analista jurídico especializado en normativa chilena. Tu tarea es \
+identificar TODAS las relaciones que el siguiente documento declara hacia \
+OTRAS normas (leyes, decretos, circulares, resoluciones u oficios), \
+clasificando cada relación según este vocabulario EXACTO:
+
+- modifica: el texto declara que cambia, sustituye o incorpora artículos a \
+otra norma (verbos: "modifícanse", "sustitúyese", "incorpórase", \
+"introdúcense modificaciones").
+- deroga: el texto declara que otra norma deja de regir ("derógase").
+- reglamenta: el documento ES el reglamento de otra norma ("Aprueba \
+Reglamento de la Ley Nº...", "reglamenta la Ley Nº...").
+- interpreta: el documento imparte instrucciones o interpreta cómo aplicar \
+otra norma, sin cambiarla ni ser su reglamento.
+- aplica: el documento resuelve un caso concreto usando otra norma como \
+fundamento (dictámenes, oficios que responden una consulta).
+- cita: cualquier otra mención de una norma como referencia o fundamento \
+("conforme a", "de conformidad con", "en virtud de", "establecido en").
+
+Para cada relación detectada, extrae:
+- identificador_destino: el identificador EXACTO de la norma destino tal \
+como aparece en el texto (ej. "Ley Nº 21.210", "DL Nº 825", "Decreto \
+Supremo Nº 250", "Circular Nº 42").
+- tipo: uno de los seis valores del vocabulario de arriba.
+- fundamento: la frase o cláusula del texto que sustenta la relación \
+(cita textual breve, no un resumen).
+
+Si el documento no menciona ninguna otra norma, devuelve una lista vacía. \
+No inventes relaciones que el texto no declara explícitamente.
+
+DOCUMENTO:
+{texto}
+"""
+
+
+class LLMExtractor:
+    """Extractor de relaciones normativas con salida estructurada (Pydantic)
+    y caché en disco — mismo patrón que `LLMRewriter`/`LLMReranker` de
+    `02-retrieval`: primera corrida llama a la API, corridas siguientes leen
+    de caché, reproducibles sin API key."""
+
+    def __init__(
+        self, model: str = "gpt-4o-mini", cache_path: Path | None = None
+    ) -> None:
+        self.model = model
+        self.cache_path = Path(cache_path) if cache_path else None
+        self._cache: dict[str, dict] = {}
+        self.api_calls = 0
+        self.tokens_in = 0
+        self.tokens_out = 0
+        self._load()
+
+    def _load(self) -> None:
+        import json as _json
+
+        if self.cache_path and self.cache_path.exists():
+            self._cache = _json.loads(self.cache_path.read_text(encoding="utf-8"))
+
+    def _save(self) -> None:
+        import json as _json
+
+        if not self.cache_path:
+            return
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        self.cache_path.write_text(
+            _json.dumps(self._cache, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    def _key(self, texto: str) -> str:
+        import hashlib
+
+        return hashlib.sha1(f"{self.model}\n{texto}".encode("utf-8")).hexdigest()
+
+    def extraer(self, texto: str) -> ExtraccionDocumento:
+        k = self._key(texto)
+        if k in self._cache:
+            return ExtraccionDocumento.model_validate(self._cache[k])
+
+        from dotenv import load_dotenv
+
+        load_dotenv()
+        from openai import OpenAI
+
+        client = OpenAI()
+        prompt = _PROMPT_EXTRACCION.format(texto=texto)
+        resp = client.chat.completions.parse(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            response_format=ExtraccionDocumento,
+            temperature=0.0,
+        )
+        resultado = resp.choices[0].message.parsed
+        if resp.usage:
+            self.tokens_in += resp.usage.prompt_tokens
+            self.tokens_out += resp.usage.completion_tokens
+        self.api_calls += 1
+        self._cache[k] = resultado.model_dump(mode="json")
+        self._save()
+        return resultado
+
+
+_NUMERO_RE = re.compile(r"(\d[\d.]*)")
+
+
+def resolver_por_numero(identificador: str, normas: list[Norma]) -> str | None:
+    """Nivel intermedio, específico del dominio: extrae el NÚMERO del
+    identificador ('Decreto Ley Nº 825' -> '825') y matchea contra el número
+    de los identificadores del catálogo.
+
+    Es más seguro que la similitud difusa genérica para este dominio, y la
+    razón es la misma que en §1 (UNSPSC es un código, no un nombre) y en §4
+    (llave canónica, no texto libre): el número es la parte estable de un
+    identificador legal chileno; el resto ('Decreto Ley' vs 'DL', 'de 1974')
+    es ruido de formato. Comparar el número evita el falso positivo que la
+    similitud de caracteres SÍ comete entre 'Ley Nº 18.695' y 'Ley Nº
+    18.575' (0.85 de similitud, dos leyes completamente distintas) — porque
+    acá '18.695' y '18.575' simplemente no son el mismo número, sin
+    ambigüedad de umbral.
+    """
+    m = _NUMERO_RE.search(identificador)
+    if not m:
+        return None
+    numero = m.group(1)
+    numeros_normas = [(n, _NUMERO_RE.search(n.identificador)) for n in normas]
+    candidatos = [n for n, nm in numeros_normas if nm and nm.group(1) == numero]
+    if len(candidatos) == 1:
+        return candidatos[0].id
+    return None  # 0 candidatos, o número ambiguo (>1 norma con el mismo número): no arriesgar
+
+
+def resolver_identificador_norma(
+    identificador: str, normas: list[Norma], umbral_difuso: float = 0.85
+) -> tuple[str | None, str]:
+    """Resuelve un identificador en texto libre (lo que el LLM extrajo, ej.
+    'Ley Nº 21.210') a un `doc_id` del corpus. Tres niveles, en orden de
+    costo y riesgo crecientes — el mismo principio de §4 ('barato y
+    determinista primero'), con un nivel intermedio nuevo que ese pipeline
+    no necesitaba porque los nombres de organismo no tienen números:
+
+    1. Diccionario exacto (§4, `resolver_organismo`).
+    2. Coincidencia por NÚMERO (`resolver_por_numero`, específico de
+       identificadores legales).
+    3. Similitud difusa genérica (§4, `resolver_organismo_difuso`) — el
+       último recurso, con el riesgo ya documentado en §4.
+
+    Devuelve `(doc_id o None, nivel)` para poder medir cuánto trabajo hizo
+    cada nivel.
+    """
+    catalogo = [Organismo(id=n.id, nombre_oficial=n.identificador) for n in normas]
+    exacto = resolver_organismo(identificador, catalogo)
+    if exacto is not None:
+        return exacto, "exacto"
+    por_numero = resolver_por_numero(identificador, normas)
+    if por_numero is not None:
+        return por_numero, "numero"
+    difuso, score = resolver_organismo_difuso(identificador, catalogo, umbral=umbral_difuso)
+    if difuso is not None:
+        return difuso, "difuso"
+    return None, "sin_match"

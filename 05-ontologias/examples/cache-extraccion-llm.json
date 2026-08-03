@@ -1,0 +1,257 @@
+{
+  "2f114c8b241e8cf7835f7bfb1bcf445b9c083535": {
+    "relaciones": [
+      {
+        "identificador_destino": "Decreto Ley Nº 825",
+        "tipo": "modifica",
+        "fundamento": "La presente ley introduce modificaciones al Decreto Ley Nº 825, de 1974, sobre Impuesto a las Ventas y Servicios."
+      },
+      {
+        "identificador_destino": "Decreto Ley Nº 824",
+        "tipo": "modifica",
+        "fundamento": "a la Ley sobre Impuesto a la Renta contenida en el artículo 1º del Decreto Ley Nº 824, de 1974;"
+      },
+      {
+        "identificador_destino": "Código Tributario",
+        "tipo": "modifica",
+        "fundamento": "y al Código Tributario, con el objeto de modernizar el sistema tributario."
+      },
+      {
+        "identificador_destino": "Ley sobre Impuesto a la Renta",
+        "tipo": "modifica",
+        "fundamento": "Sustitúyese el artículo 14 de la Ley sobre Impuesto a la Renta, estableciendo el Régimen Pro Pyme."
+      }
+    ]
+  },
+  "d5f37ca7df487bf5ccfa945fb3839d1adf7a18fb": {
+    "relaciones": [
+      {
+        "identificador_destino": "Ley Nº 21.210",
+        "tipo": "modifica",
+        "fundamento": "conforme a las modificaciones introducidas por la Ley Nº 21.210 a la Ley sobre Impuesto a las Ventas y Servicios."
+      },
+      {
+        "identificador_destino": "Decreto Ley Nº 825",
+        "tipo": "modifica",
+        "fundamento": "La Ley Nº 21.210, publicada en el Diario Oficial el 24 de febrero de 2020, introdujo modificaciones al Decreto Ley Nº 825, de 1974 (Ley sobre Impuesto a las Ventas y Servicios)"
+      }
+    ]
+  },
+  "f7eaa1095a34f3fb9516a82d14159236f036df3b": {
+    "relaciones": [
+      {
+        "identificador_destino": "Ley Nº 19.886",
+        "tipo": "cita",
+        "fundamento": "Lo dispuesto en la Ley Nº 19.886;"
+      },
+      {
+        "identificador_destino": "Ley Nº 21.634",
+        "tipo": "modifica",
+        "fundamento": "Que la Ley Nº 21.634 elevó el umbral del procedimiento de compra ágil desde 30 a 100 unidades tributarias mensuales, ampliando significativamente el universo de adquisiciones que pueden efectuarse por esta vía simplificada."
+      },
+      {
+        "identificador_destino": "Decreto Supremo Nº 250",
+        "tipo": "cita",
+        "fundamento": "en el Decreto Supremo Nº 250, de 2004, del Ministerio de Hacienda;"
+      },
+      {
+        "identificador_destino": "Resolución Nº 7",
+        "tipo": "cita",
+        "fundamento": "en la Resolución Nº 7, de 2019, de la Contraloría General de la República."
+      },
+      {
+        "identificador_destino": "Ley Nº 21.634",
+        "tipo": "cita",
+        "fundamento": "conforme al Título VI de la Ley Nº 19.886, incorporado por la Ley Nº 21.634."
+      },
+      {
+        "identificador_destino": "Ley Nº 21.634",
+        "tipo": "reglamenta",
+        "fundamento": "la presente directiva rige a contar del 11 de diciembre de 2024, fecha de entrada en vigencia de las modificaciones introducidas por la Ley Nº 21.634 en materia de compra ágil."
+      }
+    ]
+  },
+  "6a012a7e38f2bcbba82e36f70fe84d3b9aaf3997": {
+    "relaciones": [
+      {
+        "identificador_destino": "Ley Nº 19.886",
+        "tipo": "interpreta",
+        "fundamento": "El artículo 8º de la Ley Nº 19.886 establece las causales que habilitan a prescindir de la licitación pública."
+      },
+      {
+        "identificador_destino": "Decreto Supremo Nº 250",
+        "tipo": "interpreta",
+        "fundamento": "El artículo 10º del Decreto Supremo Nº 250, de 2004, del Ministerio de Hacienda, precisa que la emergencia supone una situación de hecho imprevista y sobreviniente."
+      },
+      {
+        "identificador_destino": "Ley Nº 21.634",
+        "tipo": "modifica",
+        "fundamento": "regulado en el artículo 7º bis de la Ley Nº 19.886, incorporado por la Ley Nº 21.634."
+      }
+    ]
+  },
+  "12fc58e25835c6d181f3e9a7c34f7130e0840c89": {
+    "relaciones": [
+      {
+        "identificador_destino": "Ley Nº 20.248",
+        "tipo": "reglamenta",
+        "fundamento": "APRUEBA REGLAMENTO DE LA LEY Nº 20.248 QUE ESTABLECE LA LEY DE SUBVENCIÓN ESCOLAR PREFERENCIAL"
+      }
+    ]
+  },
+  "3ad739757a3076929bffdac2cc507c48cf1cf0a1": {
+    "relaciones": [
+      {
+        "identificador_destino": "Ley Nº 21.040",
+        "tipo": "aplica",
+        "fundamento": "El artículo 43 de la Ley Nº 21.040 dispone que el Servicio Local sucede a la municipalidad o corporación municipal en todos sus derechos y obligaciones relativos al servicio educacional traspasado."
+      },
+      {
+        "identificador_destino": "Decreto Supremo Nº 148",
+        "tipo": "aplica",
+        "fundamento": "El artículo 9º del Decreto Supremo Nº 148, de 2018, del Ministerio de Educación, precisa que los saldos no ejecutados de la subvención escolar preferencial se traspasan al Servicio Local manteniendo su destino exclusivo conforme al artículo 9º de la Ley Nº 20.248."
+      },
+      {
+        "identificador_destino": "Ley Nº 20.248",
+        "tipo": "aplica",
+        "fundamento": "los saldos no ejecutados de la subvención escolar preferencial se traspasan al Servicio Local manteniendo su destino exclusivo conforme al artículo 9º de la Ley Nº 20.248."
+      },
+      {
+        "identificador_destino": "Ley Nº 20.248",
+        "tipo": "aplica",
+        "fundamento": "la sucesión legal opera respecto de las obligaciones relativas al servicio educacional, entre las que se cuenta el deber de rendir del artículo 14 de la Ley Nº 20.248."
+      },
+      {
+        "identificador_destino": "Ley Nº 18.575",
+        "tipo": "aplica",
+        "fundamento": "La eventual responsabilidad de dichas autoridades se rige por el principio de probidad administrativa del artículo 52 de la Ley Nº 18.575."
+      }
+    ]
+  },
+  "f97b3762f78336b1359589cf7e9c26284117b52a": {
+    "relaciones": [
+      {
+        "identificador_destino": "Decreto Ley Nº 824",
+        "tipo": "cita",
+        "fundamento": "conforme al Decreto Ley Nº 824, de 1974."
+      },
+      {
+        "identificador_destino": "Decreto Ley Nº 824",
+        "tipo": "modifica",
+        "fundamento": "el Régimen Pro Pyme fue establecido por la Ley Nº 21.210, que sustituyó el artículo 14 del Decreto Ley Nº 824."
+      },
+      {
+        "identificador_destino": "Ley Nº 21.210",
+        "tipo": "cita",
+        "fundamento": "el Régimen Pro Pyme fue establecido por la Ley Nº 21.210."
+      },
+      {
+        "identificador_destino": "Circular Nº 62",
+        "tipo": "cita",
+        "fundamento": "Las instrucciones se impartieron en la Circular Nº 62, de 2020."
+      },
+      {
+        "identificador_destino": "Circular Nº 50",
+        "tipo": "cita",
+        "fundamento": "la retención aplicable a las rentas del artículo 42 Nº 2 se encuentra instruida en la Circular Nº 50, de 2022."
+      }
+    ]
+  },
+  "0c81054a7b8f96238ba0deb655357911aa29f942": {
+    "relaciones": [
+      {
+        "identificador_destino": "Ley Nº 21.640",
+        "tipo": "modifica",
+        "fundamento": "Lo dispuesto en el artículo 8º de la Ley Nº 21.640, de Presupuestos del Sector Público para el año 2024"
+      },
+      {
+        "identificador_destino": "Decreto Ley Nº 1.263",
+        "tipo": "cita",
+        "fundamento": "en el Decreto Ley Nº 1.263, de 1975, Orgánico de Administración Financiera del Estado"
+      }
+    ]
+  },
+  "a1804c880476c00b2d390c2a55e0ebc05d938a38": {
+    "relaciones": [
+      {
+        "identificador_destino": "Ley Nº 20.730",
+        "tipo": "cita",
+        "fundamento": "Lo dispuesto en la Ley Nº 20.730, que regula el lobby y las gestiones que representen intereses particulares ante las autoridades y funcionarios."
+      },
+      {
+        "identificador_destino": "Decreto Supremo Nº 71",
+        "tipo": "cita",
+        "fundamento": "en el Decreto Supremo Nº 71, de 2014, del Ministerio Secretaría General de la Presidencia, que aprueba su reglamento;"
+      },
+      {
+        "identificador_destino": "Ley Nº 18.575",
+        "tipo": "cita",
+        "fundamento": "en la Ley Nº 18.575, Orgánica Constitucional de Bases Generales de la Administración del Estado."
+      },
+      {
+        "identificador_destino": "Decreto Supremo Nº 71",
+        "tipo": "aplica",
+        "fundamento": "conforme al artículo 9º del Decreto Supremo Nº 71, de 2014."
+      },
+      {
+        "identificador_destino": "Ley Nº 20.730",
+        "tipo": "aplica",
+        "fundamento": "Conforme al artículo 11 de la Ley Nº 20.730, los sujetos pasivos deberán registrar los donativos oficiales y protocolares recibidos."
+      },
+      {
+        "identificador_destino": "Decreto Supremo Nº 71",
+        "tipo": "cita",
+        "fundamento": "se excluyen aquellos de escaso valor conforme al artículo 12 del Decreto Supremo Nº 71, de 2014."
+      },
+      {
+        "identificador_destino": "Ley Nº 20.730",
+        "tipo": "cita",
+        "fundamento": "El registro de agenda pública regulado por la Ley Nº 20.730 es independiente y no sustituye la obligación de declarar intereses y patrimonio establecida en la Ley Nº 20.880 y su reglamento."
+      },
+      {
+        "identificador_destino": "Ley Nº 20.880",
+        "tipo": "cita",
+        "fundamento": "la obligación de declarar intereses y patrimonio establecida en la Ley Nº 20.880 y su reglamento."
+      },
+      {
+        "identificador_destino": "Ley Nº 20.730",
+        "tipo": "aplica",
+        "fundamento": "Las infracciones a las obligaciones de registro de la Ley Nº 20.730 serán sancionadas conforme al procedimiento y a las multas de diez a cincuenta unidades tributarias mensuales establecidas en el artículo 14 de dicha ley."
+      }
+    ]
+  },
+  "2a3992c4bbe09197eef3bcc79ffe462d7b90c434": {
+    "relaciones": [
+      {
+        "identificador_destino": "Ley Nº 21.040",
+        "tipo": "reglamenta",
+        "fundamento": "APRUEBA REGLAMENTO SOBRE EL PROCEDIMIENTO DE TRASPASO DEL SERVICIO EDUCACIONAL A LOS SERVICIOS LOCALES DE EDUCACIÓN PÚBLICA"
+      },
+      {
+        "identificador_destino": "Ley Nº 20.248",
+        "tipo": "cita",
+        "fundamento": "conforme al artículo 8º de la Ley Nº 20.248"
+      },
+      {
+        "identificador_destino": "Ley Nº 20.248",
+        "tipo": "cita",
+        "fundamento": "conforme al artículo 6º de la Ley Nº 20.248"
+      },
+      {
+        "identificador_destino": "Ley Nº 20.248",
+        "tipo": "cita",
+        "fundamento": "conforme al artículo 9º de la Ley Nº 20.248"
+      },
+      {
+        "identificador_destino": "Ley Nº 21.040",
+        "tipo": "cita",
+        "fundamento": "conforme al artículo 43 de la Ley Nº 21.040"
+      },
+      {
+        "identificador_destino": "Ley Nº 18.695",
+        "tipo": "cita",
+        "fundamento": "previstas en la Ley Nº 18.695"
+      }
+    ]
+  }
+}

@@ -138,6 +138,7 @@ nav:
       - 05-ontologias/theory/02-modelado-del-dominio.md
       - 05-ontologias/theory/03-cuanto-formalismo.md
       - 05-ontologias/theory/04-identidad-y-llaves.md
+      - 05-ontologias/theory/05-extraccion-llm.md
   - Material compartido:
       - Corpus chileno: shared/corpus_chileno/README.md
   - Blog drafts: blog-drafts/README.md
