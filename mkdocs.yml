@@ -125,6 +125,7 @@ nav:
   - 04 · Economía de inferencia:
       - 04-economia/README.md
       - 04-economia/theory/00-plan.md
+      - 04-economia/theory/01-prefill-decode.md
   - Material compartido:
       - Corpus chileno: shared/corpus_chileno/README.md
   - Blog drafts: blog-drafts/README.md
