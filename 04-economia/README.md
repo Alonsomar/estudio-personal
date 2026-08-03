@@ -10,13 +10,19 @@ Las masterclasses previas trataron el costo como **dato exógeno**: un precio
 público que se mide (`01 §10`), se presupuesta y se enruta (`03 §10`). Esta lo
 abre.
 
-## Estado: En curso
+## Estado: Terminada
 
-Plan maestro terminado; 6 secciones en desarrollo. El temario fue
+Plan maestro y las 6 secciones completas (00-06). El temario fue
 **re-especificado el 2026-08-03**: entre el 60% y el 70% del temario original ya
 estaba escrito en `01 §10` y `03 §4/§8/§10`, así que este módulo cubre solo lo que
 ningún otro toca. El mapa de lo absorbido está en
 [theory/00-plan.md](theory/00-plan.md).
+
+**El resultado principal es negativo**: hoy, para un producto B2B chileno sobre
+corpus regulatorio, el costo de inferencia no es un problema ($10.80/mes en §4,
+márgenes brutos sobre 99% en §6). Lo que la masterclass deja no es un ahorro, es
+el instrumental para saber **cuándo eso deje de ser cierto** — y el punto de
+inflexión no es el precio del token, es la arquitectura agéntica (§6).
 
 ## Secciones
 
@@ -28,7 +34,14 @@ ningún otro toca. El mapa de lo absorbido está en
 | 03 | Cuantización y destilación            | [theory/03-cuantizacion.md](theory/03-cuantizacion.md) | [code/03-cuantizacion.py](code/03-cuantizacion.py) | Terminado |
 | 04 | Self-hosting vs. API                  | [theory/04-self-hosting.md](theory/04-self-hosting.md) | [code/04-self-hosting.py](code/04-self-hosting.py) | Terminado |
 | 05 | Deriva de precios                     | [theory/05-deriva-precios.md](theory/05-deriva-precios.md) | [code/05-deriva-precios.py](code/05-deriva-precios.py) | Terminado |
-| 06 | Unit economics de un SaaS regulatorio | —                                        | —      | Pendiente |
+| 06 | Unit economics de un SaaS regulatorio | [theory/06-unit-economics.md](theory/06-unit-economics.md) | [code/06-unit-economics.py](code/06-unit-economics.py) | Terminado |
+
+El núcleo reutilizable vive en [code/econ_lib.py](code/econ_lib.py): §1 trajo la
+aritmética del transformer denso (`ModelSpec`, `decode_bytes_per_token`,
+`kv_cache_gb`, `max_concurrent_sequences`); §2 sumó `batch_curve` y `queue_wait_ms`;
+§3 sumó `quant_profile` y `min_golden_size` (análisis de potencia); §4 sumó
+`hosting_cost` y `breakeven_tokens`; §5 sumó `price_after` y `spend_trajectory`;
+§6 sumó `Plan`, `client_unit_economics` y `breakeven_queries`.
 
 ## Nota de método
 

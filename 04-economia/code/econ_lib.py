@@ -14,6 +14,8 @@ Núcleo reutilizable que acumula lo que las secciones introducen:
       en volumen, y el efecto de la utilización sobre el costo unitario.
   §5  Deriva de precios: decaimiento exponencial de tarifas, crecimiento del
       consumo por query, y el gasto total resultante (efecto Jevons).
+  §6  Unit economics: costo de servir un cliente, margen por plan, y el
+      cliente marginal que destruye valor bajo tarifa plana.
 
 Método (ver `theory/00-plan.md`): esto es un MODELO ANALÍTICO, no un benchmark.
 Predice órdenes de magnitud y puntos de equilibrio. No modela el overhead real
@@ -427,6 +429,85 @@ def spend_trajectory(
         tokens = tokens_hoy_month * (1.0 + crecimiento_consumo_anual) ** t
         filas.append((t, precio, tokens, tokens / 1e6 * precio))
     return filas
+
+
+# --------------------------------------------------------------------------- #
+# §6 Unit economics. El salto de costo por query a margen por cliente. La
+# lección de 03 §10 (la media miente) llevada al P&L: con tarifa plana y costo
+# variable, la cola derecha de uso define el margen.
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class Plan:
+    """Un plan comercial: precio mensual y uso esperado."""
+
+    nombre: str
+    precio_mes_usd: float
+    queries_mes_media: float
+    limite_queries: int | None = None  # None = ilimitado ("tarifa plana")
+
+
+@dataclass(frozen=True)
+class UnitEconomics:
+    """Margen de un cliente concreto en un mes concreto."""
+
+    plan: str
+    queries: float
+    tokens_in: float
+    tokens_out: float
+    costo_llm_usd: float
+    costo_efectivo_usd: float   # después del ahorro por caché
+    ingreso_usd: float
+    margen_usd: float
+    margen_pct: float
+
+
+def client_unit_economics(
+    plan: Plan,
+    queries_mes: float,
+    price_in_per_m: float,
+    price_out_per_m: float,
+    tokens_in: int = 272,
+    tokens_out: int = 60,
+    cache_hit_rate: float = 0.0,
+) -> UnitEconomics:
+    """Margen de un cliente que hace `queries_mes` consultas.
+
+    El caché (03 §4) entra como reducción directa del costo: un hit es una
+    llamada que no se paga. Su efecto sobre el MARGEN es mayor de lo que sugiere
+    su efecto sobre el costo, porque opera sobre la parte variable.
+
+    Si el plan tiene límite, las queries por encima no se cobran ni se sirven
+    (se asume corte duro); ese es justamente el instrumento que protege el margen.
+    """
+    servidas = min(queries_mes, plan.limite_queries) if plan.limite_queries else queries_mes
+    t_in = servidas * tokens_in
+    t_out = servidas * tokens_out
+    bruto = t_in / 1e6 * price_in_per_m + t_out / 1e6 * price_out_per_m
+    efectivo = bruto * (1.0 - cache_hit_rate)
+    margen = plan.precio_mes_usd - efectivo
+    return UnitEconomics(
+        plan=plan.nombre,
+        queries=servidas,
+        tokens_in=t_in,
+        tokens_out=t_out,
+        costo_llm_usd=bruto,
+        costo_efectivo_usd=efectivo,
+        ingreso_usd=plan.precio_mes_usd,
+        margen_usd=margen,
+        margen_pct=margen / plan.precio_mes_usd if plan.precio_mes_usd else 0.0,
+    )
+
+
+def breakeven_queries(
+    plan: Plan, price_in_per_m: float, price_out_per_m: float,
+    tokens_in: int = 272, tokens_out: int = 60, cache_hit_rate: float = 0.0,
+) -> float:
+    """Cuántas queries mensuales hacen que un cliente de este plan deje de dar
+    margen. Es el número que define si la tarifa plana es sostenible."""
+    costo_query = (
+        tokens_in / 1e6 * price_in_per_m + tokens_out / 1e6 * price_out_per_m
+    ) * (1.0 - cache_hit_rate)
+    return plan.precio_mes_usd / costo_query if costo_query > 0 else float("inf")
 
 
 def min_golden_size(

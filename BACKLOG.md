@@ -16,8 +16,8 @@ cambio.
 | 01 | Evaluación de sistemas IA | 12/12     | Terminado   |
 | 02 | Information Retrieval     | 9/9       | Terminado   |
 | 03 | Patrones de producción    | 12/12     | Terminado   |
-| 04 | Economía de inferencia    | 0/6       | Re-especificado, pendiente |
-| 05 | Ontologías y representación del conocimiento | 0/9 | Planificado |
+| 04 | Economía de inferencia    | 6/6       | Terminado   |
+| 05 | Ontologías y representación del conocimiento | 0/9 | **Siguiente** (tras B6) |
 | 06 | Harness agéntico          | 0/9       | Planificado |
 
 ---
@@ -38,13 +38,13 @@ graph LR
     style F4 fill:#fd9,stroke:#333,color:#1a1a1a
 ```
 
-| Fase | Contenido | Tareas | Sesiones est. |
+| Fase | Contenido | Tareas | Estado |
 |---|---|---|---|
-| 0 | Higiene del repo | B1–B4 | 1 |
-| 1 | Cerrar 04-economia (re-especificado a 6 secciones) | B5 | 2–3 |
-| 2 | Expandir corpus 16 → ~40 documentos | B6 | 1 |
-| 3 | 05-ontologias | B7 | 4–6 |
-| 4 | 06-harness | B8 | 4–6 |
+| 0 | Higiene del repo | B1–B4 | ✅ Hecha (`ec94dea`) |
+| 1 | Cerrar 04-economia (re-especificado a 6 secciones) | B5 | ✅ Hecha |
+| 2 | Expandir corpus 16 → ~40 documentos | B6 | ⬅️ **Siguiente** |
+| 3 | 05-ontologias | B7 | Pendiente (4–6 sesiones) |
+| 4 | 06-harness | B8 | Pendiente (4–6 sesiones) |
 
 ---
 
@@ -116,12 +116,20 @@ Se re-especifica a **6 secciones**, cubriendo solo lo que ningún módulo toca:
    token), mezcla de planes, y el costo marginal de un cliente más.
 
 **Criterios de aceptación:**
-- [ ] `04-economia/theory/00-plan.md` con el temario re-especificado y una nota
+- [x] `04-economia/theory/00-plan.md` con el temario re-especificado y una nota
       explícita de qué quedó absorbido por 01/03 y dónde.
-- [ ] Seis secciones con ejemplo numérico sobre el corpus chileno, tabla de estado
+- [x] Seis secciones con ejemplo numérico sobre el corpus chileno, tabla de estado
       del arte y sección "Conexiones" (mismo template que 01–03).
-- [ ] Código ejecutable por sección; sin duplicar componentes de `prod_lib.py`.
-- [ ] `README.md` del módulo y `mkdocs.yml` actualizados.
+- [x] Código ejecutable por sección; sin duplicar componentes de `prod_lib.py`
+      (las tarifas se importan desde ahí). Núcleo en `econ_lib.py`.
+- [x] `README.md` del módulo y `mkdocs.yml` actualizados.
+
+**Resultado principal (negativo, y por eso útil):** a la escala de un producto B2B
+chileno, el costo de inferencia es ruido — $10.80/mes (§4), márgenes brutos sobre
+99% (§6). El punto de inflexión no es el precio del token sino la **arquitectura
+agéntica**: con 15 pasos por query y modelo premium, la holgura del plan cae de
+7.975× a 12×. Consecuencia para el orden de trabajo: optimizar inferencia hoy es
+procrastinación; el tiempo rinde más en corpus (B6) y ontología (B7).
 
 ### B6 · P1 · Expandir corpus de 16 a ~40 documentos
 Prerrequisito de B7: `02 §8` ya advirtió que 16 documentos no alcanzan para que las
@@ -227,6 +235,17 @@ desastres naturales (Chile/España) ya está publicado en el blog.
 
 - [ ] `blog-drafts/README.md` enlaza los artículos publicados derivados del estudio.
 - [ ] No duplicar el contenido en este repo — solo enlazar.
+
+### B12 · P2 · Deuda de lint en 01-evals y 02-retrieval
+`uv run ruff check .` reporta 45 errores, todos preexistentes en `01-evals/code/`
+(38), `02-retrieval/code/` (5) y `shared/` (2). `03-produccion`, `04-economia` y
+`tests/` están limpios. Detectado al cerrar B5; no se arregló ahí para no mezclar
+cambios de módulos terminados en un commit de otro módulo.
+
+- [ ] `uv run ruff check .` en verde (17 son autofixables con `--fix`).
+- [ ] Verificar que cada script tocado sigue produciendo los mismos números que
+      cita su documento de teoría.
+- [ ] Añadir `ruff check` al job de CI para que no vuelva a acumularse.
 
 ---
 
