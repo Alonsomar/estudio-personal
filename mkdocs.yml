@@ -124,6 +124,7 @@ nav:
       - 03-produccion/theory/12-incidentes-postmortems.md
   - 04 · Economía de inferencia:
       - 04-economia/README.md
+      - 04-economia/theory/00-plan.md
   - Material compartido:
       - Corpus chileno: shared/corpus_chileno/README.md
   - Blog drafts: blog-drafts/README.md
