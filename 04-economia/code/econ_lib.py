@@ -10,6 +10,8 @@ Núcleo reutilizable que acumula lo que las secciones introducen:
   §3  Cuantización: perfil de memoria/velocidad/costo por dtype, y el análisis
       de potencia que dice cuántas queries de golden hacen falta para detectar
       una degradación de calidad dada.
+  §4  Self-hosting vs API: costo mensual de cada opción, punto de equilibrio
+      en volumen, y el efecto de la utilización sobre el costo unitario.
 
 Método (ver `theory/00-plan.md`): esto es un MODELO ANALÍTICO, no un benchmark.
 Predice órdenes de magnitud y puntos de equilibrio. No modela el overhead real
@@ -293,6 +295,96 @@ def quant_profile(
         batch_efectivo=batch_ef,
         usd_per_m_tokens=(gpu.usd_per_hour / (tokens_h / 1e6) if tokens_h else float("inf")),
     )
+
+
+# --------------------------------------------------------------------------- #
+# §4 Hacer vs comprar. La API es costo puramente variable; el self-hosting es
+# costo fijo por hora de GPU (esté ocupada o no) más operación. El punto de
+# equilibrio depende críticamente de la UTILIZACIÓN, que es la variable que
+# los cálculos ingenuos omiten.
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class HostingScenario:
+    """Costo mensual de servir un volumen dado, por las dos vías."""
+
+    tokens_out_month: float
+    api_usd: float
+    selfhost_gpu_usd: float
+    selfhost_ops_usd: float
+    selfhost_total_usd: float
+    utilization: float
+    gpus_needed: int
+
+
+HOURS_PER_MONTH = 730.0
+
+
+def hosting_cost(
+    tokens_out_month: float,
+    api_usd_per_m_out: float,
+    gpu: GPU,
+    sustained_tokens_per_s: float,
+    ops_usd_month: float = 0.0,
+    target_utilization: float = 0.7,
+    n_gpus: int | None = None,
+) -> HostingScenario:
+    """Compara el costo mensual de API vs. self-hosting para un volumen dado.
+
+    `sustained_tokens_per_s` es el throughput por GPU al batch efectivo (§2/§3).
+    `target_utilization` reconoce lo que §2 demostró: operar cerca del 100% hace
+    explotar la latencia, así que la capacidad se dimensiona con holgura — y esa
+    holgura ES parte del costo, no un desperdicio a eliminar.
+
+    `ops_usd_month` es el costo de operación (guardia, actualizaciones, tiempo
+    propio). Ponerlo en 0 es el error clásico de la comparación ingenua.
+    """
+    api = tokens_out_month / 1e6 * api_usd_per_m_out
+
+    # Capacidad necesaria: el volumen tiene que caber en la fracción de tiempo
+    # que la utilización objetivo permite usar.
+    capacity_per_gpu = sustained_tokens_per_s * 3600 * HOURS_PER_MONTH * target_utilization
+    needed = n_gpus if n_gpus is not None else max(1, _ceil(tokens_out_month / capacity_per_gpu))
+
+    gpu_cost = needed * gpu.usd_per_hour * HOURS_PER_MONTH
+    total_capacity = needed * sustained_tokens_per_s * 3600 * HOURS_PER_MONTH
+    util = tokens_out_month / total_capacity if total_capacity else 0.0
+
+    return HostingScenario(
+        tokens_out_month=tokens_out_month,
+        api_usd=api,
+        selfhost_gpu_usd=gpu_cost,
+        selfhost_ops_usd=ops_usd_month,
+        selfhost_total_usd=gpu_cost + ops_usd_month,
+        utilization=util,
+        gpus_needed=needed,
+    )
+
+
+def _ceil(x: float) -> int:
+    return int(x) + (1 if x > int(x) else 0)
+
+
+def breakeven_tokens(
+    api_usd_per_m_out: float,
+    gpu: GPU,
+    sustained_tokens_per_s: float,
+    ops_usd_month: float = 0.0,
+    n_gpus: int = 1,
+) -> float:
+    """Volumen mensual de tokens de salida donde self-hosting iguala a la API.
+
+    Con una GPU fija, el costo de self-hosting NO depende del volumen (es fijo)
+    y el de la API sí (es variable). El punto de equilibrio es simplemente:
+
+        tokens = costo_fijo_mensual / precio_por_token_de_la_API
+
+    Devuelve infinito si el volumen de equilibrio excede la capacidad física de
+    las GPUs: ahí el self-hosting nunca alcanza a la API, por más que crezcas.
+    """
+    fixed = n_gpus * gpu.usd_per_hour * HOURS_PER_MONTH + ops_usd_month
+    tokens = fixed / api_usd_per_m_out * 1e6
+    capacity = n_gpus * sustained_tokens_per_s * 3600 * HOURS_PER_MONTH
+    return tokens if tokens <= capacity else float("inf")
 
 
 def min_golden_size(

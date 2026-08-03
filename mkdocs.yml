@@ -128,6 +128,7 @@ nav:
       - 04-economia/theory/01-prefill-decode.md
       - 04-economia/theory/02-batching.md
       - 04-economia/theory/03-cuantizacion.md
+      - 04-economia/theory/04-self-hosting.md
   - Material compartido:
       - Corpus chileno: shared/corpus_chileno/README.md
   - Blog drafts: blog-drafts/README.md
