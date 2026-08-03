@@ -4,6 +4,9 @@ Núcleo reutilizable que acumula lo que las secciones introducen:
 
   §1  Aritmética de un modelo transformer denso: parámetros, bytes por token
       generado, tamaño del KV cache, techos de prefill y decode.
+  §2  Batching: throughput agregado, latencia por secuencia, costo por millón
+      de tokens y la cola M/M/1 que explica por qué el p95 explota cerca de
+      la saturación.
 
 Método (ver `theory/00-plan.md`): esto es un MODELO ANALÍTICO, no un benchmark.
 Predice órdenes de magnitud y puntos de equilibrio. No modela el overhead real
@@ -165,6 +168,77 @@ def arithmetic_intensity_ratio(model: ModelSpec, prompt_tokens: int, output_toke
     """
     del output_tokens  # la asimetría no depende de cuántos se generen
     return float(prompt_tokens)
+
+
+# --------------------------------------------------------------------------- #
+# §2 Batching. Los pesos se leen UNA vez por paso y sirven a todas las
+# secuencias del batch: el costo fijo de mover pesos se reparte. Es una economía
+# de escala literal, y explica por qué la inferencia se vende y no se regala.
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class BatchPoint:
+    """Un punto de la curva throughput-latencia para un tamaño de batch."""
+
+    batch: int
+    tokens_per_s_per_seq: float
+    tokens_per_s_total: float
+    ms_per_token_per_seq: float
+    usd_per_m_tokens: float
+
+
+def batch_curve(
+    model: ModelSpec,
+    gpu: GPU,
+    batch_sizes: tuple[int, ...],
+    dtype: str = "bf16",
+    efficiency: float = 0.7,
+) -> list[BatchPoint]:
+    """Curva throughput-latencia al variar el tamaño de batch.
+
+    Modelo simplificado del régimen memory-bound: mientras el batch no sature el
+    cómputo, el throughput AGREGADO crece ~linealmente con el batch y la latencia
+    POR SECUENCIA se mantiene. Es el régimen donde vive el servido real de LLMs.
+
+    El costo por millón de tokens cae con el batch porque la hora de GPU se
+    reparte entre más tokens producidos: costo_fijo / volumen.
+    """
+    base_tps = decode_tokens_per_second(model, gpu, dtype, efficiency, batch=1)
+    puntos = []
+    for b in batch_sizes:
+        total = base_tps * b
+        # Rendimientos decrecientes: al crecer el batch, el cómputo por token
+        # (atención sobre el KV cache, que NO se comparte) empieza a pesar.
+        # Penalización suave calibrada para que el efecto aparezca a batch alto.
+        penal = 1.0 / (1.0 + b / 512.0)
+        total *= (0.5 + 0.5 * penal) if b > 64 else 1.0
+        per_seq = total / b
+        usd_h = gpu.usd_per_hour
+        tokens_h = total * 3600
+        puntos.append(
+            BatchPoint(
+                batch=b,
+                tokens_per_s_per_seq=per_seq,
+                tokens_per_s_total=total,
+                ms_per_token_per_seq=1000.0 / per_seq,
+                usd_per_m_tokens=usd_h / (tokens_h / 1e6) if tokens_h else float("inf"),
+            )
+        )
+    return puntos
+
+
+def queue_wait_ms(service_ms: float, utilization: float) -> float:
+    """Espera en cola de un M/M/1 en función de la utilización.
+
+        W_espera = servicio · ρ / (1 − ρ)
+
+    El resultado no depende de LLMs: es teoría de colas. Su relevancia acá es
+    que explica el hecho que todo operador observa y pocos anticipan — la
+    latencia no se degrada linealmente con la carga, explota cerca de ρ=1.
+    A 50% de utilización esperás lo mismo que tardás; a 95%, diecinueve veces más.
+    """
+    if utilization >= 1.0:
+        return float("inf")
+    return service_ms * utilization / (1.0 - utilization)
 
 
 def max_concurrent_sequences(
