@@ -1,0 +1,57 @@
+SERVICIO DE IMPUESTOS INTERNOS
+TABLAS DE IMPUESTO A LA RENTA — AÑO TRIBUTARIO 2024
+
+Valores expresados en unidades tributarias mensuales (UTM) y anuales
+(UTA), conforme al Decreto Ley Nº 824, de 1974.
+
+I. IMPUESTO GLOBAL COMPLEMENTARIO — TABLA ANUAL
+   (artículo 52 del Decreto Ley Nº 824)
+
+  Tramo   Desde (UTA)    Hasta (UTA)    Tasa      Rebaja (UTA)
+  -----   -----------    -----------    ------    ------------
+    1           0,00          13,50     Exento           0,000
+    2          13,50          30,00       4,0%           0,540
+    3          30,00          50,00       8,0%           1,740
+    4          50,00          70,00      13,5%           4,490
+    5          70,00          90,00      23,0%          11,140
+    6          90,00         120,00      30,4%          17,800
+    7         120,00         310,00      35,0%          23,320
+    8         310,00       y más          40,0%          38,820
+
+II. IMPUESTO ÚNICO DE SEGUNDA CATEGORÍA — TABLA MENSUAL
+    (artículo 43 Nº 1 del Decreto Ley Nº 824)
+
+  Tramo   Desde (UTM)    Hasta (UTM)    Tasa      Rebaja (UTM)
+  -----   -----------    -----------    ------    ------------
+    1           0,00          13,50     Exento           0,000
+    2          13,50          30,00       4,0%           0,540
+    3          30,00          50,00       8,0%           1,740
+    4          50,00          70,00      13,5%           4,490
+    5          70,00          90,00      23,0%          11,140
+    6          90,00         120,00      30,4%          17,800
+    7         120,00         310,00      35,0%          23,320
+    8         310,00       y más          40,0%          38,820
+
+III. IMPUESTO DE PRIMERA CATEGORÍA
+
+  Régimen                                    Tasa
+  ----------------------------------------   ------
+  Régimen General semi integrado (art. 14 A)  27,0%
+  Régimen Pro Pyme General (art. 14 D Nº 3)   25,0%
+  Régimen Pro Pyme Transparente (14 D Nº 8)   Exento
+
+  Nota: el Régimen Pro Pyme fue establecido por la Ley Nº 21.210, que
+  sustituyó el artículo 14 del Decreto Ley Nº 824. Las instrucciones
+  se impartieron en la Circular Nº 62, de 2020.
+
+IV. TASAS DE PAGOS PROVISIONALES MENSUALES (PPM)
+
+  Contribuyente                                        Tasa
+  -------------------------------------------------    ------
+  Profesionales y sociedades de profesionales          14,5%
+  Régimen Pro Pyme, primer ejercicio                    0,25%
+  Régimen Pro Pyme, ejercicios siguientes               0,5%
+  Régimen General                                      variable
+
+  Nota: la retención aplicable a las rentas del artículo 42 Nº 2 se
+  encuentra instruida en la Circular Nº 50, de 2022.

@@ -17,7 +17,7 @@ cambio.
 | 02 | Information Retrieval     | 9/9       | Terminado   |
 | 03 | Patrones de producción    | 12/12     | Terminado   |
 | 04 | Economía de inferencia    | 6/6       | Terminado   |
-| 05 | Ontologías y representación del conocimiento | 0/9 | **Siguiente** (tras B6) |
+| 05 | Ontologías y representación del conocimiento | 0/9 | **Siguiente** |
 | 06 | Harness agéntico          | 0/9       | Planificado |
 
 ---
@@ -42,8 +42,8 @@ graph LR
 |---|---|---|---|
 | 0 | Higiene del repo | B1–B4 | ✅ Hecha (`ec94dea`) |
 | 1 | Cerrar 04-economia (re-especificado a 6 secciones) | B5 | ✅ Hecha |
-| 2 | Expandir corpus 16 → ~40 documentos | B6 | ⬅️ **Siguiente** |
-| 3 | 05-ontologias | B7 | Pendiente (4–6 sesiones) |
+| 2 | Expandir corpus 16 → 40 documentos | B6 | ✅ Hecha |
+| 3 | 05-ontologias | B7 | ⬅️ **Siguiente** (4–6 sesiones) |
 | 4 | 06-harness | B8 | Pendiente (4–6 sesiones) |
 
 ---
@@ -131,19 +131,31 @@ agéntica**: con 15 pasos por query y modelo premium, la holgura del plan cae de
 7.975× a 12×. Consecuencia para el orden de trabajo: optimizar inferencia hoy es
 procrastinación; el tiempo rinde más en corpus (B6) y ontología (B7).
 
-### B6 · P1 · Expandir corpus de 16 a ~40 documentos
+### B6 · P1 · Expandir corpus de 16 a 40 documentos — ✅ Cerrado (2026-08-03)
 Prerrequisito de B7: `02 §8` ya advirtió que 16 documentos no alcanzan para que las
 diferencias entre arquitecturas sean estadísticamente detectables, y un grafo sobre
 16 nodos no muestra nada interesante.
 
-- [ ] ~24 documentos nuevos en `shared/corpus_chileno/`, con **densidad de
-      relaciones** (modifica / deroga / reglamenta / cita) suficiente para un grafo.
-- [ ] Se respetan las restricciones de abstención documentadas en el README del
-      corpus: nada que responda `gd-025`, `gd-026` ni `gd-027`.
-- [ ] Inventario del README del corpus actualizado con el fenómeno que ejercita
-      cada documento nuevo.
-- [ ] `uv run python 02-retrieval/code/08-benchmark-retrievers.py` sigue corriendo
-      y se registra cómo se movieron las métricas.
+- [x] 24 documentos nuevos en `shared/corpus_chileno/` (16 → 40), organizados en
+      **cuatro clusters temáticos** con densidad de relaciones (modifica / deroga /
+      reglamenta / cita / aplica): compras públicas (ley → reforma → reglamento →
+      resolución → dictamen → DO), tributario ampliado (Renta + servicios
+      digitales), presupuesto y ejecución (ley → glosas → modificación → oficio
+      DIPRES), y probidad + educación pública (dos cadenas que convergen en un
+      dictamen). Cada cluster tiene una cadena de citas verificada contra
+      documentos reales del corpus, pensada como insumo directo para el grafo de
+      `05-ontologias`.
+- [x] Se respetan las restricciones de abstención: verificado por grep que ningún
+      documento nuevo menciona "Ley de Transparencia" (`gd-025`), "DFL Nº 3"
+      (`gd-026`) ni presupuesto de años distintos de 2024 (`gd-027`).
+- [x] Inventario del README del corpus actualizado con el fenómeno que ejercita
+      cada documento nuevo, por cluster.
+- [x] `uv run python 02-retrieval/code/08-benchmark-retrievers.py` corre y se
+      registró el movimiento: recall@3 baja en todos los sistemas con más
+      distractores (−0.037 a −0.093), el denso es el más afectado (−0.093,
+      confunde cercanía temática con relevancia), Hybrid-RRF es el único que no se
+      mueve (consistente con `02 §3`). Tabla completa en el README del corpus.
+- [x] `uv run pytest` sigue en verde (55 tests; no dependen del tamaño del corpus).
 
 ### B7 · P0 · Masterclass 05 — Ontologías y representación del conocimiento
 **Encuadre:** una ontología es un sistema de clasificación formalizado. El
