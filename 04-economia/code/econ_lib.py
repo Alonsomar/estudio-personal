@@ -7,6 +7,9 @@ Núcleo reutilizable que acumula lo que las secciones introducen:
   §2  Batching: throughput agregado, latencia por secuencia, costo por millón
       de tokens y la cola M/M/1 que explica por qué el p95 explota cerca de
       la saturación.
+  §3  Cuantización: perfil de memoria/velocidad/costo por dtype, y el análisis
+      de potencia que dice cuántas queries de golden hacen falta para detectar
+      una degradación de calidad dada.
 
 Método (ver `theory/00-plan.md`): esto es un MODELO ANALÍTICO, no un benchmark.
 Predice órdenes de magnitud y puntos de equilibrio. No modela el overhead real
@@ -239,6 +242,84 @@ def queue_wait_ms(service_ms: float, utilization: float) -> float:
     if utilization >= 1.0:
         return float("inf")
     return service_ms * utilization / (1.0 - utilization)
+
+
+# --------------------------------------------------------------------------- #
+# §3 Cuantización. Menos bits por peso = menos bytes que mover por token (§1)
+# = más rápido y más barato, además de liberar memoria para KV cache (más
+# concurrencia). Lo que cuesta es calidad, y eso NO se modela: se mide.
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class QuantProfile:
+    """Efecto de un dtype sobre memoria, velocidad, concurrencia y costo.
+
+    Todo esto es derivable de la aritmética de §1-§2. La calidad NO aparece
+    acá a propósito: no es derivable, hay que medirla en tu golden.
+    """
+
+    dtype: str
+    weights_gb: float
+    fits_in_gpu: bool
+    tokens_per_s: float
+    max_seqs_4k: int
+    batch_efectivo: int
+    usd_per_m_tokens: float
+
+
+def quant_profile(
+    model: ModelSpec, gpu: GPU, dtype: str, batch_objetivo: int = 32, context: int = 4_000
+) -> QuantProfile:
+    """Perfil completo de un modelo servido con pesos en `dtype`.
+
+    El batch efectivo está limitado por la memoria: de nada sirve querer batch
+    32 si en el KV cache solo entran 6 secuencias. Ese acoplamiento entre
+    cuantización y batch alcanzable (§2) es justamente lo que hace que el efecto
+    de cuantizar sea más que proporcional.
+    """
+    w = model.weights_gb(dtype)
+    fits = w < gpu.memory_gb - 2.0
+    seqs = max_concurrent_sequences(model, gpu, context, dtype=dtype) if fits else 0
+    batch_ef = min(batch_objetivo, seqs)
+    tps_total = (
+        decode_tokens_per_second(model, gpu, dtype, batch=batch_ef) if batch_ef else 0.0
+    )
+    tokens_h = tps_total * 3600
+    return QuantProfile(
+        dtype=dtype,
+        weights_gb=w,
+        fits_in_gpu=fits,
+        tokens_per_s=decode_tokens_per_second(model, gpu, dtype) if fits else 0.0,
+        max_seqs_4k=seqs,
+        batch_efectivo=batch_ef,
+        usd_per_m_tokens=(gpu.usd_per_hour / (tokens_h / 1e6) if tokens_h else float("inf")),
+    )
+
+
+def min_golden_size(
+    baseline_rate: float, delta: float, alpha: float = 0.05, power: float = 0.80
+) -> int:
+    """Cuántas queries de golden hacen falta para detectar una caída `delta`.
+
+    Comparación de dos proporciones pareadas, aproximación normal:
+
+        n ≈ (z_{α/2} + z_β)² · [p₁(1−p₁) + p₂(1−p₂)] / δ²
+
+    Es la pregunta que hay que hacerse ANTES de cuantizar, no después: si tu
+    golden tiene 30 queries, no vas a poder distinguir una degradación de 3
+    puntos de ruido de muestreo. Sin esto, "cuantizamos y no se notó" no
+    significa "no degradó" — significa "no teníamos con qué verlo".
+
+    Usa la aproximación normal (no exacta) y supone independencia entre
+    queries; es una cota inferior optimista del tamaño necesario.
+    """
+    z_alpha = 1.959963985  # z para α=0.05 a dos colas
+    z_beta = {0.80: 0.8416212336, 0.90: 1.281551566, 0.95: 1.644853627}.get(power, 0.8416212336)
+    p1 = baseline_rate
+    p2 = max(min(baseline_rate - delta, 1.0), 0.0)
+    var = p1 * (1 - p1) + p2 * (1 - p2)
+    if delta <= 0:
+        return 0
+    return int(((z_alpha + z_beta) ** 2 * var / delta**2) + 0.999)
 
 
 def max_concurrent_sequences(

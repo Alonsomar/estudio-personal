@@ -25,7 +25,7 @@ ningún otro toca. El mapa de lo absorbido está en
 | 00 | Plan maestro                          | [theory/00-plan.md](theory/00-plan.md)   | —      | Terminado |
 | 01 | Mecánica: prefill, decode y KV cache  | [theory/01-prefill-decode.md](theory/01-prefill-decode.md) | [code/01-prefill-decode.py](code/01-prefill-decode.py) + [econ_lib.py](code/econ_lib.py) | Terminado |
 | 02 | Batching, throughput y latencia       | [theory/02-batching.md](theory/02-batching.md) | [code/02-batching.py](code/02-batching.py) | Terminado |
-| 03 | Cuantización y destilación            | —                                        | —      | Pendiente |
+| 03 | Cuantización y destilación            | [theory/03-cuantizacion.md](theory/03-cuantizacion.md) | [code/03-cuantizacion.py](code/03-cuantizacion.py) | Terminado |
 | 04 | Self-hosting vs. API                  | —                                        | —      | Pendiente |
 | 05 | Deriva de precios                     | —                                        | —      | Pendiente |
 | 06 | Unit economics de un SaaS regulatorio | —                                        | —      | Pendiente |
