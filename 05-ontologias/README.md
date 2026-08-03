@@ -26,7 +26,7 @@ este módulo.
 | 00 | Plan maestro                                  | [theory/00-plan.md](theory/00-plan.md) | — | Terminado |
 | 01 | Qué es una ontología y por qué ya construiste varias | [theory/01-que-es-una-ontologia.md](theory/01-que-es-una-ontologia.md) | [code/01-ontologia-vs-grafo.py](code/01-ontologia-vs-grafo.py) + [ontology_lib.py](code/ontology_lib.py) | Terminado |
 | 02 | Modelado del dominio regulatorio chileno      | [theory/02-modelado-del-dominio.md](theory/02-modelado-del-dominio.md) | [code/02-grafo-normativo.py](code/02-grafo-normativo.py) | Terminado |
-| 03 | Cuánto formalismo comprar                     | — | — | Pendiente |
+| 03 | Cuánto formalismo comprar                     | [theory/03-cuanto-formalismo.md](theory/03-cuanto-formalismo.md) | [code/03-cuanto-formalismo.py](code/03-cuanto-formalismo.py) | Terminado |
 | 04 | Identidad y llaves canónicas                  | — | — | Pendiente |
 | 05 | Extraer la ontología del corpus               | — | — | Pendiente |
 | 06 | Vigencia temporal y versionado normativo      | — | — | Pendiente |
@@ -61,7 +61,10 @@ clasificador presupuestario chileno como property graph, parseado desde
 normativo completo, con datos curados a mano en
 [examples/relaciones-manual.json](examples/relaciones-manual.json) (37
 normas, 47 relaciones con fundamento textual verificable — la verdad
-fundamental que §5 usará para medir la extracción automática).
+fundamental que §5 usará para medir la extracción automática); §3 sumó
+`ConceptoSKOS`, `esquema_skos_tipos_norma` y `es_subconcepto_de` (el nivel
+de formalismo inmediatamente anterior al property graph, para medir la
+brecha en vez de solo describirla).
 
 ## Datos
 

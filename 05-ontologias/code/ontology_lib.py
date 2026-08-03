@@ -317,6 +317,68 @@ def vecinos_por_relacion(
     ]
 
 
+# --------------------------------------------------------------------------- #
+# §3 Cuánto formalismo comprar. Un esquema SKOS-like (jerarquía is-a +
+# etiquetas alternativas, sin relaciones tipadas entre instancias) para medir
+# CONCRETAMENTE la brecha entre taxonomía y ontología, en vez de solo
+# describirla en prosa.
+# --------------------------------------------------------------------------- #
+class ConceptoSKOS(BaseModel):
+    """Un concepto de un esquema tipo SKOS: jerarquía is-a + sinónimos, sin
+    relaciones tipadas entre instancias. SKOS resuelve "¿qué ES-UN X?"; no
+    puede resolver "¿qué NORMA REGLAMENTA a X?" — esa es la brecha exacta
+    que justifica pasar a un property graph (§2)."""
+
+    id: str
+    pref_label: str
+    alt_labels: list[str] = []
+    broader: str | None = None  # id del concepto padre, o None si es raíz
+
+
+def esquema_skos_tipos_norma() -> list[ConceptoSKOS]:
+    """Jerarquía is-a de los géneros documentales del corpus (§2), como la
+    modelaría un tesauro/SKOS: sin relaciones MODIFICA/REGLAMENTA, solo
+    'es un tipo de'. Sirve para medir, no solo describir, la diferencia
+    entre esto y el grafo normativo de §2."""
+    return [
+        ConceptoSKOS(id="norma", pref_label="Norma"),
+        ConceptoSKOS(id="norma_legal", pref_label="Norma con rango legal", broader="norma"),
+        ConceptoSKOS(
+            id="norma_administrativa", pref_label="Norma administrativa", broader="norma"
+        ),
+        ConceptoSKOS(id="instrumento_presupuestario", pref_label="Instrumento presupuestario", broader="norma"),
+        ConceptoSKOS(id="ley", pref_label="Ley", alt_labels=["DL", "DFL"], broader="norma_legal"),
+        ConceptoSKOS(
+            id="decreto", pref_label="Decreto", alt_labels=["DS", "decreto supremo", "decreto exento"],
+            broader="norma_administrativa",
+        ),
+        ConceptoSKOS(id="circular", pref_label="Circular", broader="norma_administrativa"),
+        ConceptoSKOS(
+            id="resolucion", pref_label="Resolución", alt_labels=["res. exenta"],
+            broader="norma_administrativa",
+        ),
+        ConceptoSKOS(
+            id="oficio", pref_label="Oficio", alt_labels=["dictamen"], broader="norma_administrativa"
+        ),
+        ConceptoSKOS(id="glosa", pref_label="Glosa presupuestaria", broader="instrumento_presupuestario"),
+    ]
+
+
+def es_subconcepto_de(esquema: list[ConceptoSKOS], hijo_id: str, ancestro_id: str) -> bool:
+    """Recorre la cadena `broader` para responder '¿es X un tipo de Y?'.
+    Es TODO lo que SKOS puede razonar: jerarquía is-a, nada de relaciones
+    tipadas entre instancias concretas."""
+    por_id = {c.id: c for c in esquema}
+    actual = por_id.get(hijo_id)
+    visitados = 0
+    while actual is not None and visitados < len(esquema) + 1:
+        if actual.id == ancestro_id:
+            return True
+        actual = por_id.get(actual.broader) if actual.broader else None
+        visitados += 1
+    return False
+
+
 def alcance_transitivo(
     g: nx.DiGraph,
     node_id: str,
