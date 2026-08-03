@@ -206,3 +206,144 @@ def monto_total(g: nx.DiGraph, node_id: str) -> float:
     grafo + agregación: la operación que un clasificador plano en texto no
     puede hacer sin parsearse a sí mismo primero."""
     return sum(a.monto_miles or 0.0 for a in descendientes_asignacion(g, node_id))
+
+
+# --------------------------------------------------------------------------- #
+# §2 El grafo normativo. Vocabulario de relaciones TIPADAS entre normas —lo
+# que el clasificador presupuestario de §1 no necesitaba porque solo tenía
+# una relación (CONTIENE). Diseñado a partir de las competency questions:
+# primero se escribe qué preguntas debe responder el sistema, después se
+# decide qué entidades y relaciones hacen falta (mismo método que 01 §4 usó
+# para golden datasets).
+# --------------------------------------------------------------------------- #
+class TipoNorma(str, Enum):
+    """Los géneros documentales que el corpus regulatorio chileno usa.
+
+    No son sinónimos intercambiables: una Circular interpreta, un Decreto
+    reglamenta, una Ley modifica. La distinción de género es lo primero que
+    un extractor (§5) tiene que acertar para que el resto del esquema tenga
+    sentido.
+    """
+
+    LEY = "ley"
+    DECRETO = "decreto"
+    CIRCULAR = "circular"
+    RESOLUCION = "resolucion"
+    OFICIO = "oficio"
+    GLOSA = "glosa"
+    DIARIO_OFICIAL = "diario_oficial"
+    TABLA = "tabla"
+
+
+class TipoRelacion(str, Enum):
+    """Vocabulario de relaciones entre normas, extraído del propio corpus:
+    son literalmente los verbos que las normas chilenas usan para referirse
+    unas a otras ("modifícanse", "derógase", "reglamenta la Ley Nº...").
+
+    Colapsar todo esto en una sola relación genérica CITA —la tentación
+    obvia— pierde información con consecuencias jurídicas reales: que una
+    norma MODIFIQUE a otra implica que el texto original cambió; que la
+    REGLAMENTE implica que la norma reglamentada sigue vigente y la
+    reglamentaria depende de ella; que la INTERPRETE implica que ninguna de
+    las dos deja de regir por la existencia de la otra. Un sistema que solo
+    sepa "A se relaciona con B" no puede responder "¿sigue vigente el texto
+    original?", que es la pregunta que de verdad importa en este dominio.
+    """
+
+    MODIFICA = "modifica"
+    DEROGA = "deroga"
+    REGLAMENTA = "reglamenta"
+    INTERPRETA = "interpreta"
+    APLICA = "aplica"
+    CITA = "cita"
+
+
+class Norma(BaseModel):
+    """Una norma del corpus: identidad mínima para ubicarla en el grafo."""
+
+    id: str  # nombre de archivo — la llave canónica (ver §4)
+    tipo: TipoNorma
+    identificador: str  # "Ley Nº 21.210", "Circular Nº 42, de 2020"
+    titulo: str
+
+
+class RelacionNormativa(BaseModel):
+    """Una arista tipada entre dos normas, con su fundamento textual.
+
+    `fundamento` no es adorno: es lo que permite auditar la relación contra
+    la fuente (la misma disciplina de trazabilidad de la doctrina del
+    portfolio) y lo que en §5 se usa para medir si el extractor automático
+    acertó no solo el tipo de relación sino el artículo correcto.
+    """
+
+    origen: str  # Norma.id
+    tipo: TipoRelacion
+    destino: str  # Norma.id
+    fundamento: str
+
+
+def build_grafo_normativo(
+    normas: list[Norma], relaciones: list[RelacionNormativa]
+) -> nx.DiGraph:
+    """Arma el grafo dirigido a partir de un catálogo de normas y relaciones.
+
+    Cada arista lleva su tipo y fundamento como atributos, así que el grafo
+    resultante conserva toda la información de `RelacionNormativa` — no es
+    una proyección con pérdida.
+    """
+    g = nx.DiGraph()
+    for norma in normas:
+        g.add_node(norma.id, data=norma)
+    for rel in relaciones:
+        g.add_edge(rel.origen, rel.destino, tipo=rel.tipo, fundamento=rel.fundamento)
+    return g
+
+
+def vecinos_por_relacion(
+    g: nx.DiGraph, node_id: str, tipo: TipoRelacion, direccion: str = "out"
+) -> list[str]:
+    """Vecinos directos de `node_id` conectados por una relación de tipo
+    `tipo`. `direccion="out"` sigue A-[tipo]->B; `"in"` sigue B-[tipo]->A.
+
+    Es la primitiva detrás de cualquier competency question de un salto:
+    "¿qué normas modifica X?" es `vecinos_por_relacion(g, X, MODIFICA, "out")`;
+    "¿qué normas modifican a X?" es la misma llamada con `direccion="in"`.
+    """
+    edges = g.out_edges(node_id, data=True) if direccion == "out" else g.in_edges(node_id, data=True)
+    return [
+        (v if direccion == "out" else u)
+        for u, v, data in edges
+        if data.get("tipo") == tipo
+    ]
+
+
+def alcance_transitivo(
+    g: nx.DiGraph,
+    node_id: str,
+    tipos: list[TipoRelacion] | None = None,
+    direccion: str = "out",
+) -> set[str]:
+    """Todo lo alcanzable desde `node_id` siguiendo relaciones de los tipos
+    dados (todas si `tipos` es None), en cualquier número de saltos.
+
+    `direccion="out"` responde "¿qué alcanza X?" (descendientes: si X es una
+    ley, qué reglamentos/circulares cuelgan de ella). `direccion="in"`
+    responde la pregunta inversa y más frecuente en auditoría normativa:
+    "¿qué documentos DEPENDEN, directa o transitivamente, de X?" — por
+    ejemplo, si el artículo 8º letra n) del DL 825 cambiara, qué circulares,
+    resoluciones y oficios quedarían potencialmente desactualizados.
+
+    Es la operación que un filtro de metadatos de una sola columna (`02 §7`)
+    no puede expresar sin una consulta recursiva — la pregunta central de §7
+    cuando compara el grafo con metadata filtering.
+    """
+    if node_id not in g:
+        return set()
+    sub_edges = [
+        (u, v) for u, v, data in g.edges(data=True)
+        if tipos is None or data.get("tipo") in tipos
+    ]
+    sub = nx.DiGraph(sub_edges)
+    if node_id not in sub:
+        return set()
+    return nx.descendants(sub, node_id) if direccion == "out" else nx.ancestors(sub, node_id)

@@ -25,7 +25,7 @@ este módulo.
 |----|-----------------------------------------------|-----|--------|-----------|
 | 00 | Plan maestro                                  | [theory/00-plan.md](theory/00-plan.md) | — | Terminado |
 | 01 | Qué es una ontología y por qué ya construiste varias | [theory/01-que-es-una-ontologia.md](theory/01-que-es-una-ontologia.md) | [code/01-ontologia-vs-grafo.py](code/01-ontologia-vs-grafo.py) + [ontology_lib.py](code/ontology_lib.py) | Terminado |
-| 02 | Modelado del dominio regulatorio chileno      | — | — | Pendiente |
+| 02 | Modelado del dominio regulatorio chileno      | [theory/02-modelado-del-dominio.md](theory/02-modelado-del-dominio.md) | [code/02-grafo-normativo.py](code/02-grafo-normativo.py) | Terminado |
 | 03 | Cuánto formalismo comprar                     | — | — | Pendiente |
 | 04 | Identidad y llaves canónicas                  | — | — | Pendiente |
 | 05 | Extraer la ontología del corpus               | — | — | Pendiente |
@@ -55,7 +55,13 @@ LLM real con caché; el costo se mide con la aritmética de `04 §1`.
 El núcleo reutilizable vive en [code/ontology_lib.py](code/ontology_lib.py):
 §1 trajo `NodoClasificador` y `parse_clasificador_presupuestario` (el
 clasificador presupuestario chileno como property graph, parseado desde
-`shared/corpus_chileno/glosa-*.txt`).
+`shared/corpus_chileno/glosa-*.txt`); §2 sumó `Norma`, `RelacionNormativa`,
+`TipoRelacion`, `build_grafo_normativo`, `vecinos_por_relacion` y
+`alcance_transitivo` — el vocabulario de relaciones tipadas para el corpus
+normativo completo, con datos curados a mano en
+[examples/relaciones-manual.json](examples/relaciones-manual.json) (37
+normas, 47 relaciones con fundamento textual verificable — la verdad
+fundamental que §5 usará para medir la extracción automática).
 
 ## Datos
 
