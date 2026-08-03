@@ -24,7 +24,7 @@ este módulo.
 | #  | Título                                       | Doc | Código | Estado    |
 |----|-----------------------------------------------|-----|--------|-----------|
 | 00 | Plan maestro                                  | [theory/00-plan.md](theory/00-plan.md) | — | Terminado |
-| 01 | Qué es una ontología y por qué ya construiste varias | — | — | Pendiente |
+| 01 | Qué es una ontología y por qué ya construiste varias | [theory/01-que-es-una-ontologia.md](theory/01-que-es-una-ontologia.md) | [code/01-ontologia-vs-grafo.py](code/01-ontologia-vs-grafo.py) + [ontology_lib.py](code/ontology_lib.py) | Terminado |
 | 02 | Modelado del dominio regulatorio chileno      | — | — | Pendiente |
 | 03 | Cuánto formalismo comprar                     | — | — | Pendiente |
 | 04 | Identidad y llaves canónicas                  | — | — | Pendiente |
@@ -51,6 +51,11 @@ uv run python 05-ontologias/code/01-ontologia-vs-grafo.py
 Property graph con `networkx` + esquema Pydantic, sin base de grafos
 dedicada ni razonador OWL — decisión justificada en §3. La extracción usa
 LLM real con caché; el costo se mide con la aritmética de `04 §1`.
+
+El núcleo reutilizable vive en [code/ontology_lib.py](code/ontology_lib.py):
+§1 trajo `NodoClasificador` y `parse_clasificador_presupuestario` (el
+clasificador presupuestario chileno como property graph, parseado desde
+`shared/corpus_chileno/glosa-*.txt`).
 
 ## Datos
 
