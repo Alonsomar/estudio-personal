@@ -17,6 +17,7 @@ dependencies = [
     "fastapi",
     "httpx",
     "uvicorn",
+    "networkx",
 ]
 
 [dependency-groups]
