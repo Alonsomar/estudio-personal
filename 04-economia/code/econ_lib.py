@@ -12,6 +12,8 @@ Núcleo reutilizable que acumula lo que las secciones introducen:
       una degradación de calidad dada.
   §4  Self-hosting vs API: costo mensual de cada opción, punto de equilibrio
       en volumen, y el efecto de la utilización sobre el costo unitario.
+  §5  Deriva de precios: decaimiento exponencial de tarifas, crecimiento del
+      consumo por query, y el gasto total resultante (efecto Jevons).
 
 Método (ver `theory/00-plan.md`): esto es un MODELO ANALÍTICO, no un benchmark.
 Predice órdenes de magnitud y puntos de equilibrio. No modela el overhead real
@@ -385,6 +387,46 @@ def breakeven_tokens(
     tokens = fixed / api_usd_per_m_out * 1e6
     capacity = n_gpus * sustained_tokens_per_s * 3600 * HOURS_PER_MONTH
     return tokens if tokens <= capacity else float("inf")
+
+
+# --------------------------------------------------------------------------- #
+# §5 Deriva. Las tarifas caen; el consumo por query sube. El gasto total es el
+# producto de las dos, y ahí es donde vive la sorpresa.
+# --------------------------------------------------------------------------- #
+def price_after(precio_hoy: float, caida_anual: float, anios: float) -> float:
+    """Tarifa proyectada suponiendo caída proporcional constante.
+
+        p(t) = p0 · (1 − caída_anual)^t
+
+    `caida_anual` = 0.6 significa "el precio cae 60% cada año" (o sea, queda el
+    40%). La forma exponencial es el supuesto más simple que captura el hecho
+    observado; no es una predicción, es un escenario parametrizado.
+    """
+    return precio_hoy * (1.0 - caida_anual) ** anios
+
+
+def spend_trajectory(
+    tokens_hoy_month: float,
+    precio_hoy_per_m: float,
+    caida_precio_anual: float,
+    crecimiento_consumo_anual: float,
+    anios: int = 5,
+) -> list[tuple[int, float, float, float]]:
+    """Trayectoria de (año, tarifa, tokens/mes, gasto/mes).
+
+    El punto de la sección: aunque la tarifa caiga, el gasto puede subir si el
+    consumo por query crece más rápido. Es la paradoja de Jevons — abaratar un
+    insumo aumenta su consumo total, y a veces el gasto total con él.
+
+    `crecimiento_consumo_anual` = 1.0 significa que el consumo se duplica cada
+    año (más contexto, más pasos agénticos, más usuarios).
+    """
+    filas = []
+    for t in range(anios + 1):
+        precio = price_after(precio_hoy_per_m, caida_precio_anual, t)
+        tokens = tokens_hoy_month * (1.0 + crecimiento_consumo_anual) ** t
+        filas.append((t, precio, tokens, tokens / 1e6 * precio))
+    return filas
 
 
 def min_golden_size(
