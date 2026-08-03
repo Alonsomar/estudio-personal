@@ -27,7 +27,7 @@ este módulo.
 | 01 | Qué es una ontología y por qué ya construiste varias | [theory/01-que-es-una-ontologia.md](theory/01-que-es-una-ontologia.md) | [code/01-ontologia-vs-grafo.py](code/01-ontologia-vs-grafo.py) + [ontology_lib.py](code/ontology_lib.py) | Terminado |
 | 02 | Modelado del dominio regulatorio chileno      | [theory/02-modelado-del-dominio.md](theory/02-modelado-del-dominio.md) | [code/02-grafo-normativo.py](code/02-grafo-normativo.py) | Terminado |
 | 03 | Cuánto formalismo comprar                     | [theory/03-cuanto-formalismo.md](theory/03-cuanto-formalismo.md) | [code/03-cuanto-formalismo.py](code/03-cuanto-formalismo.py) | Terminado |
-| 04 | Identidad y llaves canónicas                  | — | — | Pendiente |
+| 04 | Identidad y llaves canónicas                  | [theory/04-identidad-y-llaves.md](theory/04-identidad-y-llaves.md) | [code/04-identidad-y-llaves.py](code/04-identidad-y-llaves.py) | Terminado |
 | 05 | Extraer la ontología del corpus               | — | — | Pendiente |
 | 06 | Vigencia temporal y versionado normativo      | — | — | Pendiente |
 | 07 | Del grafo al retrieval: GraphRAG y su economía | — | — | Pendiente |
@@ -64,7 +64,10 @@ normas, 47 relaciones con fundamento textual verificable — la verdad
 fundamental que §5 usará para medir la extracción automática); §3 sumó
 `ConceptoSKOS`, `esquema_skos_tipos_norma` y `es_subconcepto_de` (el nivel
 de formalismo inmediatamente anterior al property graph, para medir la
-brecha en vez de solo describirla).
+brecha en vez de solo describirla); §4 sumó `Organismo`, `resolver_organismo`
+(diccionario) y `resolver_organismo_difuso` (similitud de secuencia,
+fallback) — pipeline de entity resolution de dos niveles con orden
+justificado por un falso positivo real y medido.
 
 ## Datos
 

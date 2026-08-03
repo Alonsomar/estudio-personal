@@ -15,11 +15,22 @@ global, testeable in-process.
 from __future__ import annotations
 
 import re
+import unicodedata
 from enum import Enum
 from pathlib import Path
 
 import networkx as nx
 from pydantic import BaseModel
+
+
+def strip_accents(text: str) -> str:
+    """Quita acentos/diacríticos (NFKD + filtrar combining marks). Duplicada
+    a propósito desde `retrieval_lib.strip_accents`: es una función de tres
+    líneas y evita acoplar el orden de sys.path entre módulos de
+    masterclasses distintas."""
+    return "".join(
+        c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c)
+    )
 
 # --------------------------------------------------------------------------- #
 # §1 El clasificador presupuestario como ontología de facto. Seis niveles
@@ -377,6 +388,109 @@ def es_subconcepto_de(esquema: list[ConceptoSKOS], hijo_id: str, ancestro_id: st
         actual = por_id.get(actual.broader) if actual.broader else None
         visitados += 1
     return False
+
+
+# --------------------------------------------------------------------------- #
+# §4 Identidad y llaves canónicas. Entity resolution: decidir cuándo dos
+# menciones textuales distintas ("Dirección de Compras" y "CHILECOMPRA") son
+# la MISMA entidad. Mismo problema que record linkage en microdatos
+# administrativos — otro dominio, la misma disciplina.
+# --------------------------------------------------------------------------- #
+class Organismo(BaseModel):
+    """Un organismo público, con su llave canónica y las variantes
+    textuales bajo las que el corpus lo menciona.
+
+    `id` es la llave canónica — el análogo, en este dominio, del RUT de un
+    organismo o el `cut_comunal` de una comuna (doctrina del portfolio:
+    nunca usar el nombre libre como identificador). `nombre_oficial` es la
+    forma para mostrar; `variantes` son las formas bajo las que el corpus
+    real menciona la misma entidad.
+    """
+
+    id: str
+    nombre_oficial: str
+    variantes: list[str] = []
+
+
+def normalizar_nombre(texto: str) -> str:
+    """Minúsculas + sin acentos + espacios colapsados. El primer nivel de
+    resolución, determinista y gratis, antes de cualquier diccionario."""
+    return " ".join(strip_accents(texto.lower()).split())
+
+
+def resolver_organismo(
+    mencion: str, catalogo: list[Organismo]
+) -> str | None:
+    """Resolución de Nivel 1: normalización + coincidencia exacta contra las
+    variantes conocidas de cada organismo. Barato, determinista, sin falsos
+    positivos — por eso va PRIMERO en el pipeline, antes de cualquier
+    comparación difusa.
+
+    Devuelve el `id` canónico o `None` si la mención no coincide con ninguna
+    variante conocida (candidata a Nivel 2, o a que alguien la agregue al
+    catálogo).
+    """
+    obj = normalizar_nombre(mencion)
+    for org in catalogo:
+        formas = [org.nombre_oficial, *org.variantes]
+        if obj in {normalizar_nombre(f) for f in formas}:
+            return org.id
+    return None
+
+
+def resolver_organismo_difuso(
+    mencion: str, catalogo: list[Organismo], umbral: float = 0.5
+) -> tuple[str | None, float]:
+    """Resolución de Nivel 2: similitud de secuencia (difflib, stdlib) contra
+    los nombres oficiales del catálogo. Es el fallback CARO y PROBABILÍSTICO
+    — se usa solo cuando el Nivel 1 no encontró nada, nunca antes, porque
+    puede producir falsos positivos con nombres institucionales que
+    comparten prefijo o estructura ('Dirección de X Pública').
+
+    Devuelve `(id_candidato, score)`; el llamador decide si el score alcanza
+    para aceptar automáticamente o si hace falta revisión humana.
+    """
+    import difflib
+
+    mejor_id: str | None = None
+    mejor_score = 0.0
+    for org in catalogo:
+        score = difflib.SequenceMatcher(
+            None, normalizar_nombre(mencion), normalizar_nombre(org.nombre_oficial)
+        ).ratio()
+        if score > mejor_score:
+            mejor_score, mejor_id = score, org.id
+    if mejor_score >= umbral:
+        return mejor_id, mejor_score
+    return None, mejor_score
+
+
+def catalogo_organismos_corpus() -> list[Organismo]:
+    """Catálogo curado a mano de los organismos que el corpus menciona con
+    más de una forma textual, sobrevivido a un grep sistemático (no
+    inventado): cada variante está tomada literalmente del texto real."""
+    return [
+        Organismo(
+            id="dccp", nombre_oficial="Dirección de Compras y Contratación Pública",
+            variantes=["Dirección de Compras", "CHILECOMPRA", "ChileCompra"],
+        ),
+        Organismo(
+            id="sii", nombre_oficial="Servicio de Impuestos Internos",
+            variantes=[],  # el corpus SIEMPRE usa la forma completa; sin variantes que resolver
+        ),
+        Organismo(
+            id="cgr", nombre_oficial="Contraloría General de la República",
+            variantes=["esta Contraloría"],
+        ),
+        Organismo(
+            id="dipres", nombre_oficial="Dirección de Presupuestos",
+            variantes=[],
+        ),
+        Organismo(
+            id="minsal", nombre_oficial="Ministerio de Salud",
+            variantes=[],
+        ),
+    ]
 
 
 def alcance_transitivo(
