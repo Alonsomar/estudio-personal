@@ -1,0 +1,26 @@
+name: Tests
+
+# Smoke tests de las librerías reutilizables. No usan API keys ni red,
+# así que corren en cualquier PR sin secretos.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Instalar dependencias
+        run: uv sync
+
+      - name: Correr tests
+        run: uv run pytest -q

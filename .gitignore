@@ -8,6 +8,10 @@ __pycache__
 *.egg-info
 output/
 .ipynb_checkpoints
+.pytest_cache
+
+# Config local del editor
+.vscode/
 
 # MkDocs (sitio generado; se construye en CI)
 site/

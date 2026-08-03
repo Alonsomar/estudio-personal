@@ -79,6 +79,7 @@ markdown_extensions:
 # la secuencia de lectura. Al añadir un documento nuevo, agrégalo aquí.
 nav:
   - Inicio: index.md
+  - Hoja de ruta: BACKLOG.md
   - 01 · Evaluación de sistemas IA:
       - 01-evals/README.md
       - 01-evals/theory/00-plan.md

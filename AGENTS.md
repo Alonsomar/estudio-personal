@@ -2,10 +2,21 @@
 
 ## Propósito del proyecto
 
-Sistema de estudio personal estructurado en 4 masterclasses orientadas a construir
-productos de IA sobre corpus regulatorio y fiscal chileno. El objetivo es dominar
-evaluación de sistemas IA, information retrieval, patrones de producción y economía
-de inferencia, con foco práctico y aplicado.
+Sistema de estudio personal estructurado en masterclasses orientadas a construir
+productos de IA sobre corpus regulatorio y fiscal chileno. Cada módulo cubre una de
+las cuatro capas invariantes de un producto sobre corpus legal (ingestión,
+representación del conocimiento, retrieval y orquestación, generación verificada);
+el marco completo está en el [README](README.md).
+
+## Antes de empezar cualquier sesión
+
+Leer **este archivo** y **[BACKLOG.md](BACKLOG.md)**. El backlog es la cola de
+trabajo vigente: contiene el estado real de cada módulo, la hoja de ruta por fases,
+los temarios de los módulos planificados, las decisiones ya tomadas (no
+reabrirlas) y lo que está explícitamente fuera de alcance.
+
+Los commits referencian el ID del backlog: `feat(ontologias): B7 — sección 3`.
+Si una tarea cambia de alcance o estado, se actualiza `BACKLOG.md` en el mismo commit.
 
 ## Audiencia
 
@@ -31,6 +42,11 @@ estudio-personal/
 ├── 02-retrieval/        # Masterclass: Information Retrieval
 ├── 03-produccion/       # Masterclass: Patrones de producción
 ├── 04-economia/         # Masterclass: Economía de inferencia
+├── 05-ontologias/       # Masterclass: Ontologías y representación (planificado)
+├── 06-harness/          # Masterclass: Harness agéntico (planificado)
+├── tests/               # Smoke tests de las librerías reutilizables
+├── docs/                # Solo symlinks a las carpetas reales (para MkDocs)
+├── BACKLOG.md           # Cola de trabajo y hoja de ruta
 └── blog-drafts/         # Borradores de posts derivados del estudio
 ```
 
@@ -69,6 +85,17 @@ uv run pytest
 python script.py
 pytest
 ```
+
+## Tests
+
+`tests/` contiene smoke tests de las librerías reutilizables (`retrieval_lib.py`,
+`prod_lib.py`, `shared/`). Reglas:
+
+- **Corren sin API keys ni red.** Nada que llame a un proveedor de LLM.
+- Cubren invariantes y propiedades matemáticas (rangos de métricas, monotonías,
+  idempotencia), no valores exactos que cambian al tocar el corpus.
+- Al agregar un componente al núcleo de una masterclass, agregar su smoke test.
+- `uv run pytest` debe pasar en verde antes de cerrar un cambio mediano o grande.
 
 ## Uso de shared/
 
