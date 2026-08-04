@@ -41,7 +41,7 @@ las citas verificables. Ese es el hilo que atraviesa los seis módulos.
 | 02 | Information Retrieval       | [02-retrieval/](02-retrieval/README.md) | 9/9   | Terminado |
 | 03 | Patrones de producción      | [03-produccion/](03-produccion/README.md) | 12/12 | Terminado |
 | 04 | Economía de inferencia      | [04-economia/](04-economia/README.md)   | 6/6   | Terminado |
-| 05 | Ontologías y representación | [05-ontologias/](05-ontologias/README.md) | 0/9 | En curso |
+| 05 | Ontologías y representación | [05-ontologias/](05-ontologias/README.md) | 9/9 | Terminado |
 | 06 | Harness agéntico            | —                                        | 0/9   | Planificado |
 
 Los módulos se hacen **en orden**, uno cerrado antes de abrir el siguiente. La cola

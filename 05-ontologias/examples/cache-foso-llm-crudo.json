@@ -1,0 +1,15 @@
+{
+  "bc629de9609bc7bad5ba568bee2d629177233d69": {
+    "respuesta": {
+      "documentos": [
+        "decreto-01-subvencion-escolar.txt",
+        "glosa-02-presupuesto-educacion.txt",
+        "oficio-01-contraloria-subvenciones.txt",
+        "oficio-05-contraloria-traspaso-slep.txt"
+      ],
+      "razonamiento": "1. **decreto-01-subvencion-escolar.txt**: Este decreto aprueba el reglamento de la Ley Nº 20.248, estableciendo la subvención escolar preferencial, por lo que menciona directamente la ley.  \n2. **glosa-02-presupuesto-educacion.txt**: Esta glosa detalla las asignaciones del programa de subvenciones, incluyendo la Subvención Escolar Preferencial, que se rige por la Ley Nº 20.248.  \n3. **oficio-01-contraloria-subvenciones.txt**: Este oficio se refiere a la utilización de recursos de la Subvención Escolar Preferencial, regulada por la Ley Nº 20.248, y su reglamento.  \n4. **oficio-05-contraloria-traspaso-slep.txt**: Este oficio menciona que el Servicio Local de Educación Pública sucede a la municipalidad en todos sus derechos y obligaciones relativos al servicio educacional traspasado, incluyendo la gestión de la Subvención Escolar Preferencial, que está regulada por la Ley Nº 20.248."
+    },
+    "tokens_in": 25694,
+    "tokens_out": 298
+  }
+}

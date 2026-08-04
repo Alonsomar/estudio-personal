@@ -5,7 +5,7 @@ de aceptación verificables. Los commits referencian el ID (`feat(ontologias): B
 sección 3`). Si una tarea cambia de alcance o estado, se actualiza aquí en el mismo
 cambio.
 
-Última revisión: **2026-08-03**.
+Última revisión: **2026-08-04**.
 
 ---
 
@@ -17,8 +17,8 @@ cambio.
 | 02 | Information Retrieval     | 9/9       | Terminado   |
 | 03 | Patrones de producción    | 12/12     | Terminado   |
 | 04 | Economía de inferencia    | 6/6       | Terminado   |
-| 05 | Ontologías y representación del conocimiento | 0/9 | **Siguiente** |
-| 06 | Harness agéntico          | 0/9       | Planificado |
+| 05 | Ontologías y representación del conocimiento | 9/9 | Terminado |
+| 06 | Harness agéntico          | 0/9       | **Siguiente** |
 
 ---
 
@@ -43,8 +43,8 @@ graph LR
 | 0 | Higiene del repo | B1–B4 | ✅ Hecha (`ec94dea`) |
 | 1 | Cerrar 04-economia (re-especificado a 6 secciones) | B5 | ✅ Hecha |
 | 2 | Expandir corpus 16 → 40 documentos | B6 | ✅ Hecha |
-| 3 | 05-ontologias | B7 | ⬅️ **Siguiente** (4–6 sesiones) |
-| 4 | 06-harness | B8 | Pendiente (4–6 sesiones) |
+| 3 | 05-ontologias | B7 | ✅ Hecha |
+| 4 | 06-harness | B8 | ⬅️ **Siguiente** (4–6 sesiones) |
 
 ---
 
@@ -157,7 +157,7 @@ diferencias entre arquitecturas sean estadísticamente detectables, y un grafo s
       mueve (consistente con `02 §3`). Tabla completa en el README del corpus.
 - [x] `uv run pytest` sigue en verde (55 tests; no dependen del tamaño del corpus).
 
-### B7 · P0 · Masterclass 05 — Ontologías y representación del conocimiento
+### B7 · P0 · Masterclass 05 — Ontologías y representación del conocimiento — ✅ Cerrado (2026-08-04)
 **Encuadre:** una ontología es un sistema de clasificación formalizado. El
 clasificador presupuestario chileno (partida → capítulo → programa → subtítulo →
 ítem → asignación) *es* una ontología; COFOG, CIIU, CIUO y UNSPSC también. El
@@ -188,11 +188,35 @@ GraphRAG) del inventario temático.
 9. La ontología como foso competitivo: por qué un modelo mejor no comoditiza esto.
 
 **Criterios de aceptación:**
-- [ ] `00-plan.md` + 9 secciones con el template de 01–03.
-- [ ] Grafo real sobre el corpus (networkx + esquema Pydantic) y extractor con LLM.
-- [ ] Benchmark honesto grafo vs. híbrido reutilizando `golden-retrieval.json`, con
+- [x] `00-plan.md` + 9 secciones con el template de 01–03.
+- [x] Grafo real sobre el corpus (networkx + esquema Pydantic) y extractor con LLM.
+- [x] Benchmark honesto grafo vs. híbrido reutilizando `golden-retrieval.json`, con
       IC. Si el grafo no gana, **el resultado negativo se publica**.
-- [ ] Documento sobre EU AI Act / governance dentro del módulo (ver B9).
+- [x] Documento sobre EU AI Act / governance dentro del módulo (ver B9).
+
+**Resultado principal (negativo en retrieval, positivo en estructura — y por eso
+útil):** el grafo normativo (37 normas, 47 relaciones curadas a mano) **no** mejora
+recall@3/@5 sobre `golden-retrieval.json` (`§8`, IC95% [0,0] exacto), ni siquiera en
+el subconjunto de queries multi-doc — porque "multi-doc" (la pregunta combina dos
+temas) y "multi-hop" (las fuentes están conectadas por citas) no son lo mismo, y el
+golden mide lo primero. Donde el grafo sí gana, medido en `§9`: la misma competency
+question que el grafo responde con 100% de precisión, un LLM con el corpus crudo en
+contexto (sin curación) la responde con 50% de recall. El foso no es la tecnología,
+es la curación de dominio (§1-§6) que la tecnología todavía no reemplaza sola —
+confirmado también por `§5`, donde la extracción automática necesitó un nivel de
+resolución de identidad específico del dominio (comparar por número de norma) para
+duplicar su recall.
+
+**Corrección de rumbo documentada (§4):** el ejemplo "DIPRES = Dirección de
+Presupuestos" del temario original no se pudo usar — verificado por grep, "DIPRES"
+no aparece ni una vez en el corpus real. El ejemplo grounded que se usó en su lugar
+fue la Dirección de Compras y Contratación Pública (tres formas textuales reales:
+nombre completo, forma corta, "CHILECOMPRA").
+
+**Fechas de B9 verificadas contra fuente primaria** (no solo DOUE genérico, sino el
+texto exacto): Reglamento (UE) 2026/1744, publicado 24-07-2026, en vigor desde
+27-07-2026 — confirma los diferimientos a diciembre 2027 (Anexo III) y agosto 2028
+(Anexo I) que el inventario había anticipado sin poder verificar.
 
 ### B8 · P0 · Masterclass 06 — Harness agéntico
 **Encuadre:** el harness es diseño institucional. El mismo modelo rinde
@@ -231,15 +255,18 @@ Cubre el tema #7 del inventario (orquestación Claude Code + Codex).
       (artefacto de portfolio, no ejercicio).
 - [ ] Un agente evaluado con métricas de trayectoria sobre una tarea del dominio.
 
-### B9 · P2 · Documento de governance / EU AI Act
+### B9 · P2 · Documento de governance / EU AI Act — ✅ Cerrado (2026-08-04, dentro de B7/§9)
 Material de alto valor para entrevista y **perecedero**. Vive como documento dentro
 de 05-ontologias, no como masterclass propia. El gancho con 05 es real: un
 fine-tuning sustancial puede reclasificar a un *deployer* como *provider*.
 
-- [ ] Fechas del Omnibus verificadas **contra fuente primaria (DOUE)** antes de
-      escribirlas como hechos. El inventario cita dic-2027 (Anexo III) y ago-2028
-      (Anexo I): tratar como `[verificar]` hasta confirmar.
-- [ ] Cada afirmación normativa con enlace a su fuente.
+- [x] Fechas del Omnibus verificadas **contra fuente primaria**: Reglamento (UE)
+      2026/1744, DOUE 24-07-2026, en vigor 27-07-2026
+      ([EUR-Lex](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng)). El Omnibus ya
+      no es una propuesta: es un reglamento publicado y vigente. Confirma dic-2027
+      (Anexo III) y ago-2028 (Anexo I).
+- [x] Cada afirmación normativa con enlace a su fuente — ver
+      `05-ontologias/theory/09-la-ontologia-como-foso.md`, sección de governance.
 
 ### B10 · P2 · Enlazar artículos publicados desde blog-drafts
 `blog-drafts/` está vacío salvo el README. El artículo sobre riesgos fiscales de

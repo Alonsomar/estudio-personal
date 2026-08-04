@@ -42,7 +42,7 @@ estudio-personal/
 ├── 02-retrieval/        # Masterclass: Information Retrieval
 ├── 03-produccion/       # Masterclass: Patrones de producción
 ├── 04-economia/         # Masterclass: Economía de inferencia
-├── 05-ontologias/       # Masterclass: Ontologías y representación (en curso)
+├── 05-ontologias/       # Masterclass: Ontologías y representación (terminada)
 ├── 06-harness/          # Masterclass: Harness agéntico (planificado)
 ├── tests/               # Smoke tests de las librerías reutilizables
 ├── docs/                # Solo symlinks a las carpetas reales (para MkDocs)

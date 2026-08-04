@@ -12,12 +12,19 @@ ontología. Esta masterclass le pone nombre técnico a una práctica que el
 autor ya ejerce, y la conecta con el retrieval construido en `02` y las
 herramientas de IA del resto del repo.
 
-## Estado: En curso
+## Estado: Terminada
 
-Plan maestro terminado; 9 secciones en desarrollo. Prerrequisito cumplido:
+Plan maestro y las 9 secciones completas (00-09). Prerrequisito cumplido:
 `B6` expandió el corpus de 16 a 40 documentos en cuatro clusters con cadenas
 de citas verificadas, diseñadas específicamente como insumo para el grafo de
 este módulo.
+
+**El cierre es honesto, no triunfalista**: el grafo no mejora el recall
+sobre `golden-retrieval.json` (`§8`, resultado negativo publicado tal como
+salió), pero responde con 100% de precisión preguntas de dependencia
+transitiva que un LLM sin la curación de este módulo responde con 50% de
+recall (`§9`, experimento directo). El foso no es la tecnología: es la
+curación de dominio que la tecnología todavía no sabe hacer sola.
 
 ## Secciones
 
@@ -32,15 +39,17 @@ este módulo.
 | 06 | Vigencia temporal y versionado normativo      | [theory/06-vigencia-temporal.md](theory/06-vigencia-temporal.md) | [code/06-vigencia-temporal.py](code/06-vigencia-temporal.py) | Terminado |
 | 07 | Del grafo al retrieval: GraphRAG y su economía | [theory/07-graphrag-economia.md](theory/07-graphrag-economia.md) | [code/07-graphrag-economia.py](code/07-graphrag-economia.py) | Terminado |
 | 08 | Evaluar un sistema con ontología              | [theory/08-evaluar-con-ontologia.md](theory/08-evaluar-con-ontologia.md) | [code/08-evaluar-con-ontologia.py](code/08-evaluar-con-ontologia.py) | Terminado |
-| 09 | La ontología como foso competitivo            | — | — | Pendiente |
+| 09 | La ontología como foso competitivo (+ governance EU AI Act) | [theory/09-la-ontologia-como-foso.md](theory/09-la-ontologia-como-foso.md) | [code/09-ontologia-como-foso.py](code/09-ontologia-como-foso.py) | Terminado |
 
 ## Nota de método
 
-El grafo tiene que **ganarse el lugar**. Todo lo que aporte se mide contra
+El grafo tuvo que **ganarse el lugar**. Todo lo que aportó se midió contra
 el retrieval híbrido de `02`, reutilizando `golden-retrieval.json` sin
-modificar y el aparato estadístico de `01 §8` (deltas + IC bootstrap). Si el
-grafo no gana, el resultado negativo se publica igual — la misma disciplina
-que `04 §4` aplicó a self-hosting.
+modificar y el aparato estadístico de `01 §8` (deltas + IC bootstrap). El
+grafo no ganó en `§8` — y el resultado negativo se publicó igual, misma
+disciplina que `04 §4` aplicó a self-hosting. `§9` cierra mostrando dónde
+sí gana: preguntas de dependencia transitiva que el texto libre no puede
+responder sin la curación de dominio de `§1-§6`.
 
 ## Cómo ejecutar código
 
@@ -76,20 +85,24 @@ a nivel de artículo y bitemporalidad (vigencia legal vs. fecha de registro,
 esta última tomada de commits reales de git); §7 sumó `comunidades_del_grafo`
 (Louvain) y `GraphRAGIndexer` (structured output, caché en disco) — réplica
 minimalista del paso de indexación de GraphRAG para medir su costo real
-sobre este corpus. §8 no sumó componentes nuevos a `ontology_lib.py`:
-reutiliza todo lo anterior y agrega `GraphExpandedRetriever` en el propio
-script de demo, sometiendo el grafo a `golden-retrieval.json` con el
-aparato de `01 §8`. **Resultado negativo, publicado igual**: recall@3/@5
-sin diferencia contra BM25 solo, incluso en el subconjunto de queries
-multi-doc — el golden mide QA general, no QA multi-hop de citación, y esa
-es la distinción exacta que `§7` había anticipado con evidencia externa.
+sobre este corpus. §8 y §9 no sumaron componentes nuevos a `ontology_lib.py`:
+reutilizan todo lo anterior. §8 agregó `GraphExpandedRetriever` en el propio
+script de demo, sometiendo el grafo a `golden-retrieval.json` con el aparato
+de `01 §8` — **resultado negativo, publicado igual**: recall@3/@5 sin
+diferencia contra BM25 solo, incluso en queries multi-doc. §9 cerró con un
+experimento directo (LLM sin grafo vs. grafo, misma competency question de
+§2): 50% de recall sin curación contra 100% con ella, y un documento de
+governance sobre reclasificación *provider*/*deployer* bajo la EU AI Act,
+con fechas verificadas contra el Diario Oficial de la UE (Reglamento (UE)
+2026/1744).
 
 ## Datos
 
 - Corpus regulatorio: `shared/corpus_chileno/` (40 documentos, `B6`).
 - Golden de retrieval (§8, sin modificar): `02-retrieval/examples/golden-retrieval.json`.
-- Verdad fundamental (§2, usada como referencia en §5): [examples/relaciones-manual.json](examples/relaciones-manual.json).
+- Verdad fundamental (§2, usada como referencia en §5, §8 y §9): [examples/relaciones-manual.json](examples/relaciones-manual.json).
 - Caché de extracción LLM (§5): `examples/cache-extraccion-llm.json` — con caché poblada, el script corre sin API key.
 - Caché de resúmenes de comunidad (§7): `examples/cache-graphrag-comunidades.json`.
+- Caché del experimento de cierre (§9): `examples/cache-foso-llm-crudo.json`.
 
 Ver [AGENTS.md](../AGENTS.md) para convenciones completas.
