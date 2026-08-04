@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import sys
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -68,7 +69,9 @@ def cargar_ground_truth() -> tuple[list[Norma], set[tuple[str, str, str]]]:
     return normas, gt
 
 
-def demo_extraccion(extractor: LLMExtractor, normas: list[Norma]) -> dict:
+def demo_extraccion(
+    extractor: LLMExtractor, normas: list[Norma], *, usar_numero: bool
+) -> dict:
     """Extrae relaciones de la muestra y resuelve destinos a doc_id."""
     seccion("1. Extracción sobre 10 documentos (structured output + Pydantic)")
 
@@ -81,7 +84,9 @@ def demo_extraccion(extractor: LLMExtractor, normas: list[Norma]) -> dict:
         extraccion = extractor.extraer(texto)
         relaciones_doc = []
         for rel in extraccion.relaciones:
-            destino_id, nivel = resolver_identificador_norma(rel.identificador_destino, normas)
+            destino_id, nivel = resolver_identificador_norma(
+                rel.identificador_destino, normas, usar_numero=usar_numero
+            )
             niveles_resolucion[nivel] += 1
             if destino_id is None:
                 sin_resolver.append(f"{doc_id} -> '{rel.identificador_destino}' ({rel.tipo.value})")
@@ -102,10 +107,10 @@ def demo_extraccion(extractor: LLMExtractor, normas: list[Norma]) -> dict:
     return resultados
 
 
-def demo_precision_recall(resultados: dict[str, list[RelacionNormativa]], gt: set) -> None:
+def calcular_metricas(
+    resultados: dict[str, list[RelacionNormativa]], gt: set
+) -> dict[str, float | int | set]:
     """Precisión y recall contra la verdad fundamental curada a mano."""
-    seccion("2. Precisión y recall contra relaciones-manual.json (§2)")
-
     extraidas = {
         (r.origen, r.tipo.value, r.destino)
         for rels in resultados.values() for r in rels
@@ -120,29 +125,44 @@ def demo_precision_recall(resultados: dict[str, list[RelacionNormativa]], gt: se
     recall = len(verdaderos_positivos) / len(gt_muestra) if gt_muestra else 0.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
 
-    print(f"Ground truth en la muestra (10 docs):  {len(gt_muestra)} relaciones")
-    print(f"Extraídas y resueltas:                 {len(extraidas)} relaciones")
-    print(f"Verdaderos positivos (match exacto):   {len(verdaderos_positivos)}")
-    print(f"Falsos positivos:                      {len(falsos_positivos)}")
-    print(f"Falsos negativos (no detectadas):      {len(falsos_negativos)}")
-    print(f"\nPrecisión: {precision:.0%}   Recall: {recall:.0%}   F1: {f1:.0%}")
+    return {
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "gt": len(gt_muestra),
+        "extraidas": len(extraidas),
+        "tp": verdaderos_positivos,
+        "fp": falsos_positivos,
+        "fn": falsos_negativos,
+    }
 
-    if falsos_positivos:
+
+def demo_precision_recall(metricas: dict) -> None:
+    seccion("2. Precisión y recall contra relaciones-manual.json (§2)")
+    print(f"Ground truth en la muestra (10 docs):  {metricas['gt']} relaciones")
+    print(f"Extraídas y resueltas:                 {metricas['extraidas']} relaciones")
+    print(f"Verdaderos positivos (match exacto):   {len(metricas['tp'])}")
+    print(f"Falsos positivos:                      {len(metricas['fp'])}")
+    print(f"Falsos negativos (no detectadas):      {len(metricas['fn'])}")
+    print(
+        f"\nPrecisión: {metricas['precision']:.0%}   "
+        f"Recall: {metricas['recall']:.0%}   F1: {metricas['f1']:.0%}"
+    )
+
+    if metricas["fp"]:
         print("\nFalsos positivos (el LLM extrajo algo que no está en la verdad fundamental):")
-        for fp in sorted(falsos_positivos):
+        for fp in sorted(metricas["fp"]):
             print(f"    {fp}")
-    if falsos_negativos:
+    if metricas["fn"]:
         print("\nFalsos negativos (relaciones reales que el LLM no detectó):")
-        for fn in sorted(falsos_negativos):
+        for fn in sorted(metricas["fn"]):
             print(f"    {fn}")
 
     print(
         "\nOjo con la lectura de los falsos positivos: 'match exacto' exige que\n"
-        "tipo Y destino coincidan con la anotación manual. Un falso positivo puede\n"
-        "ser un error real del LLM, O una relación legítima que la curación manual\n"
-        "de §2 simplemente no anotó (§2 fue explícito: 'curación manual, no\n"
-        "exhaustiva'). Sin revisar caso por caso, la precisión reportada es una\n"
-        "COTA INFERIOR, no el error real del extractor."
+        "tipo Y destino coincidan con la ontología v2 auditada. La literalidad y\n"
+        "cobertura del ground truth ya están comprobadas; un falso positivo es\n"
+        "por tanto un error medido del pipeline bajo este criterio explícito."
     )
 
 
@@ -154,11 +174,13 @@ def demo_costo(extractor: LLMExtractor) -> None:
     costo_in = extractor.tokens_in / 1e6 * precio["in"]
     costo_out = extractor.tokens_out / 1e6 * precio["out"]
     costo_total = costo_in + costo_out
+    hist_in, hist_out = extractor.historical_tokens
 
     print(f"Llamadas a la API en esta corrida:  {extractor.api_calls}")
-    print(f"Tokens de entrada:                  {extractor.tokens_in:,}")
-    print(f"Tokens de salida:                   {extractor.tokens_out:,}")
-    print(f"Costo ({MODEL}):                    ${costo_total:.4f}")
+    print(f"Tokens actuales in/out:             {extractor.tokens_in:,} / {extractor.tokens_out:,}")
+    print(f"Costo de esta corrida ({MODEL}):    ${costo_total:.4f}")
+    print(f"Uso histórico del caché in/out:     {hist_in:,} / {hist_out:,}")
+    print(f"Costo histórico persistido:         ${extractor.historical_cost_usd:.4f}")
     if extractor.api_calls:
         print(f"Costo por documento:                ${costo_total / extractor.api_calls:.5f}")
         print(f"Costo proyectado, corpus completo (40 docs): "
@@ -169,7 +191,7 @@ def demo_costo(extractor: LLMExtractor) -> None:
     print(
         "\nPara calibrar: el análisis de potencia de 04 §3 dijo que hacen falta ~683\n"
         "queries de golden para detectar una caída de calidad de 5 puntos. Extraer\n"
-        "la ontología completa del corpus (40 docs) cuesta menos de un centavo con\n"
+        "la ontología completa del corpus (40 docs) cuesta cerca de dos centavos con\n"
         "este modelo — el costo NUNCA es el obstáculo para escalar la extracción;\n"
         "la calidad de la resolución de identificadores (ver §2 de este script) sí."
     )
@@ -184,15 +206,13 @@ def demo_donde_el_humano_sigue_haciendo_falta() -> None:
         "declara explícitamente. Hay al menos dos categorías que se le escapan\n"
         "por diseño, no por un prompt insuficiente:\n"
         "\n"
-        "1. RELACIONES IMPLÍCITAS: dos normas que regulan la misma materia sin\n"
-        "   citarse. Ejemplo real del corpus: `norma-01` (Ley de Lobby, 20.730) y\n"
-        "   `norma-02` (Ley de Probidad, 20.880) regulan materias contiguas\n"
-        "   —ambas tocan conflictos de interés de funcionarios públicos— y NINGÚN\n"
-        "   documento del corpus las conecta explícitamente. Un extractor de texto\n"
-        "   nunca las va a relacionar porque no hay ninguna oración que lo diga.\n"
-        "   Detectarlo requiere conocimiento de dominio: alguien que sepa que\n"
-        "   'lobby' y 'declaración de intereses' son instrumentos de la misma\n"
-        "   política de transparencia, aunque el corpus no lo declare.\n"
+        "1. OMISIONES EXPLÍCITAS: la relación Lobby–Probidad sí aparece en el\n"
+        "   texto de la Ley 20.880. El extractor no la recuperó y la primera\n"
+        "   curación manual tampoco la había anotado. Es un falso negativo de\n"
+        "   ambos procesos, corregido en el ground truth v2. Las relaciones\n"
+        "   verdaderamente implícitas —materias afines sin referencia textual—\n"
+        "   siguen siendo una limitación conceptual, pero este experimento no las\n"
+        "   mide ni inventa aristas para representarlas.\n"
         "\n"
         "2. RELACIONES QUE DEPENDEN DE CONTEXTO DOCUMENTAL: la anáfora de §4\n"
         "   ('este Servicio') requiere saber quién emite el documento, información\n"
@@ -203,7 +223,7 @@ def demo_donde_el_humano_sigue_haciendo_falta() -> None:
     )
 
 
-def grafico_efecto_resolucion() -> None:
+def grafico_efecto_resolucion(sin_numero: dict, con_numero: dict) -> None:
     """El salto de precisión/recall al agregar el nivel 'número' (medido
     a mano en esta sección: 25/22/23 -> 38/52/44)."""
     import matplotlib
@@ -211,17 +231,15 @@ def grafico_efecto_resolucion() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    # Valores tomados de las dos corridas de esta sección: solo diccionario
-    # exacto + difuso (umbral 0.85) vs. con el nivel intermedio por número.
     metricas = ["Precisión", "Recall", "F1"]
-    sin_numero = [0.25, 0.22, 0.23]
-    con_numero = [0.38, 0.52, 0.44]
+    sin_vals = [sin_numero["precision"], sin_numero["recall"], sin_numero["f1"]]
+    con_vals = [con_numero["precision"], con_numero["recall"], con_numero["f1"]]
 
     fig, ax = plt.subplots(figsize=(7.5, 4.5))
     x = range(len(metricas))
     w = 0.35
-    ax.bar([i - w / 2 for i in x], sin_numero, width=w, label="sin nivel 'número'", color="#e74c3c")
-    ax.bar([i + w / 2 for i in x], con_numero, width=w, label="con nivel 'número'", color="#2ecc71")
+    ax.bar([i - w / 2 for i in x], sin_vals, width=w, label="sin nivel 'número'", color="#e74c3c")
+    ax.bar([i + w / 2 for i in x], con_vals, width=w, label="con nivel 'número'", color="#2ecc71")
     ax.set_xticks(list(x))
     ax.set_xticklabels(metricas)
     ax.set_ylim(0, 0.6)
@@ -231,7 +249,7 @@ def grafico_efecto_resolucion() -> None:
         "la mayor parte de la mejora", fontsize=11,
     )
     ax.legend(fontsize=9)
-    for i, (a, b) in enumerate(zip(sin_numero, con_numero)):
+    for i, (a, b) in enumerate(zip(sin_vals, con_vals)):
         ax.text(i - w / 2, a + 0.01, f"{a:.0%}", ha="center", fontsize=8)
         ax.text(i + w / 2, b + 0.01, f"{b:.0%}", ha="center", fontsize=8)
 
@@ -242,12 +260,20 @@ def grafico_efecto_resolucion() -> None:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--allow-api", action="store_true")
+    args = parser.parse_args()
     log.info(f"Extrayendo relaciones con {MODEL} (caché en {CACHE_PATH.name}).")
     normas, gt = cargar_ground_truth()
-    extractor = LLMExtractor(model=MODEL, cache_path=CACHE_PATH)
-    resultados = demo_extraccion(extractor, normas)
-    demo_precision_recall(resultados, gt)
+    extractor = LLMExtractor(
+        model=MODEL, cache_path=CACHE_PATH, allow_api=args.allow_api, max_api_calls=10
+    )
+    resultados_con = demo_extraccion(extractor, normas, usar_numero=True)
+    resultados_sin = demo_extraccion(extractor, normas, usar_numero=False)
+    metricas_con = calcular_metricas(resultados_con, gt)
+    metricas_sin = calcular_metricas(resultados_sin, gt)
+    demo_precision_recall(metricas_con)
     demo_costo(extractor)
     demo_donde_el_humano_sigue_haciendo_falta()
-    grafico_efecto_resolucion()
+    grafico_efecto_resolucion(metricas_sin, metricas_con)
     print()
