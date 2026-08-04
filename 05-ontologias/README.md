@@ -29,7 +29,7 @@ este módulo.
 | 03 | Cuánto formalismo comprar                     | [theory/03-cuanto-formalismo.md](theory/03-cuanto-formalismo.md) | [code/03-cuanto-formalismo.py](code/03-cuanto-formalismo.py) | Terminado |
 | 04 | Identidad y llaves canónicas                  | [theory/04-identidad-y-llaves.md](theory/04-identidad-y-llaves.md) | [code/04-identidad-y-llaves.py](code/04-identidad-y-llaves.py) | Terminado |
 | 05 | Extraer la ontología del corpus               | [theory/05-extraccion-llm.md](theory/05-extraccion-llm.md) | [code/05-extraccion-llm.py](code/05-extraccion-llm.py) | Terminado |
-| 06 | Vigencia temporal y versionado normativo      | — | — | Pendiente |
+| 06 | Vigencia temporal y versionado normativo      | [theory/06-vigencia-temporal.md](theory/06-vigencia-temporal.md) | [code/06-vigencia-temporal.py](code/06-vigencia-temporal.py) | Terminado |
 | 07 | Del grafo al retrieval: GraphRAG y su economía | — | — | Pendiente |
 | 08 | Evaluar un sistema con ontología              | — | — | Pendiente |
 | 09 | La ontología como foso competitivo            | — | — | Pendiente |
@@ -70,7 +70,10 @@ fallback) — pipeline de entity resolution de dos niveles con orden
 justificado por un falso positivo real y medido; §5 sumó `LLMExtractor`
 (structured output vía Pydantic, caché en disco), `resolver_por_numero`
 (nivel intermedio de resolución específico de identificadores legales) y
-`resolver_identificador_norma` (pipeline de tres niveles).
+`resolver_identificador_norma` (pipeline de tres niveles); §6 sumó
+`ModificacionArticulo`, `texto_vigente` y `que_sabia_el_sistema` — vigencia
+a nivel de artículo y bitemporalidad (vigencia legal vs. fecha de registro,
+esta última tomada de commits reales de git).
 
 ## Datos
 

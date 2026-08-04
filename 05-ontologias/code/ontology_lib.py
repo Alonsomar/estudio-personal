@@ -15,6 +15,9 @@ Acumula los componentes que las secciones introducen:
   §5  Extracción automática con LLM + structured output (LLMExtractor),
       y resolución de identificadores de norma reutilizando el pipeline
       de §4.
+  §6  Vigencia a nivel de artículo y bitemporalidad (ModificacionArticulo,
+      texto_vigente, que_sabia_el_sistema): retoma el límite "documento
+      reemplaza documento" que 02 §9 dejó abierto.
 
 Diseño: un property graph con `networkx` + esquema Pydantic, sin base de
 grafos dedicada ni razonador OWL (decisión justificada en §3). Mismo patrón
@@ -722,3 +725,72 @@ def resolver_identificador_norma(
     if difuso is not None:
         return difuso, "difuso"
     return None, "sin_match"
+
+
+# --------------------------------------------------------------------------- #
+# §6 Vigencia temporal a nivel de ARTÍCULO, y bitemporalidad. Retoma el
+# límite que 02 §9 dejó explícito: "documento reemplaza documento" es
+# demasiado grueso porque una ley modifica UN artículo de otra, no la norma
+# completa. `RelacionNormativa` (§2) ya vive a nivel de documento; acá se
+# agrega el nivel de artículo que ese modelo no tenía.
+# --------------------------------------------------------------------------- #
+class ModificacionArticulo(BaseModel):
+    """Una modificación a un artículo específico de una norma, con DOS
+    fechas independientes:
+
+    - `valido_desde`: VIGENCIA — desde cuándo la modificación rige
+      legalmente (puede ser posterior a la publicación: vacancia legis).
+    - `registrado_el`: REGISTRO — cuándo ESTA ontología incorporó el dato.
+
+    Confundir las dos es el error bitemporal clásico: un sistema construido
+    en una fecha puede documentar vigencias de años antes, y un sistema de
+    auditoría que no distinga "vigente desde" de "lo supimos desde" no puede
+    responder honestamente qué sabía en qué momento.
+    """
+
+    norma_modificadora: str  # doc_id
+    norma_modificada: str  # doc_id
+    articulo: str
+    valido_desde: str  # fecha ISO de vigencia legal
+    registrado_el: str  # fecha ISO en que esta ontología incorporó el dato
+    fundamento: str
+
+
+def texto_vigente(
+    norma_base: str,
+    articulo: str,
+    modificaciones: list[ModificacionArticulo],
+    fecha_consulta: str,
+) -> tuple[str, str | None]:
+    """¿Qué norma define el texto vigente de `articulo` de `norma_base` en
+    `fecha_consulta`? Devuelve `(doc_id_fuente, valido_desde o None)`.
+
+    Recorre SOLO las modificaciones registradas para ESE artículo específico
+    (no para el documento completo) y toma la más reciente cuya vigencia ya
+    empezó en la fecha consultada. Si ninguna aplica, el artículo sigue
+    regido por su texto original — que es exactamente el caso que un modelo
+    a nivel de documento (`02 §9`) no puede expresar: un documento marcado
+    "no vigente" en su totalidad, cuando en realidad solo UN artículo suyo
+    fue modificado y el resto sigue rigiendo tal como se publicó.
+    """
+    aplicables = [
+        m for m in modificaciones
+        if m.norma_modificada == norma_base and m.articulo == articulo
+        and m.valido_desde <= fecha_consulta
+    ]
+    if not aplicables:
+        return norma_base, None
+    ultima = max(aplicables, key=lambda m: m.valido_desde)
+    return ultima.norma_modificadora, ultima.valido_desde
+
+
+def que_sabia_el_sistema(
+    modificaciones: list[ModificacionArticulo], fecha_corte: str
+) -> list[ModificacionArticulo]:
+    """La pregunta BITEMPORAL: no '¿qué era vigente?' sino '¿qué sabía ESTE
+    sistema en `fecha_corte`?' — filtra por `registrado_el`, no por
+    `valido_desde`. Dos preguntas distintas con respuestas distintas: una
+    norma puede llevar años vigente y el sistema haberla incorporado recién
+    ahora (exactamente el caso de este corpus, construido de una vez en
+    2026 sobre normas de 1974 en adelante)."""
+    return [m for m in modificaciones if m.registrado_el <= fecha_corte]
