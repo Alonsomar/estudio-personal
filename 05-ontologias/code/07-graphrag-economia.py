@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import sys
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -56,10 +57,16 @@ def demo_indexacion_graphrag(g, normas, relaciones, indexer: GraphRAGIndexer) ->
     seccion("1. Indexación estilo GraphRAG: comunidades + resumen por LLM")
 
     comunidades = comunidades_del_grafo(g)
-    print(f"Louvain detecta {len(comunidades)} comunidades sobre 37 nodos / 47 aristas.\n")
+    print(
+        f"Louvain detecta {len(comunidades)} comunidades sobre "
+        f"{g.number_of_nodes()} nodos / {g.number_of_edges()} aristas.\n"
+    )
 
     por_id = {n.id: n for n in normas}
     for i, com in enumerate(comunidades):
+        # `comunidades_del_grafo` devuelve listas ORDENADAS: el prompt que se
+        # construye acá es la clave de caché, y con conjuntos el orden variaba
+        # por proceso (PYTHONHASHSEED), fallando la caché en cada corrida.
         normas_com = [por_id[nid] for nid in com if nid in por_id]
         rel_com = [r for r in relaciones if r.origen in com and r.destino in com]
         resumen = indexer.resumir_comunidad(normas_com, rel_com)
@@ -79,19 +86,18 @@ def demo_costo_indexacion(indexer: GraphRAGIndexer) -> None:
 
     precio = PRICING[MODEL]
     costo = indexer.tokens_in / 1e6 * precio["in"] + indexer.tokens_out / 1e6 * precio["out"]
-    print(f"Llamadas a la API:  {indexer.api_calls}")
-    print(f"Tokens in/out:      {indexer.tokens_in:,} / {indexer.tokens_out:,}")
-    print(f"Costo total:        ${costo:.4f}")
+    hist_in, hist_out = indexer.historical_tokens
+    print(f"Llamadas en esta corrida:     {indexer.api_calls}")
+    print(f"Tokens actuales in/out:       {indexer.tokens_in:,} / {indexer.tokens_out:,}")
+    print(f"Costo de esta corrida:        ${costo:.4f}")
+    print(f"Tokens históricos del caché:  {hist_in:,} / {hist_out:,}")
+    print(f"Costo histórico persistido:   ${indexer.historical_cost_usd:.4f}")
     print(
-        "\nSobre 37 normas esto es centavos. La cita real: indexar un dataset legal\n"
-        "de 5 GB con GraphRAG costó USD 33.000 en tokens de LLM en 2024 (entity\n"
-        "extraction + relationship extraction + resúmenes jerárquicos de\n"
-        "comunidad, pasando el corpus completo por el LLM varias veces). Para\n"
-        "mediados de 2025, Microsoft Research había bajado ese costo al 0,1% de la\n"
-        "cifra original (LazyGraphRAG, selección dinámica de comunidades) — la\n"
-        "ola de optimización 2024-2026 ataca exactamente este problema.\n"
-        "\nLa escala es lo que decide, no el método: a 37 normas la indexación es\n"
-        "gratis; a 5 GB de expedientes legales, es un proyecto de infraestructura."
+        "\nEn este corpus pequeño el costo medido es de centavos. No se extrapola\n"
+        "a un supuesto dataset legal de 5 GB: la auditoría no encontró una fuente\n"
+        "primaria que confirmara conjuntamente dominio, tamaño y costo. La escala\n"
+        "sigue siendo una consideración de diseño, pero acá solo se publica lo\n"
+        "que este experimento reproduce."
     )
 
 
@@ -179,9 +185,17 @@ def grafico_comunidades(g) -> None:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--allow-api", action="store_true")
+    args = parser.parse_args()
     log.info(f"Indexación estilo GraphRAG con {MODEL} (caché en {CACHE_PATH.name}).")
     g, normas, relaciones = cargar_grafo()
-    indexer = GraphRAGIndexer(model=MODEL, cache_path=CACHE_PATH)
+    indexer = GraphRAGIndexer(
+        model=MODEL,
+        cache_path=CACHE_PATH,
+        allow_api=args.allow_api,
+        max_api_calls=len(comunidades_del_grafo(g)),
+    )
     demo_indexacion_graphrag(g, normas, relaciones, indexer)
     demo_costo_indexacion(indexer)
     demo_costo_competency_questions(g)

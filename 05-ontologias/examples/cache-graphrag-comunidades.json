@@ -1,54 +1,105 @@
 {
-  "44e95659ec3efd5e98b827301d79d67ee155d2dd": {
-    "tema": "Normativa sobre Compras Públicas y Contratación en Chile",
-    "resumen": "Este grupo de normas se centra en la regulación de las compras públicas en Chile, abarcando desde la Ley Nº 19.886 sobre contratos administrativos hasta su modernización mediante la Ley Nº 21.634. Incluye directrices sobre la compra ágil y aspectos presupuestarios relacionados con el Ministerio del Interior y el Ministerio de Obras Públicas, así como resoluciones y dictámenes que orientan la aplicación de estas normativas."
-  },
-  "dfcfb7b7b5a0a9e487bcb6da235ca3b68a5e69b4": {
-    "tema": "Regulación del Lobby y la Gestión de Intereses en Chile",
-    "resumen": "Este grupo de normas se centra en la regulación del lobby y las gestiones de intereses particulares en Chile, estableciendo un marco legal a través de la Ley Nº 20.730 y su respectivo reglamento. Además, incluye disposiciones sobre el registro de lobbistas y la agenda pública, promoviendo la transparencia en las interacciones entre el sector público y los intereses privados."
-  },
-  "b371d502fd94bcdbcae3a6412c8a64f59998c6aa": {
-    "tema": "Probidad en la Función Pública y Prevención de Conflictos de Intereses",
-    "resumen": "Este grupo de normas se centra en la regulación de la probidad en la función pública en Chile, estableciendo principios y procedimientos para prevenir conflictos de intereses. El Decreto Supremo Nº 2 de 2016 actúa como reglamento de la Ley Nº 20.880, detallando las disposiciones necesarias para asegurar la transparencia y la ética en el ejercicio de funciones públicas."
-  },
-  "941775aec9a3641557fec5bd857a9979857876b8": {
-    "tema": "Educación Pública y Subvención Escolar Preferencial en Chile",
-    "resumen": "Este grupo de normas regula el funcionamiento y traspaso de recursos en el Sistema de Educación Pública en Chile, incluyendo la Subvención Escolar Preferencial (SEP) y su uso en servicios locales de educación. Se establecen las bases administrativas y reglamentarias para la gestión de estos recursos, así como los procedimientos de traspaso y uso de saldos de SEP."
-  },
-  "77b2c14b0078893ff888cf2fa241a5a1e3d9e6c8": {
-    "tema": "Exenciones y créditos fiscales en el sector de la construcción",
-    "resumen": "Este grupo de normas aborda las exenciones de IVA aplicables a ciertas actividades económicas, específicamente en el contexto de la construcción, así como el establecimiento de un crédito especial para empresas constructoras. Las circulares proporcionan directrices sobre cómo estas disposiciones se interrelacionan y afectan a las empresas del sector."
-  },
-  "38bc5aad28cc555e0273e85a09cfff50f62714c8": {
-    "tema": "Normativa Tributaria en Chile",
-    "resumen": "Este grupo de normas aborda la legislación tributaria en Chile, incluyendo el Impuesto a la Renta y el IVA, así como disposiciones específicas para el régimen Pro Pyme y el tratamiento de servicios digitales. Se destaca la modernización de la legislación tributaria a través de la Ley Nº 21.210 y su impacto en la regulación de plataformas de intermediación y la facturación electrónica."
-  },
-  "1f988ca1dcfddaafefccd53c8e79e28c2f3bbaf2": {
-    "tema": "Presupuesto del Ministerio de Salud 2024",
-    "resumen": "Este grupo de normas se centra en la regulación y ejecución del presupuesto del Ministerio de Salud para el año 2024, incluyendo la Ley de Presupuestos del Sector Público, la modificación del presupuesto a través de un decreto, y la ejecución presupuestaria trimestral a través de un oficio circular. Estas normas establecen las bases y procedimientos para la gestión financiera del sector salud en el contexto del presupuesto nacional."
-  },
-  "7b17f824499cad6be4f9afb5ae0476fa2e4aebc7": {
-    "tema": "Normativa sobre Compras Públicas y Presupuestos en Chile",
-    "resumen": "Este grupo de normas regula el marco legal y administrativo de las compras públicas en Chile, destacando la Ley Nº 19.886 y su modernización a través de la Ley Nº 21.634, así como el reglamento correspondiente. Además, incluye directrices sobre la contratación ágil y aspectos presupuestarios relacionados con los Ministerios del Interior y de Obras Públicas para el año 2024."
-  },
-  "0e779aec088082fc313ef3fbb84172691963fe1e": {
-    "tema": "Regulación del Lobby y la Gestión de Intereses en Chile",
-    "resumen": "Este grupo de normas se centra en la regulación del lobby y las gestiones de intereses particulares en Chile, estableciendo un marco legal que incluye la Ley Nº 20.730, su reglamento a través del Decreto Supremo Nº 71, y la creación de un registro de lobbistas mediante la Resolución Exenta Nº 218. Juntas, estas normas buscan promover la transparencia y la ética en las interacciones entre el sector público y los intereses privados."
-  },
-  "4d27f022727292410d63dd5759c5a888a1450bc1": {
-    "tema": "Probidad y Conflictos de Intereses en la Función Pública",
-    "resumen": "Este grupo de normas se centra en la regulación de la probidad en la función pública y la prevención de conflictos de intereses, estableciendo principios y procedimientos para asegurar la transparencia y la ética en el ejercicio de cargos públicos. La Ley Nº 20.880 establece los lineamientos generales, mientras que el Decreto Supremo Nº 2 de 2016 proporciona el reglamento específico para su implementación."
-  },
-  "19a778cd8acf2773ecffda4c673ba5f0acfbd157": {
-    "tema": "Educación Pública y Subvenciones en Chile",
-    "resumen": "Este grupo de normas regula el traspaso de la gestión educativa a los Servicios Locales de Educación Pública, estableciendo un marco normativo para la creación del Sistema de Educación Pública en Chile. Incluye disposiciones sobre la Subvención Escolar Preferencial (SEP) y su uso, así como los procedimientos administrativos relacionados con la administración del Estado en el contexto educativo."
-  },
-  "0ccf4f57a5d8fd28d2e7c8a7707a3891de1f1727": {
-    "tema": "Normativa Tributaria en Chile",
-    "resumen": "Este grupo de normas aborda la modernización de la legislación tributaria en Chile, incluyendo la regulación de documentos tributarios electrónicos, el régimen Pro Pyme, y el tratamiento de servicios digitales. Se relaciona con la aplicación de impuestos a la renta y al valor agregado (IVA), así como con las tasas impositivas correspondientes para el año tributario 2024."
-  },
-  "d591ab0442ea43ca45e756fd038b9727eaedcbbb": {
-    "tema": "Presupuesto del Sector Público y Salud 2024",
-    "resumen": "Este grupo de normas se centra en la Ley de Presupuestos del Sector Público para el año 2024, específicamente en la ejecución y modificación del presupuesto asignado al Ministerio de Salud. Incluye directrices sobre la ejecución presupuestaria trimestral y ajustes necesarios en la partida correspondiente a salud."
+  "format_version": 2,
+  "entries": {
+    "07e4e0b6810db35ad8620959c636b3f123988d8101c8b11f3d7f3927ab821839": {
+      "response": {
+        "tema": "Normativa sobre educación y subvenciones en Chile",
+        "resumen": "Este grupo de normas se centra en la regulación de la Subvención Escolar Preferencial (SEP) y su implementación en el contexto del Sistema de Educación Pública, incluyendo aspectos relacionados con el traspaso a Servicios Locales de Educación Pública y el uso de recursos asignados. Además, se abordan aspectos presupuestarios y dictámenes de la Contraloría que orientan el uso de estos recursos en el ámbito educativo."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "resumen-comunidad-v1",
+      "schema_version": "resumen-comunidad-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "3a894888defa1f117c0440bec86dec97e50ca469638b2cd8ea6db6fcc23e6b87",
+      "tokens_input": 766,
+      "tokens_output": 102,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001761,
+      "replica": 0
+    },
+    "09976ec638451a6942de935d6089ba63aed9c10118a027573a0e167bbb3998c4": {
+      "response": {
+        "tema": "Presupuesto del Sector Salud 2024 en Chile",
+        "resumen": "Este grupo de normas regula la modificación y ejecución del presupuesto del Ministerio de Salud para el año 2024, incluyendo el Decreto Nº 1.187 que modifica la partida correspondiente, así como la Ley Nº 21.640 que establece el presupuesto del sector público. Además, se incluye un Oficio Circular que detalla la ejecución presupuestaria trimestral, asegurando el seguimiento y control de los recursos asignados."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "resumen-comunidad-v1",
+      "schema_version": "resumen-comunidad-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "ffdad1cd51136974600abe46792f70cd5420c27a08c773f567717868af072298",
+      "tokens_input": 431,
+      "tokens_output": 102,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00012585,
+      "replica": 0
+    },
+    "1e864e3d17a6ea2f6fb00e7deadf2785d38356811f230263b6a323fa2c14446f": {
+      "response": {
+        "tema": "Normativa sobre Compras Públicas y Presupuestos en Chile",
+        "resumen": "Este grupo de normas regula el marco legal y reglamentario de las compras públicas en Chile, incluyendo la Ley Nº 19.886 sobre contratos administrativos y su modernización a través de la Ley Nº 21.634. Además, se abordan aspectos relacionados con la ejecución presupuestaria del Ministerio de Obras Públicas y del Ministerio del Interior para el año 2024, así como directrices específicas para la contratación ágil y el manejo de emergencias."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "resumen-comunidad-v1",
+      "schema_version": "resumen-comunidad-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8f5cd2d09be9d81b475806e0bb98feced737afa26aa619876c7e4ec84793a1d5",
+      "tokens_input": 827,
+      "tokens_output": 112,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00019125000000000001,
+      "replica": 0
+    },
+    "46febe9203aacb460065b78b579c88d4f4f5d16e84d35702a8a18e8856898ac8": {
+      "response": {
+        "tema": "Regulación del Lobby y la Probidad en la Función Pública en Chile",
+        "resumen": "Este grupo de normas aborda la regulación del lobby y las gestiones de intereses particulares, estableciendo principios de probidad en la función pública y mecanismos para prevenir conflictos de interés. Incluye reglamentos específicos que detallan la aplicación de estas leyes, así como la creación de un registro de lobbistas para promover la transparencia en las interacciones entre el sector público y privado."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "resumen-comunidad-v1",
+      "schema_version": "resumen-comunidad-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "381674b5efd7832b21aee1408a822c6841983e196247f8b610ae7b865c7a95fa",
+      "tokens_input": 554,
+      "tokens_output": 98,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00014189999999999998,
+      "replica": 0
+    },
+    "c3c2e4eee3aa6c62ec81296c75551344f7cef3cd002b5b76849889c19a6dc247": {
+      "response": {
+        "tema": "Normativa tributaria en Chile",
+        "resumen": "Este grupo de normas aborda diversos aspectos de la legislación tributaria chilena, incluyendo el IVA a servicios digitales, el régimen Pro Pyme, y las exenciones de IVA. Además, se relaciona con la modernización de la legislación tributaria y el tratamiento de plataformas de intermediación, regulando aspectos como los documentos tributarios electrónicos y las tasas de impuesto a la renta."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "resumen-comunidad-v1",
+      "schema_version": "resumen-comunidad-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "a9e66341ce235ca7ed0c4ee60fb01104bb59d2c97eb6a018cfb1feb865478b41",
+      "tokens_input": 1174,
+      "tokens_output": 90,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00023009999999999998,
+      "replica": 0
+    }
   }
 }
