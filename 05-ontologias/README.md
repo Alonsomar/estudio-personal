@@ -30,7 +30,7 @@ este módulo.
 | 04 | Identidad y llaves canónicas                  | [theory/04-identidad-y-llaves.md](theory/04-identidad-y-llaves.md) | [code/04-identidad-y-llaves.py](code/04-identidad-y-llaves.py) | Terminado |
 | 05 | Extraer la ontología del corpus               | [theory/05-extraccion-llm.md](theory/05-extraccion-llm.md) | [code/05-extraccion-llm.py](code/05-extraccion-llm.py) | Terminado |
 | 06 | Vigencia temporal y versionado normativo      | [theory/06-vigencia-temporal.md](theory/06-vigencia-temporal.md) | [code/06-vigencia-temporal.py](code/06-vigencia-temporal.py) | Terminado |
-| 07 | Del grafo al retrieval: GraphRAG y su economía | — | — | Pendiente |
+| 07 | Del grafo al retrieval: GraphRAG y su economía | [theory/07-graphrag-economia.md](theory/07-graphrag-economia.md) | [code/07-graphrag-economia.py](code/07-graphrag-economia.py) | Terminado |
 | 08 | Evaluar un sistema con ontología              | — | — | Pendiente |
 | 09 | La ontología como foso competitivo            | — | — | Pendiente |
 
@@ -73,7 +73,10 @@ justificado por un falso positivo real y medido; §5 sumó `LLMExtractor`
 `resolver_identificador_norma` (pipeline de tres niveles); §6 sumó
 `ModificacionArticulo`, `texto_vigente` y `que_sabia_el_sistema` — vigencia
 a nivel de artículo y bitemporalidad (vigencia legal vs. fecha de registro,
-esta última tomada de commits reales de git).
+esta última tomada de commits reales de git); §7 sumó `comunidades_del_grafo`
+(Louvain) y `GraphRAGIndexer` (structured output, caché en disco) — réplica
+minimalista del paso de indexación de GraphRAG para medir su costo real
+sobre este corpus.
 
 ## Datos
 
@@ -81,5 +84,6 @@ esta última tomada de commits reales de git).
 - Golden de retrieval (§8, sin modificar): `02-retrieval/examples/golden-retrieval.json`.
 - Verdad fundamental (§2, usada como referencia en §5): [examples/relaciones-manual.json](examples/relaciones-manual.json).
 - Caché de extracción LLM (§5): `examples/cache-extraccion-llm.json` — con caché poblada, el script corre sin API key.
+- Caché de resúmenes de comunidad (§7): `examples/cache-graphrag-comunidades.json`.
 
 Ver [AGENTS.md](../AGENTS.md) para convenciones completas.

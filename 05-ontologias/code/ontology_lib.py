@@ -18,6 +18,9 @@ Acumula los componentes que las secciones introducen:
   §6  Vigencia a nivel de artículo y bitemporalidad (ModificacionArticulo,
       texto_vigente, que_sabia_el_sistema): retoma el límite "documento
       reemplaza documento" que 02 §9 dejó abierto.
+  §7  GraphRAG y su economía: comunidades_del_grafo (Louvain) +
+      GraphRAGIndexer, réplica minimalista del paso de indexación de
+      GraphRAG para medir su costo real sobre este corpus.
 
 Diseño: un property graph con `networkx` + esquema Pydantic, sin base de
 grafos dedicada ni razonador OWL (decisión justificada en §3). Mismo patrón
@@ -794,3 +797,106 @@ def que_sabia_el_sistema(
     ahora (exactamente el caso de este corpus, construido de una vez en
     2026 sobre normas de 1974 en adelante)."""
     return [m for m in modificaciones if m.registrado_el <= fecha_corte]
+
+
+# --------------------------------------------------------------------------- #
+# §7 GraphRAG y su economía. Réplica minimalista del paso de indexación de
+# GraphRAG (Microsoft, 2024): detectar comunidades del grafo y resumir cada
+# una con un LLM, ANTES de responder ninguna consulta. Mide el costo real
+# sobre este corpus, en vez de describirlo en abstracto.
+# --------------------------------------------------------------------------- #
+def comunidades_del_grafo(g: nx.DiGraph, seed: int = 7) -> list[set[str]]:
+    """Detecta comunidades con Louvain sobre la versión NO dirigida del
+    grafo (estándar en detección de comunidades: la dirección de MODIFICA
+    vs CITA no importa para agrupar, solo la densidad de conexión)."""
+    return [set(c) for c in nx.community.louvain_communities(g.to_undirected(), seed=seed)]
+
+
+class ResumenComunidad(BaseModel):
+    """La salida del paso de indexación de GraphRAG: un resumen en
+    lenguaje natural de qué trata un grupo de normas conectadas."""
+
+    tema: str
+    resumen: str
+
+
+_PROMPT_RESUMEN_COMUNIDAD = """\
+Eres un analista jurídico. A continuación tienes un grupo de normas \
+chilenas conectadas entre sí (mismo "vecindario" tematico en un grafo de \
+citas). Resume en 2-3 frases de que trata este grupo en su conjunto, \
+como lo haria un indice tematico.
+
+NORMAS DEL GRUPO:
+{normas}
+
+RELACIONES DENTRO DEL GRUPO:
+{relaciones}
+"""
+
+
+class GraphRAGIndexer:
+    """Replica minimalista del paso de indexacion de GraphRAG: un resumen
+    por comunidad, con LLM y cache en disco -- mismo patron que
+    `LLMExtractor` (S5). Existe para MEDIR el costo de ese paso sobre este
+    corpus, no para usarlo en produccion."""
+
+    def __init__(self, model: str = "gpt-4o-mini", cache_path: Path | None = None) -> None:
+        self.model = model
+        self.cache_path = Path(cache_path) if cache_path else None
+        self._cache: dict[str, dict] = {}
+        self.api_calls = 0
+        self.tokens_in = 0
+        self.tokens_out = 0
+        self._load()
+
+    def _load(self) -> None:
+        import json as _json
+
+        if self.cache_path and self.cache_path.exists():
+            self._cache = _json.loads(self.cache_path.read_text(encoding="utf-8"))
+
+    def _save(self) -> None:
+        import json as _json
+
+        if not self.cache_path:
+            return
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        self.cache_path.write_text(
+            _json.dumps(self._cache, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    def resumir_comunidad(
+        self, normas: list[Norma], relaciones: list[RelacionNormativa]
+    ) -> ResumenComunidad:
+        import hashlib
+
+        texto_normas = "\n".join(f"- {n.identificador}: {n.titulo}" for n in normas)
+        texto_relaciones = "\n".join(
+            f"- {r.origen} --[{r.tipo.value}]--> {r.destino}" for r in relaciones
+        ) or "(ninguna relacion interna al grupo)"
+        prompt = _PROMPT_RESUMEN_COMUNIDAD.format(normas=texto_normas, relaciones=texto_relaciones)
+
+        k = hashlib.sha1(f"{self.model}\n{prompt}".encode("utf-8")).hexdigest()
+        if k in self._cache:
+            return ResumenComunidad.model_validate(self._cache[k])
+
+        from dotenv import load_dotenv
+
+        load_dotenv()
+        from openai import OpenAI
+
+        client = OpenAI()
+        resp = client.chat.completions.parse(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            response_format=ResumenComunidad,
+            temperature=0.0,
+        )
+        resultado = resp.choices[0].message.parsed
+        if resp.usage:
+            self.tokens_in += resp.usage.prompt_tokens
+            self.tokens_out += resp.usage.completion_tokens
+        self.api_calls += 1
+        self._cache[k] = resultado.model_dump(mode="json")
+        self._save()
+        return resultado
