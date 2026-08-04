@@ -61,24 +61,29 @@ class GraphExpandedRetriever:
     dándole a los vecinos legítimos la oportunidad real de entrar al top-k
     que la primera versión les negaba por diseño."""
 
-    def __init__(self, base, grafo, tipos_expansion, n_semillas=3, profundidad=None):
+    def __init__(self, base, grafo, tipos_expansion, n_semillas=1, profundidad=None):
         self.base = base
         self.grafo = grafo
-        self.tipos_expansion = set(tipos_expansion)
+        self.tipos_expansion = list(tipos_expansion)
+        self.prioridad = {tipo: i for i, tipo in enumerate(self.tipos_expansion)}
         self.n_semillas = n_semillas
         self.profundidad = profundidad  # None = todo el corpus (ver search())
 
-    def _vecinos_fuertes(self, doc_id: str) -> set[str]:
+    def _vecinos_fuertes(self, doc_id: str, ranking_base: dict[str, int]) -> list[str]:
         if doc_id not in self.grafo:
-            return set()
-        vecinos: set[str] = set()
+            return []
+        candidatos: list[tuple[int, int, str]] = []
         for _, v, d in self.grafo.out_edges(doc_id, data=True):
             if d["tipo"] in self.tipos_expansion:
-                vecinos.add(v)
+                candidatos.append(
+                    (self.prioridad[d["tipo"]], ranking_base.get(v, 10**9), v)
+                )
         for u, _, d in self.grafo.in_edges(doc_id, data=True):
             if d["tipo"] in self.tipos_expansion:
-                vecinos.add(u)
-        return vecinos
+                candidatos.append(
+                    (self.prioridad[d["tipo"]], ranking_base.get(u, 10**9), u)
+                )
+        return list(dict.fromkeys(doc_id for _, _, doc_id in sorted(candidatos)))
 
     def search(self, query: str, k: int = 5) -> list[ScoredDoc]:
         profundidad = self.profundidad or 200  # >> tamaño del corpus: ranking completo
@@ -92,9 +97,10 @@ class GraphExpandedRetriever:
                 orden.append(r.chunk.doc_id)
 
         semillas = orden[: self.n_semillas]
+        ranking_base = {doc_id: i for i, doc_id in enumerate(orden)}
         vecinos_promovidos: list[str] = []
         for s in semillas:
-            for v in self._vecinos_fuertes(s):
+            for v in self._vecinos_fuertes(s, ranking_base):
                 if v in por_doc and v not in semillas and v not in vecinos_promovidos:
                     vecinos_promovidos.append(v)
 
@@ -121,10 +127,10 @@ def demo_cobertura_y_consistencia(normas, relaciones) -> None:
     print(f"Cobertura: {len(normas_ids & corpus_total)}/{len(corpus_total)} documentos = {cobertura:.1%}")
     print(f"Fuera de la ontología: {fuera}")
     print(
-        "\nLos tres documentos fuera son los distractores que B6 diseñó a propósito\n"
-        "(glosa-02, glosa-03, tabla-01 — sin relación normativa directa con los\n"
-        "clusters modelados). Cobertura del 92.5% sobre documentos RELEVANTES es\n"
-        "100%: nada quedó fuera que debiera estar dentro."
+        "\nLos dos documentos fuera son glosa-03 y tabla-01: el escáner de\n"
+        "identificadores no encuentra en ellos una mención resoluble a una norma\n"
+        "del catálogo. La cobertura se reporta como 38/40, sin redefinir el\n"
+        "denominador después de observar los datos."
     )
 
     import networkx as nx
@@ -138,11 +144,9 @@ def demo_cobertura_y_consistencia(normas, relaciones) -> None:
           "contexto temporal — sería circular.)" if not ciclos else f"  {ciclos}")
 
     print(
-        "\nPrecisión de entity linking: medida en §4 (organismos) y §5\n"
-        "(identificadores de norma) — no se repite acá. Resumen: 38% de precisión\n"
-        "en match exacto contra el ground truth curado, con el matiz ya\n"
-        "documentado de que ese número es una COTA INFERIOR (algunos 'falsos\n"
-        "positivos' eran hallazgos correctos que la curación manual no anotó)."
+        "\nLa precisión de entity linking se deriva en §5 de la corrida cacheada\n"
+        "contra la versión auditada del ground truth; no se copia aquí como un\n"
+        "número hardcodeado."
     )
 
 
@@ -169,7 +173,7 @@ def demo_benchmark_retrieval(grafo):
     resultados = {}
     for nombre, retr in sistemas.items():
         resultados[nombre] = evaluate_retriever(
-            retr, golden_chunk, queries_by_id, granularity="doc", k_values=(1, 3, 5)
+            retr, golden_chunk, queries_by_id, granularity="doc", k_values=(3, 5)
         )
 
     print(f"{'sistema':>48} | {'recall@3':>20} | {'recall@5':>20} | {'MRR':>20}")
