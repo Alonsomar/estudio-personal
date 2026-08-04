@@ -1,5 +1,9 @@
 # 00 — Plan Maestro: Ontologías y Representación del Conocimiento
 
+> Estado tras B13 (2026-08-04): implementado sobre 40 documentos, 38 nodos
+> normativos y 69 relaciones literales. §8 conserva las 30 queries de retrieval;
+> §9 usa un golden estructural separado de 18 preguntas × 3 réplicas.
+
 ## Objetivo de la masterclass
 
 Formalizar algo que el autor ya practica sin nombrarlo: clasificar el mundo
@@ -146,9 +150,9 @@ posicionamiento.
   razonador OWL para este corpus y esta escala.
 
 ### Sección 4 — Identidad y llaves canónicas
-- El problema de entity resolution, con ejemplos ya presentes en el corpus:
-  "DIPRES" y "Dirección de Presupuestos" son la misma entidad; "SII" y
-  "Servicio de Impuestos Internos" también; el RUT de un organismo es su
+- El problema de entity resolution, con ejemplos presentes en el corpus:
+  nombre completo, forma corta y `CHILECOMPRA` para la Dirección de Compras;
+  el RUT de un organismo es su
   llave canónica, nunca el nombre libre — la doctrina #6 del portfolio
   aplicada aquí con ejemplos concretos.
 - Es *record linkage*, técnica que el autor ya usa en trabajo de economía
@@ -226,15 +230,13 @@ posicionamiento.
   sobre el golden de retrieval, esa es la sección que lo dice, con la misma
   honestidad que `04 §4` tuvo con self-hosting.
 
-### Sección 9 — La ontología como foso competitivo
-- Por qué un modelo mejor no comoditiza esto: la ontología es curación y
-  estructura específica de dominio, no capacidad general del modelo. Un
-  laboratorio de frontera no va a construir el grafo de citas del corpus
-  regulatorio chileno.
-- Cierra el argumento transversal del repo (README, capa 2 de 4): la
-  ventaja competitiva vive en la intersección dominio × capacidad, y la
-  ontología es donde esa intersección se vuelve un activo versionable y no
-  solo una explicación en un README.
+### Sección 9 — Ontología curada y competency questions
+- Golden congelado de 18 preguntas: 8 de un salto, 7 multi-hop y 3 negativas.
+- Tres réplicas LLM por pregunta; métricas por réplica, promedio por pregunta y
+  bootstrap sobre 18 unidades.
+- El grafo compilado es una comprobación de consistencia, no un comparador
+  independiente. La conclusión se limita a una brecha de recuperación respecto
+  del conocimiento curado cuando el intervalo excluye cero.
 - Documento de governance / EU AI Act (criterio de aceptación `B9`): el
   puente ya señalado en `04 §3` — un fine-tuning sustancial puede
   reclasificar a un *deployer* como *provider*— se desarrolla acá, con las

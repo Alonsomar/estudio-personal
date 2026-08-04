@@ -43,8 +43,8 @@ graph LR
 | 0 | Higiene del repo | B1–B4 | ✅ Hecha (`ec94dea`) |
 | 1 | Cerrar 04-economia (re-especificado a 6 secciones) | B5 | ✅ Hecha |
 | 2 | Expandir corpus 16 → 40 documentos | B6 | ✅ Hecha |
-| 3 | 05-ontologias | B7 + B13 | ⚠️ Reabierta por auditoría |
-| 4 | 06-harness | B8 | Bloqueada por cierre de B13 |
+| 3 | 05-ontologias | B7 + B13 | ✅ Terminada |
+| 4 | 06-harness | B8 | Siguiente fase |
 
 ---
 
@@ -157,12 +157,11 @@ diferencias entre arquitecturas sean estadísticamente detectables, y un grafo s
       mueve (consistente con `02 §3`). Tabla completa en el README del corpus.
 - [x] `uv run pytest` sigue en verde (55 tests; no dependen del tamaño del corpus).
 
-### B7 · P0 · Masterclass 05 — Ontologías y representación del conocimiento — ⚠️ Reabierto por B13
+### B7 · P0 · Masterclass 05 — Ontologías y representación del conocimiento — ✅ Cerrado (2026-08-04, remediado por B13)
 
-Las 9 secciones están escritas, pero la auditoría posterior al cierre invalidó
-parte de la evidencia y de las cifras propagadas abajo. Este bloque conserva el
-resultado **histórico** del cierre `91eaebf`; B13 define el estado vigente y debe
-cerrarse antes de volver a marcar B7 como terminado.
+Las 9 secciones están escritas y la evidencia fue reconstruida por B13. Los
+resultados históricos del cierre `91eaebf` se conservan en la nota de auditoría;
+las cifras siguientes son las vigentes.
 
 **Encuadre:** una ontología es un sistema de clasificación formalizado. El
 clasificador presupuestario chileno (partida → capítulo → programa → subtítulo →
@@ -200,18 +199,13 @@ GraphRAG) del inventario temático.
       IC. Si el grafo no gana, **el resultado negativo se publica**.
 - [x] Documento sobre EU AI Act / governance dentro del módulo (ver B9).
 
-**Resultado principal (negativo en retrieval, positivo en estructura — y por eso
-útil):** el grafo normativo (37 normas, 47 relaciones curadas a mano) **no** mejora
-recall@3/@5 sobre `golden-retrieval.json` (`§8`, IC95% [0,0] exacto), ni siquiera en
-el subconjunto de queries multi-doc — porque "multi-doc" (la pregunta combina dos
-temas) y "multi-hop" (las fuentes están conectadas por citas) no son lo mismo, y el
-golden mide lo primero. Donde el grafo sí gana, medido en `§9`: la misma competency
-question que el grafo responde con 100% de precisión, un LLM con el corpus crudo en
-contexto (sin curación) la responde con 50% de recall. El foso no es la tecnología,
-es la curación de dominio (§1-§6) que la tecnología todavía no reemplaza sola —
-confirmado también por `§5`, donde la extracción automática necesitó un nivel de
-resolución de identidad específico del dominio (comparar por número de norma) para
-duplicar su recall.
+**Resultado vigente:** el grafo normativo tiene 38 normas y 69 relaciones
+literales. En §8, la expansión fuerte empata con BM25; expandir todas las
+relaciones reduce recall@3 y recall@5 en 0,033, con IC que incluye cero. El golden
+de retrieval no mide multi-hop. §9 usa un golden separado de 18 preguntas y tres
+réplicas: el LLM crudo obtiene F1 0,439 [0,289; 0,594] y el delta frente al
+conocimiento curado es −0,561 [−0,711; −0,406]. Se concluye una brecha detectable
+de recuperación en este benchmark, no un foso comercial demostrado.
 
 **Corrección de rumbo documentada (§4):** el ejemplo "DIPRES = Dirección de
 Presupuestos" del temario original no se pudo usar — verificado por grep, "DIPRES"
@@ -292,29 +286,27 @@ cambios de módulos terminados en un commit de otro módulo.
       cita su documento de teoría.
 - [ ] Añadir `ruff check` al job de CI para que no vuelva a acumularse.
 
-### B13 · P0 · Remediar auditoría posterior al cierre de 05-ontologias
+### B13 · P0 · Remediar auditoría posterior al cierre de 05-ontologias — ✅ Cerrado (2026-08-04)
 
 La auditoría independiente del commit de cierre `91eaebf` confirmó el núcleo de
 19 de 20 hallazgos y clasificó uno como mixto. El detalle, evidencia reproducible
 y estado de las correcciones locales está en
 [`05-ontologias/notes/01-auditoria-post-cierre.md`](05-ontologias/notes/01-auditoria-post-cierre.md).
 
-B7 conserva 9/9 secciones escritas, pero se reabre su cierre: el ground truth
-incompleto y varias degeneraciones experimentales vuelven obsoletos números y
-afirmaciones propagados entre §1–§9, el README del módulo y este backlog. Por la
-doctrina secuencial del repo, B8 no comienza hasta cerrar esta remediación.
+B7 conserva 9/9 secciones escritas y vuelve a estado terminado. B8 queda como
+siguiente fase.
 
-- [ ] Aprobar un plan de remediación que ordene dependencias entre corpus,
+- [x] Aprobar un plan de remediación que ordene dependencias entre corpus,
       ground truth, librería, experimentos y narrativa.
-- [ ] Integrar o ajustar las correcciones locales existentes sin perder sus
+- [x] Integrar o ajustar las correcciones locales existentes sin perder sus
       tests de regresión.
-- [ ] Recalcular todas las métricas afectadas desde artefactos reproducibles y
+- [x] Recalcular todas las métricas afectadas desde artefactos reproducibles y
       sin llamadas de red en tests.
-- [ ] Rediseñar §8 para que cada métrica pueda variar por construcción y agregar
+- [x] Rediseñar §8 para que cada métrica pueda variar por construcción y agregar
       un golden específico multi-hop si se mantiene esa conclusión.
-- [ ] Reemplazar el experimento `n=1` de §9 o rebajar explícitamente el alcance
+- [x] Reemplazar el experimento `n=1` de §9 o rebajar explícitamente el alcance
       de su conclusión; retirar el titular 100% vs. 50%.
-- [ ] Sincronizar teoría, scripts, diagramas, README y BACKLOG con los resultados
+- [x] Sincronizar teoría, scripts, diagramas, README y BACKLOG con los resultados
       finales; `uv run pytest` debe permanecer en verde.
 
 ---

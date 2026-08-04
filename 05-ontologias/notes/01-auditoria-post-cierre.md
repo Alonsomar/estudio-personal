@@ -124,3 +124,37 @@ honestos, retirar los titulares no demostrados y separar con claridad tres cosas
 
 La definición del plan completo de remediación queda fuera de esta auditoría y se
 registra como tarea separada en el backlog.
+
+## Resolución final B13
+
+La matriz anterior conserva el diagnóstico en el momento de la auditoría. El
+estado final, después de regenerar datos, cachés, experimentos y narrativa, es:
+
+| # | Resuelto por | Resultado |
+|---:|---|---|
+| 1 | `2ea2da5`, `bc0aac6` | Lobby–Probidad queda como arista literal; §5 ya no la llama implícita. |
+| 2 | `56a7995` | Vigencia 2020-06-01 documentada con fuente SII; vacancia de Ley 21.634 modelada. |
+| 3 | `d8b7024` | Una semilla y orden determinista; recall@3 puede cambiar. |
+| 4 | `02aff20` | Reemplazado `n=1` por 18 preguntas × 3 réplicas. |
+| 5 | `2ea2da5`, `b9dbe1b` | 69 fundamentos literales; test de cobertura de menciones. |
+| 6 | `2ea2da5`, `02aff20` | P4 se reconoce como un salto; multi-hop usa caminos reales congelados. |
+| 7 | `649469f` | Cinco comunidades estables entre hash seeds; caché v2 con uso histórico. |
+| 8 | `b9dbe1b` | Regex anclada al designador y casos borde cubiertos. |
+| 9 | `b9dbe1b`, `56a7995` | API tipada con `no_existe`, `original`, `modificado` y `derogado`. |
+| 10 | `a409640` | Búsqueda normalizada; variante duplicada retirada; ranking rotulado como stress test. |
+| 11 | `b9dbe1b`, `bc0aac6`, `649469f`, `02aff20` | Contrato común de caché, tokens, tarifa y costo histórico persistidos. |
+| 12 | `bc0aac6` | Ablación `usar_numero` ejecutable; gráfico derivado del caché. |
+| 13 | `b9dbe1b` | Cinco filas tabulares, monto en Subtítulo y reconciliación sin doble conteo. |
+| 14 | `b9dbe1b` | Contrato y tests declaran scoring por `(origen, tipo, destino)`. |
+| 15 | `bc0aac6` | Conteos se derivan de la corrida, no de identificadores hardcodeados. |
+| 16 | `bc0aac6` | Eliminada la frase “casi se duplicó”; se publican métricas regeneradas. |
+| 17 | `a409640` | Dos circulares y una resolución. |
+| 18 | `2ea2da5` | Numeración y narrativa de competency questions corregidas. |
+| 19 | `56a7995` | Cinco eventos totales descritos sin atribuirlos desde art. 14. |
+| 20 | `2ea2da5` | Conteos dinámicos: 38 normas / 69 relaciones. |
+
+Resultados finales: §8 empata con relaciones fuertes y empeora 0,033 en
+recall@3/@5 con todas las relaciones; §9 obtiene F1 LLM 0,439 y delta
+LLM−conocimiento curado −0,561, IC95% [−0,711; −0,406]. Las 69 llamadas de
+regeneración costaron históricamente cerca de USD 0,217 y las corridas offline
+posteriores hicieron cero llamadas.
