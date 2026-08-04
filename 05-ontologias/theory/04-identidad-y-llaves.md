@@ -110,7 +110,8 @@ Buscando la mejor coincidencia difusa para: 'Dirección de Compras y Contrataci�
 ![Similitud difusa: el vecino equivocado gana](../diagrams/riesgo-similitud-difusa.png)
 
 **"Dirección de Educación Pública" queda más cerca, por similitud de
-caracteres, que la respuesta correcta.** Los nombres institucionales
+caracteres, que la respuesta correcta.** Es un *stress test* controlado con
+nombres reales, no un fallo observado del pipeline de producción. Los nombres institucionales
 chilenos comparten estructura —"Dirección de X Pública/Nacional"— que la
 similitud léxica no distingue de la identidad real. Este no es un caso
 patológico construido para asustar: es el primer resultado que salió de
@@ -125,7 +126,7 @@ públicas del corpus.
 
 ## Lo que ningún nivel resuelve solo: la anáfora
 
-Tres circulares del corpus usan la frase **"este Servicio"** para referirse
+Dos circulares y una resolución del corpus usan la frase **"este Servicio"** para referirse
 al organismo que las emite:
 
 ```

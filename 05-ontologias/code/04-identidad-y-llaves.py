@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from ontology_lib import (  # noqa: E402
     catalogo_organismos_corpus,
+    normalizar_nombre,
     resolver_organismo,
     resolver_organismo_difuso,
 )
@@ -42,12 +43,17 @@ def demo_el_problema() -> None:
         "para EL MISMO organismo (la Dirección de Compras y Contratación Pública):\n"
     )
     formas = [
-        ("Dirección de Compras y Contratación Pública", "ley-03, ley-04 (forma completa, primera mención)"),
-        ("Dirección de Compras", "ley-03, decreto-03, resolucion-01 (forma corta, menciones posteriores)"),
-        ("CHILECOMPRA", "resolucion-01 (nombre de marca, encabezado institucional)"),
+        "Dirección de Compras y Contratación Pública",
+        "Dirección de Compras",
+        "CHILECOMPRA",
     ]
-    for forma, donde in formas:
-        print(f"  '{forma}'\n      -> {donde}")
+    for forma in formas:
+        docs = []
+        buscada = normalizar_nombre(forma)
+        for path in sorted(CORPUS_DIR.glob("*.txt")):
+            if buscada in normalizar_nombre(path.read_text(encoding="utf-8")):
+                docs.append(path.name)
+        print(f"  '{forma}'\n      -> {', '.join(docs)}")
 
     print(
         "\nSin resolución, un grafo construido por coincidencia literal de string\n"
@@ -103,7 +109,7 @@ def demo_nivel_2_difuso_y_su_riesgo() -> None:
 
     print(
         "\nAcá el fallback rescata un caso legítimo que el diccionario no cubría.\n"
-        "Pero el mismo mecanismo tiene un modo de falla real, no hipotético:"
+        "Pero el mismo mecanismo tiene un modo de falla en un escenario controlado:"
     )
 
     import difflib
@@ -126,7 +132,9 @@ def demo_nivel_2_difuso_y_su_riesgo() -> None:
 
     print(
         "\n'Dirección de Educación Pública' queda MÁS cerca por similitud de\n"
-        "secuencia que 'Dirección de Compras' — la respuesta correcta. Los\n"
+        "secuencia que 'Dirección de Compras' — la respuesta correcta del stress\n"
+        "test. Estos nombres son candidatos reales, pero esta lista no reproduce\n"
+        "un incidente observado en el pipeline de producción. Los\n"
         "nombres institucionales chilenos comparten estructura ('Dirección de\n"
         "X Pública/Nacional') que la similitud de caracteres no distingue de la\n"
         "identidad real. Es la razón concreta, medida, por la que el pipeline\n"
@@ -140,7 +148,8 @@ def demo_contexto_documental() -> None:
     seccion("4. Lo que ni el diccionario ni la similitud resuelven: anáfora")
 
     print(
-        "Tres circulares del corpus usan la frase 'este Servicio' para referirse\n"
+        "Dos circulares y una resolución del corpus usan la frase 'este Servicio'\n"
+        "para referirse\n"
         "al organismo que las emite:\n"
     )
     casos = [
