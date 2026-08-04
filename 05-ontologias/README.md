@@ -31,7 +31,7 @@ este módulo.
 | 05 | Extraer la ontología del corpus               | [theory/05-extraccion-llm.md](theory/05-extraccion-llm.md) | [code/05-extraccion-llm.py](code/05-extraccion-llm.py) | Terminado |
 | 06 | Vigencia temporal y versionado normativo      | [theory/06-vigencia-temporal.md](theory/06-vigencia-temporal.md) | [code/06-vigencia-temporal.py](code/06-vigencia-temporal.py) | Terminado |
 | 07 | Del grafo al retrieval: GraphRAG y su economía | [theory/07-graphrag-economia.md](theory/07-graphrag-economia.md) | [code/07-graphrag-economia.py](code/07-graphrag-economia.py) | Terminado |
-| 08 | Evaluar un sistema con ontología              | — | — | Pendiente |
+| 08 | Evaluar un sistema con ontología              | [theory/08-evaluar-con-ontologia.md](theory/08-evaluar-con-ontologia.md) | [code/08-evaluar-con-ontologia.py](code/08-evaluar-con-ontologia.py) | Terminado |
 | 09 | La ontología como foso competitivo            | — | — | Pendiente |
 
 ## Nota de método
@@ -76,7 +76,13 @@ a nivel de artículo y bitemporalidad (vigencia legal vs. fecha de registro,
 esta última tomada de commits reales de git); §7 sumó `comunidades_del_grafo`
 (Louvain) y `GraphRAGIndexer` (structured output, caché en disco) — réplica
 minimalista del paso de indexación de GraphRAG para medir su costo real
-sobre este corpus.
+sobre este corpus. §8 no sumó componentes nuevos a `ontology_lib.py`:
+reutiliza todo lo anterior y agrega `GraphExpandedRetriever` en el propio
+script de demo, sometiendo el grafo a `golden-retrieval.json` con el
+aparato de `01 §8`. **Resultado negativo, publicado igual**: recall@3/@5
+sin diferencia contra BM25 solo, incluso en el subconjunto de queries
+multi-doc — el golden mide QA general, no QA multi-hop de citación, y esa
+es la distinción exacta que `§7` había anticipado con evidencia externa.
 
 ## Datos
 
