@@ -61,7 +61,7 @@ salieron seis relaciones:
 
 > **Nota honesta:** `DEROGA` está en el esquema porque es una relación real
 > del dominio (una ley puede derogar a otra completa o parcialmente), pero
-> **no aparece en las 47 relaciones curadas de este corpus** — ninguno de
+> **no aparece en las 69 relaciones curadas de este corpus** — ninguno de
 > los 40 documentos deroga a otro. Se mantiene en el vocabulario porque
 > excluirla sería sobre-ajustar el esquema a los datos disponibles en vez
 > de al dominio que representan.
@@ -70,16 +70,16 @@ salieron seis relaciones:
 
 Colapsar las seis relaciones en una sola ("se relaciona con") es la
 simplificación obvia, y es exactamente la que pierde lo que le importa al
-dominio. Contadas sobre las 47 relaciones curadas:
+dominio. Contadas sobre las 69 relaciones curadas:
 
 ```
     relación | ocurrencias | ejemplo verificado
 ------------------------------------------------------------------------------------------
-        cita |          33 | oficio --[cita]--> ley
+        cita |          54 | oficio --[cita]--> ley
   reglamenta |           6 | decreto --[reglamenta]--> ley
     modifica |           4 | decreto --[modifica]--> glosa
       aplica |           3 | oficio --[aplica]--> ley
-  interpreta |           1 | circular --[interpreta]--> ley
+  interpreta |           2 | circular --[interpreta]--> ley
 ```
 
 `CITA` domina en volumen —es la relación "débil", sin implicancia sobre
@@ -127,23 +127,33 @@ La pregunta inversa a P1, resuelta invirtiendo la dirección del recorrido
     <- decreto-03-reglamento-compras-publicas.txt
 ```
 
-**P4 — Transitividad sin límite de saltos: ¿qué depende de la SEP (Ley
-20.248)?**
+**P4 — ¿Qué documentos se relacionan directamente con la SEP (Ley 20.248)?**
 
 ```
     <- decreto-01-subvencion-escolar.txt
     <- decreto-06-reglamento-servicios-locales.txt
     <- do-01-extracto-decreto-aranceles.txt
+    <- glosa-02-presupuesto-educacion.txt
     <- ley-09-ley-21040-educacion-publica.txt
     <- oficio-01-contraloria-subvenciones.txt
     <- oficio-05-contraloria-traspaso-slep.txt
 ```
 
-Seis documentos, algunos a **varios saltos** de distancia: `oficio-05`
-depende de `decreto-06`, que depende de `ley-09`, que cita a `ley-08` (la
-SEP). Un filtro de metadatos de una sola columna no expresa esto sin una
-consulta recursiva ad-hoc — es precisamente la comparación que `§7` va a
-formalizar entre el grafo y `02 §7`.
+Los siete documentos tienen una arista **directa** hacia `ley-08`. La
+versión inicial presentó `oficio-05` como caso multi-hop porque su cita
+directa a la Ley 20.248 no estaba anotada. Corregir el ground truth elimina
+el supuesto recorrido de dos-tres saltos: P4 demuestra el valor de una
+consulta estructurada, pero no el de la transitividad.
+
+El grafo corregido sí contiene rutas multi-hop genuinas. Por ejemplo:
+
+```text
+decreto-04 -> ley-06 -> ley-03 -> ley-07
+```
+
+La modificación presupuestaria cita la Ley de Presupuestos; esta cita la
+Ley de Compras; y esta última cita la Ley 18.575. `§8` evalúa esta clase de
+pregunta con un golden estructural separado, sin reutilizar P4 como prueba.
 
 ## Por qué un solo tipo de relación no alcanza (el caso completo)
 
@@ -152,21 +162,14 @@ documentos que dependen del DL 825 usando solo `CITA` contra usarlo junto
 con `MODIFICA`:
 
 ```
-Documentos que CITAN al DL 825, sin contar MODIFICA: 3
-  -> circular-05, do-01, oficio-03
+Documentos que CITAN al DL 825, directa o transitivamente: 9
 
-Documentos que citan O modifican, en cualquier número de saltos: 5
-  -> circular-05, do-01, ley-02, oficio-03, tabla-02
+Documentos que citan O modifican, en cualquier número de saltos: 10
 ```
 
-La diferencia son **dos** documentos, y por dos razones distintas que vale
-la pena distinguir:
-
-- **`ley-02` es directa**: modifica al DL 825, no solo lo menciona.
-- **`tabla-02` es transitiva**: no cita al DL 825 en absoluto — cita a la
-  Ley 21.210, que sí lo modifica. El camino de dos saltos
-  (`tabla-02 --cita--> ley-02 --modifica--> ley-01`) solo existe si el
-  subgrafo incluye ambos tipos de relación.
+La diferencia es **`ley-02`**: modifica al DL 825, no solo lo menciona. El
+resto llega por `CITA` directa o transitiva; la versión inicial subcontaba
+esas citas por la incompletitud del ground truth.
 
 Un grafo con una sola relación genérica puede contar cuántos documentos
 *mencionan* al DL 825. No puede separar "lo menciona" de "depende de un
@@ -180,25 +183,24 @@ Tres clases, siguiendo el patrón ya establecido en el repo (`Chunk` en
 
 - **`Norma`**: identidad mínima (id, tipo, identificador oficial, título).
 - **`RelacionNormativa`**: una arista tipada con **fundamento textual
-  obligatorio** — no es adorno, es lo que permite auditar cada relación
-  contra la fuente (trazabilidad, doctrina del portfolio) y lo que `§5` usa
-  para medir si el extractor automático acertó no solo el tipo de relación
-  sino el artículo correcto.
+  obligatorio** — una cita literal que permite auditarla contra la fuente.
+  `§5` puntúa `(origen, tipo, destino)`; el fundamento se revisa como
+  trazabilidad, no como parte de esa métrica.
 - **`TipoRelacion`**: el enum de seis valores de la tabla de arriba.
 
 ## La verdad fundamental que este módulo deja construida
 
-Las 47 relaciones de esta sección no son solo una demo: son **curadas a
+Las 69 relaciones de esta sección no son solo una demo: son **curadas a
 mano por lectura directa del texto**, cada una con su fundamento citado, y
 quedan guardadas en `examples/relaciones-manual.json` con ese propósito
 explícito. `§5` va a extraer relaciones automáticamente con un LLM sobre el
 corpus completo; este conjunto es la vara con la que se va a medir si esa
 extracción acierta.
 
-Cobertura: 37 de 40 documentos del corpus. Los tres que faltan
-(`glosa-02`, `glosa-03`, `tabla-01`) son los distractores que `B6` diseñó a
-propósito — sin relación normativa directa con los clusters modelados, y
-por lo tanto correctamente ausentes de esta ontología.
+Cobertura: 38 de 40 documentos del corpus. Quedan fuera `glosa-03` y
+`tabla-01`, que no contienen referencias explícitas a otro documento del
+catálogo. `glosa-02` ya no se trata como distractor: cita literalmente la
+Ley 20.248 y forma parte de la ontología.
 
 ## Estado del arte (2026)
 
@@ -225,12 +227,11 @@ lo que hace falta.
 - **`01 §8` (estadística)**: cuando `§5` mida la tasa de error de la
   extracción automática contra esta verdad fundamental, usará el mismo
   aparato de deltas e IC.
-- **`02 §7` (metadata filtering)**: la comparación explícita entre "filtro
-  de una columna" y "recorrido de grafo" en P4 es el argumento central que
-  `§7` retoma con números de costo.
+- **`02 §7` (metadata filtering)**: P4 se responde con una arista directa;
+  el valor diferencial de la transitividad se evalúa por separado en §8.
 - **`02 §9` (casos límite)**: P1 es el ejemplo concreto del límite que esa
   sección dejó abierto sobre versionado a nivel artículo.
-- **`B6`**: las cadenas de citas diseñadas a propósito en el corpus son,
-  literalmente, las 47 relaciones de esta sección.
+- **`B6`**: las cadenas de citas diseñadas a propósito en el corpus son el
+  insumo de las 69 relaciones explícitas de esta sección.
 - **`§5`**: `relaciones-manual.json` es la verdad fundamental contra la que
   se mide la extracción con LLM.

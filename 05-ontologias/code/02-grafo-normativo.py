@@ -1,8 +1,7 @@
 """§2 — Modelado del dominio regulatorio chileno.
 
 Produce los números que cita `theory/02-modelado-del-dominio.md`. Carga la
-ontología curada a mano en `examples/relaciones-manual.json` (37 normas, 47
-relaciones, cada una con fundamento textual verificable) y responde
+ontología curada a mano en `examples/relaciones-manual.json` y responde
 competency questions por recorrido de grafo.
 
     uv run python 05-ontologias/code/02-grafo-normativo.py
@@ -32,6 +31,7 @@ from shared.utils import get_logger  # noqa: E402
 
 log = get_logger(__name__)
 DATA_PATH = Path(__file__).resolve().parent.parent / "examples" / "relaciones-manual.json"
+CORPUS_DIR = ROOT / "shared" / "corpus_chileno"
 
 
 def seccion(titulo: str) -> None:
@@ -100,10 +100,15 @@ def demo_competency_questions(g) -> None:
     for d in sorted(dependientes):
         print(f"    <- {d}")
     print(
-        f"\n    {len(dependientes)} documentos dependen de la SEP a través de hasta\n"
-        "    varios saltos (p. ej. oficio-05 depende de decreto-06, que depende de\n"
-        "    ley-09, que cita a ley-08). Un filtro de metadatos de una columna\n"
-        "    (02 §7) no expresa esto sin una consulta recursiva ad-hoc."
+        f"\n    {len(dependientes)} documentos; los siete tienen una arista DIRECTA\n"
+        "    a ley-08. P4 demuestra consulta estructurada, no transitividad. La\n"
+        "    auditoría encontró que el único camino indirecto publicado era una\n"
+        "    arista directa omitida del ground truth.\n"
+        "\n    Un caso multi-hop genuino del grafo corregido es:\n"
+        "      decreto-04 -> ley-06 -> ley-03 -> ley-07\n"
+        "    (modificación presupuestaria -> Ley de Presupuestos -> Ley de\n"
+        "    Compras -> Bases de la Administración). §8 lo evalúa en un golden\n"
+        "    estructural separado."
     )
 
 
@@ -121,14 +126,10 @@ def demo_un_solo_salto_no_alcanza(g) -> None:
     print(f"Documentos que citan O modifican, en cualquier número de saltos: "
           f"{len(con_modifica)} -> {sorted(con_modifica)}")
     print(
-        "\nLa diferencia son DOS documentos, no uno, y por dos razones distintas:\n"
-        "\n  - 'ley-02' (Ley 21.210) es directa: MODIFICA al DL 825, no solo lo cita.\n"
-        "    Es la única norma del corpus cuya relación con el DL 825 implica que\n"
-        "    el texto original cambió.\n"
-        "\n  - 'tabla-02' es TRANSITIVA: no cita al DL 825 directamente, cita a la\n"
-        "    Ley 21.210 (que sí modifica al DL 825). Con solo CITA, ese camino de\n"
-        "    dos saltos (tabla-02 --cita--> ley-02 --modifica--> ley-01) no existe\n"
-        "    en el subgrafo. Con CITA+MODIFICA, sí.\n"
+        "\nLa diferencia es 'ley-02' (Ley 21.210): MODIFICA al DL 825, no solo lo\n"
+        "cita. Es la única norma del corpus cuya relación directa con el DL 825\n"
+        "implica que el texto original cambió. El resto llega por CITA directa o\n"
+        "transitiva; el dataset v1 subcontaba esas citas.\n"
         "\nUn grafo con una sola relación genérica ('se relaciona con') puede\n"
         "contar cuántos documentos mencionan al DL 825, pero no puede separar 'lo\n"
         "menciona' de 'depende de un cambio en él' — que es la pregunta que le\n"
@@ -136,18 +137,17 @@ def demo_un_solo_salto_no_alcanza(g) -> None:
     )
 
 
-def demo_esquema(normas: list[Norma]) -> None:
+def demo_esquema(normas: list[Norma], relaciones: list[RelacionNormativa]) -> None:
     """El catálogo de normas por tipo, como resumen del esquema."""
     seccion("4. El catálogo de normas, por tipo")
 
     conteo = Counter(n.tipo.value for n in normas)
     for tipo, n in conteo.most_common():
         print(f"  {tipo:>15}: {n:>2}")
-    print(
-        f"\n{len(normas)} normas, {len(conteo)} géneros documentales. Cobertura del\n"
-        "corpus: 37/40 documentos (quedan fuera los distractores del corpus por\n"
-        "diseño — ver shared/corpus_chileno/README.md)."
-    )
+    total_corpus = len(list(CORPUS_DIR.glob("*.txt")))
+    fuera = sorted(p.name for p in CORPUS_DIR.glob("*.txt") if p.name not in {n.id for n in normas})
+    print(f"\n{len(normas)} normas, {len(relaciones)} relaciones, {len(conteo)} géneros.")
+    print(f"Cobertura del corpus: {len(normas)}/{total_corpus}; fuera: {fuera}.")
 
 
 def grafico_grafo_normativo(g) -> None:
@@ -186,7 +186,8 @@ def grafico_grafo_normativo(g) -> None:
             connectionstyle="arc3,rad=0.05",
         )
     ax.set_title(
-        "Grafo normativo del corpus chileno (37 normas, 47 relaciones tipadas)",
+        f"Grafo normativo del corpus chileno ({g.number_of_nodes()} normas, "
+        f"{g.number_of_edges()} relaciones tipadas)",
         fontsize=12,
     )
     leg_nodos = [Patch(facecolor=c, label=t) for t, c in colores_norma.items()]
@@ -207,7 +208,7 @@ if __name__ == "__main__":
     normas, relaciones, metadata = cargar()
     g = build_grafo_normativo(normas, relaciones)
     print(f"\nGrafo: {g.number_of_nodes()} nodos, {g.number_of_edges()} aristas.")
-    demo_esquema(normas)
+    demo_esquema(normas, relaciones)
     demo_vocabulario(relaciones)
     demo_competency_questions(g)
     demo_un_solo_salto_no_alcanza(g)
