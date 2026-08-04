@@ -30,13 +30,104 @@ global, testeable in-process.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 import unicodedata
+from datetime import date
 from enum import Enum
 from pathlib import Path
+from typing import Any, Literal
 
 import networkx as nx
 from pydantic import BaseModel
+
+
+CACHE_FORMAT_VERSION = 2
+DEFAULT_TARIFF_USD_PER_M = {"input": 0.15, "output": 0.60}
+
+
+class OfflineCacheMiss(RuntimeError):
+    """La operación requería API, pero el modo offline es el predeterminado."""
+
+
+class LLMCacheEntry(BaseModel):
+    """Contrato auditable compartido por §5, §7 y §9."""
+
+    response: dict[str, Any]
+    model_requested: str
+    model_returned: str
+    prompt_version: str
+    schema_version: str
+    temperature: float
+    prompt_sha256: str
+    tokens_input: int
+    tokens_output: int
+    tariff_usd_per_m: dict[str, float]
+    historical_cost_usd: float
+    replica: int = 0
+
+
+def llm_cache_key(
+    *,
+    model: str,
+    prompt: str,
+    schema: type[BaseModel],
+    schema_version: str,
+    temperature: float,
+    replica: int = 0,
+) -> str:
+    """Clave estable: cualquier cambio material invalida el caché."""
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "schema": schema.model_json_schema(),
+        "schema_version": schema_version,
+        "temperature": temperature,
+        "replica": replica,
+    }
+    serializado = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(serializado.encode("utf-8")).hexdigest()
+
+
+def prompt_sha256(prompt: str) -> str:
+    return hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+
+
+def historical_cost(tokens_input: int, tokens_output: int) -> float:
+    return (
+        tokens_input / 1_000_000 * DEFAULT_TARIFF_USD_PER_M["input"]
+        + tokens_output / 1_000_000 * DEFAULT_TARIFF_USD_PER_M["output"]
+    )
+
+
+def load_versioned_cache(path: Path | None) -> dict[str, LLMCacheEntry]:
+    if path is None or not path.exists():
+        return {}
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if raw.get("format_version") != CACHE_FORMAT_VERSION:
+        raise ValueError(
+            f"caché incompatible en {path}: se requiere formato v{CACHE_FORMAT_VERSION}"
+        )
+    return {
+        key: LLMCacheEntry.model_validate(value)
+        for key, value in raw.get("entries", {}).items()
+    }
+
+
+def save_versioned_cache(path: Path | None, entries: dict[str, LLMCacheEntry]) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "format_version": CACHE_FORMAT_VERSION,
+        "entries": {
+            key: entries[key].model_dump(mode="json") for key in sorted(entries)
+        },
+    }
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def strip_accents(text: str) -> str:
@@ -83,6 +174,7 @@ class NodoClasificador(BaseModel):
     nombre: str
     doc_id: str
     monto_miles: float | None = None
+    monto_reportado_miles: float | None = None
     glosa_num: str | None = None
     glosa_texto: str | None = None
 
@@ -101,6 +193,11 @@ _PATTERNS: dict[NivelClasificador, re.Pattern] = {
 }
 _MONTO_RE = re.compile(r"^Monto:\s*\$([\d.]+)\s*miles")
 _GLOSA_RE = re.compile(r"^Glosa\s+(\d+):\s*(.+)$")
+_FILA_TABLA_RE = re.compile(
+    r"^(?P<codigo>\d{3})\s+(?P<glosa>\d{2})\s+"
+    r"(?P<nombre>.+?)\s{2,}(?P<monto>[\d.]+)$"
+)
+_TOTAL_PROGRAMA_RE = re.compile(r"^TOTAL\s+Programa\s+\d+\s+([\d.]+)$", re.IGNORECASE)
 
 # Orden jerárquico, usado para saber qué niveles "cierra" una línea nueva.
 _ORDEN = list(NivelClasificador)
@@ -190,12 +287,60 @@ def _parse_one(path: Path, g: nx.DiGraph) -> None:
         if matched:
             continue
 
+        # Algunas glosas presupuestarias expresan Asignaciones en una tabla
+        # de ancho fijo, bajo el Subtítulo activo. Son exactamente los mismos
+        # nodos del clasificador que la forma lineal; cambia solo la sintaxis.
+        m = _FILA_TABLA_RE.match(line)
+        if m:
+            codigo = m.group("codigo")
+            padre_id = ids_activos.get(NivelClasificador.SUBTITULO)
+            if padre_id is None:
+                continue
+            idx = _ORDEN.index(NivelClasificador.ASIGNACION)
+            ruta = [
+                codigos_activos[n]
+                for n in _ORDEN[:idx]
+                if n in codigos_activos
+            ]
+            ruta.append(codigo)
+            node_id = f"{doc_id}::{'/'.join(ruta)}"
+            monto = float(m.group("monto").replace(".", ""))
+            g.add_node(
+                node_id,
+                data=NodoClasificador(
+                    id=node_id,
+                    nivel=NivelClasificador.ASIGNACION,
+                    codigo=codigo,
+                    nombre=m.group("nombre").strip(),
+                    doc_id=doc_id,
+                    monto_miles=monto,
+                    glosa_num=m.group("glosa"),
+                ),
+            )
+            g.add_edge(padre_id, node_id, tipo="CONTIENE")
+            continue
+
+        m = _TOTAL_PROGRAMA_RE.match(line)
+        if m:
+            programa_id = ids_activos.get(NivelClasificador.PROGRAMA)
+            if programa_id and programa_id in g.nodes:
+                g.nodes[programa_id]["data"].monto_reportado_miles = float(
+                    m.group(1).replace(".", "")
+                )
+            continue
+
         m = _MONTO_RE.match(line)
         if m:
             monto = float(m.group(1).replace(".", ""))
-            asign_id = ids_activos.get(NivelClasificador.ASIGNACION)
-            if asign_id and asign_id in g.nodes:
-                g.nodes[asign_id]["data"].monto_miles = monto
+            # El corpus también reporta un monto directamente en Subtítulo
+            # cuando no existe Ítem ni Asignación. Se asigna al nivel activo
+            # más profundo, sea cual sea, en lugar de descartarlo.
+            receptor_id = next(
+                (ids_activos[n] for n in reversed(_ORDEN) if n in ids_activos),
+                None,
+            )
+            if receptor_id and receptor_id in g.nodes:
+                g.nodes[receptor_id]["data"].monto_miles = monto
             continue
 
         m = _GLOSA_RE.match(line)
@@ -229,10 +374,24 @@ def descendientes_asignacion(g: nx.DiGraph, node_id: str) -> list[NodoClasificad
 
 
 def monto_total(g: nx.DiGraph, node_id: str) -> float:
-    """Suma el monto de todas las Asignaciones bajo un nodo. Recorrido de
-    grafo + agregación: la operación que un clasificador plano en texto no
-    puede hacer sin parsearse a sí mismo primero."""
-    return sum(a.monto_miles or 0.0 for a in descendientes_asignacion(g, node_id))
+    """Suma las hojas monetarias bajo un nodo, sin duplicar agregados.
+
+    Un monto puede vivir en Asignación o directamente en Subtítulo. Si un
+    nodo con monto tuviera descendientes monetarios, prevalecen las hojas;
+    ``monto_reportado_miles`` nunca entra en la suma: solo reconcilia el
+    agregado calculado contra el total declarado por la fuente.
+    """
+    if node_id not in g:
+        return 0.0
+
+    def subtotal(nid: str) -> float:
+        hijos = list(g.successors(nid))
+        subtotales = [subtotal(hijo) for hijo in hijos]
+        if any(valor != 0.0 for valor in subtotales):
+            return sum(subtotales)
+        return g.nodes[nid]["data"].monto_miles or 0.0
+
+    return subtotal(node_id)
 
 
 # --------------------------------------------------------------------------- #
@@ -297,16 +456,36 @@ class Norma(BaseModel):
 class RelacionNormativa(BaseModel):
     """Una arista tipada entre dos normas, con su fundamento textual.
 
-    `fundamento` no es adorno: es lo que permite auditar la relación contra
-    la fuente (la misma disciplina de trazabilidad de la doctrina del
-    portfolio) y lo que en §5 se usa para medir si el extractor automático
-    acertó no solo el tipo de relación sino el artículo correcto.
+    `fundamento` no es adorno: es la **cita literal** del documento origen
+    que sustenta la arista, y es lo que permite auditarla contra la fuente
+    (la misma disciplina de trazabilidad de la doctrina del portfolio). El
+    invariante lo verifica `tests/test_ontology_lib.py`, que compara cada
+    fundamento contra el texto real del corpus tras normalizar espacios y
+    acentos — el corpus corta líneas, la cita no.
+
+    `§5` compara la extracción automática contra este dataset por
+    `(origen, tipo, destino)`; el fundamento sirve para auditar a mano cada
+    caso, no entra en el cálculo de precisión/recall.
     """
 
     origen: str  # Norma.id
     tipo: TipoRelacion
     destino: str  # Norma.id
     fundamento: str
+
+
+class CompetencyQuestion(BaseModel):
+    """Pregunta estructural con esperados congelados y caminos auditables."""
+
+    id: str
+    question: str
+    category: Literal["one_hop", "multi_hop", "negative"]
+    target_node: str
+    direction: Literal["in", "out"]
+    relation_types: list[TipoRelacion]
+    max_hops: int
+    expected_doc_ids: list[str]
+    witness_paths: list[list[str]]
 
 
 def build_grafo_normativo(
@@ -488,7 +667,7 @@ def catalogo_organismos_corpus() -> list[Organismo]:
     return [
         Organismo(
             id="dccp", nombre_oficial="Dirección de Compras y Contratación Pública",
-            variantes=["Dirección de Compras", "CHILECOMPRA", "ChileCompra"],
+            variantes=["Dirección de Compras", "CHILECOMPRA"],
         ),
         Organismo(
             id="sii", nombre_oficial="Servicio de Impuestos Internos",
@@ -611,41 +790,65 @@ class LLMExtractor:
     de caché, reproducibles sin API key."""
 
     def __init__(
-        self, model: str = "gpt-4o-mini", cache_path: Path | None = None
+        self,
+        model: str = "gpt-4o-mini",
+        cache_path: Path | None = None,
+        *,
+        allow_api: bool = False,
+        max_api_calls: int = 10,
+        max_cost_usd: float = 1.0,
     ) -> None:
         self.model = model
         self.cache_path = Path(cache_path) if cache_path else None
-        self._cache: dict[str, dict] = {}
+        self.allow_api = allow_api
+        self.max_api_calls = max_api_calls
+        self.max_cost_usd = max_cost_usd
+        self._cache: dict[str, LLMCacheEntry] = {}
         self.api_calls = 0
         self.tokens_in = 0
         self.tokens_out = 0
         self._load()
 
     def _load(self) -> None:
-        import json as _json
-
-        if self.cache_path and self.cache_path.exists():
-            self._cache = _json.loads(self.cache_path.read_text(encoding="utf-8"))
+        self._cache = load_versioned_cache(self.cache_path)
 
     def _save(self) -> None:
-        import json as _json
+        save_versioned_cache(self.cache_path, self._cache)
 
-        if not self.cache_path:
-            return
-        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-        self.cache_path.write_text(
-            _json.dumps(self._cache, ensure_ascii=False, indent=2), encoding="utf-8"
+    @property
+    def historical_tokens(self) -> tuple[int, int]:
+        return (
+            sum(e.tokens_input for e in self._cache.values()),
+            sum(e.tokens_output for e in self._cache.values()),
         )
 
-    def _key(self, texto: str) -> str:
-        import hashlib
-
-        return hashlib.sha1(f"{self.model}\n{texto}".encode("utf-8")).hexdigest()
+    @property
+    def historical_cost_usd(self) -> float:
+        return sum(e.historical_cost_usd for e in self._cache.values())
 
     def extraer(self, texto: str) -> ExtraccionDocumento:
-        k = self._key(texto)
+        prompt = _PROMPT_EXTRACCION.format(texto=texto)
+        k = llm_cache_key(
+            model=self.model,
+            prompt=prompt,
+            schema=ExtraccionDocumento,
+            schema_version="extraccion-documento-v1",
+            temperature=0.0,
+        )
         if k in self._cache:
-            return ExtraccionDocumento.model_validate(self._cache[k])
+            return ExtraccionDocumento.model_validate(self._cache[k].response)
+
+        if not self.allow_api:
+            raise OfflineCacheMiss(
+                f"cache miss de extracción ({k[:12]}); repita con allow_api=True "
+                "solo durante la corrida controlada"
+            )
+        if self.api_calls >= self.max_api_calls:
+            raise RuntimeError(f"límite de llamadas alcanzado: {self.max_api_calls}")
+        costo_estimado = historical_cost(max(len(prompt) // 4, 1), 2_000)
+        costo_actual = historical_cost(self.tokens_in, self.tokens_out)
+        if costo_actual + costo_estimado > self.max_cost_usd:
+            raise RuntimeError(f"presupuesto API excedido antes de llamar: USD {self.max_cost_usd}")
 
         from dotenv import load_dotenv
 
@@ -653,7 +856,6 @@ class LLMExtractor:
         from openai import OpenAI
 
         client = OpenAI()
-        prompt = _PROMPT_EXTRACCION.format(texto=texto)
         resp = client.chat.completions.parse(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
@@ -661,46 +863,174 @@ class LLMExtractor:
             temperature=0.0,
         )
         resultado = resp.choices[0].message.parsed
-        if resp.usage:
-            self.tokens_in += resp.usage.prompt_tokens
-            self.tokens_out += resp.usage.completion_tokens
+        tokens_in = resp.usage.prompt_tokens if resp.usage else 0
+        tokens_out = resp.usage.completion_tokens if resp.usage else 0
+        self.tokens_in += tokens_in
+        self.tokens_out += tokens_out
         self.api_calls += 1
-        self._cache[k] = resultado.model_dump(mode="json")
+        self._cache[k] = LLMCacheEntry(
+            response=resultado.model_dump(mode="json"),
+            model_requested=self.model,
+            model_returned=resp.model,
+            prompt_version="extraccion-v1",
+            schema_version="extraccion-documento-v1",
+            temperature=0.0,
+            prompt_sha256=prompt_sha256(prompt),
+            tokens_input=tokens_in,
+            tokens_output=tokens_out,
+            tariff_usd_per_m=DEFAULT_TARIFF_USD_PER_M,
+            historical_cost_usd=historical_cost(tokens_in, tokens_out),
+        )
         self._save()
         return resultado
 
 
-_NUMERO_RE = re.compile(r"(\d[\d.]*)")
+# El número de una norma chilena va SIEMPRE detrás de su designador de género
+# ("Ley", "DL", "Decreto Supremo", "Circular"...), opcionalmente separado por
+# alguna variante de "Nº". Anclar la extracción al designador es lo que
+# distingue el número de la NORMA del número de un ARTÍCULO, que en el
+# lenguaje jurídico lo precede casi siempre ("el artículo 9º de la Ley Nº
+# 20.248"). Una regex que tomara el primer número del string devolvería "9".
+_DESIGNADOR = (
+    r"(?:ley(?:\s+n[uú]mero)?|dfl|d\.?f\.?l\.?|decreto\s+ley|d\.?l\.?|"
+    r"decreto\s+supremo|d\.?s\.?|decreto(?:\s+exento)?|circular|"
+    r"resoluci[oó]n(?:\s+exenta)?|oficio(?:\s+circular)?|dictamen)"
+)
+_NUMERO_NORMA_RE = re.compile(
+    rf"\b{_DESIGNADOR}\s*(?:n\s*[º°ªo]?\.?\s*|n[úu]m\.?\s*)?(\d[\d.]*\d|\d)",
+    re.IGNORECASE,
+)
+
+_REFERENCIA_NORMA_RE = re.compile(
+    r"\b(?P<designador>ley|dfl|d\.?f\.?l\.?|decreto\s+ley|d\.?l\.?|"
+    r"decreto\s+supremo|d\.?s\.?|decreto\s+exento|decreto|circular|"
+    r"resoluci[oó]n\s+exenta|resoluci[oó]n|oficio\s+circular|oficio|dictamen)"
+    r"\s*(?:n\s*[º°ªo]?\.?\s*|n[úu]m\.?\s*)?"
+    r"(?P<numero>\d[\d.]*\d|\d)",
+    re.IGNORECASE,
+)
+
+
+def _tipo_designador(texto: str) -> str:
+    """Agrupa variantes tipográficas del género de una norma.
+
+    El número por sí solo no identifica una norma: ``DFL Nº 2`` y
+    ``Decreto Supremo Nº 2`` son instrumentos distintos. Esta clave se usa
+    en el escáner de cobertura del ground truth para no fabricar aristas por
+    una coincidencia numérica accidental.
+    """
+    t = strip_accents(texto.lower()).replace(".", "")
+    if t.startswith(("decreto ley", "dl")):
+        return "dl"
+    if t.startswith(("decreto supremo", "ds")):
+        return "ds"
+    if t.startswith("decreto exento"):
+        return "decreto_exento"
+    if t.startswith("decreto"):
+        return "decreto"
+    if t.startswith("dfl"):
+        return "dfl"
+    if t.startswith("ley"):
+        return "ley"
+    if t.startswith("circular"):
+        return "circular"
+    if t.startswith("resolucion"):
+        return "resolucion"
+    if t.startswith("dictamen"):
+        return "dictamen"
+    return "oficio"
+
+
+def menciones_normativas_catalogo(
+    texto: str,
+    normas: list[Norma],
+    *,
+    origen_id: str | None = None,
+) -> set[str]:
+    """Resuelve referencias explícitas del texto contra el catálogo.
+
+    Es una red de seguridad para la curación manual, no un extractor
+    semántico: solo cubre menciones que incluyen designador y número. Las
+    glosas, tablas y extractos del Diario Oficial se excluyen como destinos
+    porque su ``identificador`` suele contener el número de la ley de la que
+    forman parte y no constituye una identidad normativa propia.
+    """
+    claves: dict[tuple[str, str], str] = {}
+    for norma in normas:
+        if norma.tipo in {TipoNorma.GLOSA, TipoNorma.TABLA, TipoNorma.DIARIO_OFICIAL}:
+            continue
+        match = _REFERENCIA_NORMA_RE.search(norma.identificador)
+        if not match:
+            continue
+        clave = (
+            _tipo_designador(match.group("designador")),
+            match.group("numero").replace(".", ""),
+        )
+        if clave in claves and claves[clave] != norma.id:
+            raise ValueError(f"identificador normativo ambiguo en catálogo: {clave}")
+        claves[clave] = norma.id
+
+    encontrados: set[str] = set()
+    for match in _REFERENCIA_NORMA_RE.finditer(texto):
+        clave = (
+            _tipo_designador(match.group("designador")),
+            match.group("numero").replace(".", ""),
+        )
+        destino = claves.get(clave)
+        if destino is not None and destino != origen_id:
+            encontrados.add(destino)
+    return encontrados
+
+
+def _numero_canonico(texto: str) -> str | None:
+    """El número de norma que aparece en `texto`, sin separadores de miles.
+
+    'Ley Nº 21.210', 'LEY 21210' y 'ley 21.210,' devuelven todos '21210': el
+    punto es ruido tipográfico, no parte de la identidad. Es la misma lección
+    de `§1` (UNSPSC es un código) y `§4` (llave canónica, nunca texto libre),
+    un nivel más abajo.
+    """
+    m = _NUMERO_NORMA_RE.search(texto)
+    if not m:
+        return None
+    return m.group(1).replace(".", "").rstrip(".")
 
 
 def resolver_por_numero(identificador: str, normas: list[Norma]) -> str | None:
-    """Nivel intermedio, específico del dominio: extrae el NÚMERO del
-    identificador ('Decreto Ley Nº 825' -> '825') y matchea contra el número
-    de los identificadores del catálogo.
+    """Nivel intermedio, específico del dominio: extrae el número de la norma
+    ('Decreto Ley Nº 825' -> '825') y lo matchea contra el número de los
+    identificadores del catálogo.
 
-    Es más seguro que la similitud difusa genérica para este dominio, y la
-    razón es la misma que en §1 (UNSPSC es un código, no un nombre) y en §4
-    (llave canónica, no texto libre): el número es la parte estable de un
-    identificador legal chileno; el resto ('Decreto Ley' vs 'DL', 'de 1974')
-    es ruido de formato. Comparar el número evita el falso positivo que la
-    similitud de caracteres SÍ comete entre 'Ley Nº 18.695' y 'Ley Nº
-    18.575' (0.85 de similitud, dos leyes completamente distintas) — porque
-    acá '18.695' y '18.575' simplemente no son el mismo número, sin
-    ambigüedad de umbral.
+    Dos precisiones que esta función aprendió a golpes (auditoría 2026-08-04):
+
+    1. **El número se ancla al designador**, no a la primera cifra del string.
+       Con la versión anterior, 'el art. 12 del DL 825' resolvía a la Partida
+       12 del presupuesto — un falso positivo silencioso y con etiqueta de
+       nivel 'numero', o sea, presentado como resolución confiable.
+    2. **El separador de miles se descarta** antes de comparar: 'Ley 21210' y
+       'Ley Nº 21.210' son la misma norma escritas por dos redactores.
+
+    Sigue siendo más seguro que la similitud de caracteres para este dominio
+    —'Ley Nº 18.695' y 'Ley Nº 18.575' comparten 0.846 de similitud y son
+    leyes distintas, pero 18695 != 18575 sin ambigüedad de umbral—, con la
+    salvedad de que NO cubre por sí solo ese riesgo: el nivel difuso corre
+    después igual (ver `resolver_identificador_norma`).
     """
-    m = _NUMERO_RE.search(identificador)
-    if not m:
+    numero = _numero_canonico(identificador)
+    if numero is None:
         return None
-    numero = m.group(1)
-    numeros_normas = [(n, _NUMERO_RE.search(n.identificador)) for n in normas]
-    candidatos = [n for n, nm in numeros_normas if nm and nm.group(1) == numero]
+    candidatos = [n for n in normas if _numero_canonico(n.identificador) == numero]
     if len(candidatos) == 1:
         return candidatos[0].id
     return None  # 0 candidatos, o número ambiguo (>1 norma con el mismo número): no arriesgar
 
 
 def resolver_identificador_norma(
-    identificador: str, normas: list[Norma], umbral_difuso: float = 0.85
+    identificador: str,
+    normas: list[Norma],
+    umbral_difuso: float = 0.85,
+    *,
+    usar_numero: bool = True,
 ) -> tuple[str | None, str]:
     """Resuelve un identificador en texto libre (lo que el LLM extrajo, ej.
     'Ley Nº 21.210') a un `doc_id` del corpus. Tres niveles, en orden de
@@ -721,9 +1051,10 @@ def resolver_identificador_norma(
     exacto = resolver_organismo(identificador, catalogo)
     if exacto is not None:
         return exacto, "exacto"
-    por_numero = resolver_por_numero(identificador, normas)
-    if por_numero is not None:
-        return por_numero, "numero"
+    if usar_numero:
+        por_numero = resolver_por_numero(identificador, normas)
+        if por_numero is not None:
+            return por_numero, "numero"
     difuso, score = resolver_organismo_difuso(identificador, catalogo, umbral=umbral_difuso)
     if difuso is not None:
         return difuso, "difuso"
@@ -737,6 +1068,25 @@ def resolver_identificador_norma(
 # completa. `RelacionNormativa` (§2) ya vive a nivel de documento; acá se
 # agrega el nivel de artículo que ese modelo no tenía.
 # --------------------------------------------------------------------------- #
+class TipoCambioArticulo(str, Enum):
+    CREA = "crea"
+    MODIFICA = "modifica"
+    DEROGA = "deroga"
+
+
+class EstadoVigencia(str, Enum):
+    NO_EXISTE = "no_existe"
+    ORIGINAL = "original"
+    MODIFICADO = "modificado"
+    DEROGADO = "derogado"
+
+
+class VersionArticulo(BaseModel):
+    estado: EstadoVigencia
+    fuente_doc_id: str | None
+    vigente_desde: date | None
+
+
 class ModificacionArticulo(BaseModel):
     """Una modificación a un artículo específico de una norma, con DOS
     fechas independientes:
@@ -754,41 +1104,83 @@ class ModificacionArticulo(BaseModel):
     norma_modificadora: str  # doc_id
     norma_modificada: str  # doc_id
     articulo: str
-    valido_desde: str  # fecha ISO de vigencia legal
-    registrado_el: str  # fecha ISO en que esta ontología incorporó el dato
+    valido_desde: date
+    registrado_el: date
     fundamento: str
+    tipo_cambio: TipoCambioArticulo = TipoCambioArticulo.MODIFICA
+
+
+def _fecha_tipificada(fecha: str | date) -> date:
+    if isinstance(fecha, date):
+        return fecha
+    try:
+        return date.fromisoformat(fecha)
+    except ValueError as exc:
+        raise ValueError(f"fecha no ISO-8601: {fecha!r}") from exc
 
 
 def texto_vigente(
     norma_base: str,
     articulo: str,
     modificaciones: list[ModificacionArticulo],
-    fecha_consulta: str,
-) -> tuple[str, str | None]:
+    fecha_consulta: str | date,
+) -> VersionArticulo:
     """¿Qué norma define el texto vigente de `articulo` de `norma_base` en
-    `fecha_consulta`? Devuelve `(doc_id_fuente, valido_desde o None)`.
+    `fecha_consulta`? Devuelve `(doc_id_fuente, valido_desde)`.
 
     Recorre SOLO las modificaciones registradas para ESE artículo específico
     (no para el documento completo) y toma la más reciente cuya vigencia ya
-    empezó en la fecha consultada. Si ninguna aplica, el artículo sigue
-    regido por su texto original — que es exactamente el caso que un modelo
-    a nivel de documento (`02 §9`) no puede expresar: un documento marcado
-    "no vigente" en su totalidad, cuando en realidad solo UN artículo suyo
-    fue modificado y el resto sigue rigiendo tal como se publicó.
+    empezó en la fecha consultada. Tres respuestas posibles, no dos:
+
+    - `(norma_modificadora, valido_desde)`: rige un texto modificado.
+    - `(norma_base, None)`: rige el texto original — el caso que un modelo a
+      nivel de documento (`02 §9`) no puede expresar, porque marca "no
+      vigente" el archivo entero cuando solo un artículo cambió.
+    - `(None, None)`: el artículo **no existe** en esa fecha. Ocurre cuando
+      la única modificación que lo menciona lo crea (`crea_articulo=True`) y
+      su vigencia todavía no empezó: el caso del art. 7º bis de la Ley 19.886
+      antes del 11-12-2024, con la ley que lo crea ya publicada.
     """
-    aplicables = [
+    fecha = _fecha_tipificada(fecha_consulta)
+    del_articulo = [
         m for m in modificaciones
         if m.norma_modificada == norma_base and m.articulo == articulo
-        and m.valido_desde <= fecha_consulta
     ]
-    if not aplicables:
-        return norma_base, None
-    ultima = max(aplicables, key=lambda m: m.valido_desde)
-    return ultima.norma_modificadora, ultima.valido_desde
+    aplicables = [m for m in del_articulo if m.valido_desde <= fecha]
+    if aplicables:
+        ultima = max(aplicables, key=lambda m: m.valido_desde)
+        if ultima.tipo_cambio == TipoCambioArticulo.DEROGA:
+            return VersionArticulo(
+                estado=EstadoVigencia.DEROGADO,
+                fuente_doc_id=ultima.norma_modificadora,
+                vigente_desde=ultima.valido_desde,
+            )
+        return VersionArticulo(
+            estado=(
+                EstadoVigencia.MODIFICADO
+                if ultima.tipo_cambio == TipoCambioArticulo.MODIFICA
+                else EstadoVigencia.ORIGINAL
+            ),
+            fuente_doc_id=ultima.norma_modificadora,
+            vigente_desde=ultima.valido_desde,
+        )
+    if del_articulo and all(
+        m.tipo_cambio == TipoCambioArticulo.CREA for m in del_articulo
+    ):
+        return VersionArticulo(
+            estado=EstadoVigencia.NO_EXISTE,
+            fuente_doc_id=None,
+            vigente_desde=None,
+        )
+    return VersionArticulo(
+        estado=EstadoVigencia.ORIGINAL,
+        fuente_doc_id=norma_base,
+        vigente_desde=None,
+    )
 
 
 def que_sabia_el_sistema(
-    modificaciones: list[ModificacionArticulo], fecha_corte: str
+    modificaciones: list[ModificacionArticulo], fecha_corte: str | date
 ) -> list[ModificacionArticulo]:
     """La pregunta BITEMPORAL: no '¿qué era vigente?' sino '¿qué sabía ESTE
     sistema en `fecha_corte`?' — filtra por `registrado_el`, no por
@@ -796,7 +1188,8 @@ def que_sabia_el_sistema(
     norma puede llevar años vigente y el sistema haberla incorporado recién
     ahora (exactamente el caso de este corpus, construido de una vez en
     2026 sobre normas de 1974 en adelante)."""
-    return [m for m in modificaciones if m.registrado_el <= fecha_corte]
+    fecha = _fecha_tipificada(fecha_corte)
+    return [m for m in modificaciones if m.registrado_el <= fecha]
 
 
 # --------------------------------------------------------------------------- #
@@ -805,11 +1198,21 @@ def que_sabia_el_sistema(
 # una con un LLM, ANTES de responder ninguna consulta. Mide el costo real
 # sobre este corpus, en vez de describirlo en abstracto.
 # --------------------------------------------------------------------------- #
-def comunidades_del_grafo(g: nx.DiGraph, seed: int = 7) -> list[set[str]]:
+def comunidades_del_grafo(g: nx.DiGraph, seed: int = 7) -> list[list[str]]:
     """Detecta comunidades con Louvain sobre la versión NO dirigida del
     grafo (estándar en detección de comunidades: la dirección de MODIFICA
-    vs CITA no importa para agrupar, solo la densidad de conexión)."""
-    return [set(c) for c in nx.community.louvain_communities(g.to_undirected(), seed=seed)]
+    vs CITA no importa para agrupar, solo la densidad de conexión).
+
+    Devuelve **listas ordenadas**, no conjuntos, y en orden estable. No es
+    cosmética: `GraphRAGIndexer` hashea el prompt para cachear el resumen de
+    cada comunidad, y el prompt se construye recorriendo esta estructura. Con
+    `set[str]`, el orden de iteración dependía del `PYTHONHASHSEED` —
+    aleatorio por proceso—, así que cada corrida generaba una clave distinta,
+    fallaba la caché y gastaba llamadas reales a la API. El caché comiteado
+    llegó a tener 13 entradas para 7 comunidades por esta causa.
+    """
+    comunidades = nx.community.louvain_communities(g.to_undirected(), seed=seed)
+    return sorted((sorted(c) for c in comunidades), key=lambda c: (-len(c), c[0]))
 
 
 class ResumenComunidad(BaseModel):
@@ -840,45 +1243,74 @@ class GraphRAGIndexer:
     `LLMExtractor` (S5). Existe para MEDIR el costo de ese paso sobre este
     corpus, no para usarlo en produccion."""
 
-    def __init__(self, model: str = "gpt-4o-mini", cache_path: Path | None = None) -> None:
+    def __init__(
+        self,
+        model: str = "gpt-4o-mini",
+        cache_path: Path | None = None,
+        *,
+        allow_api: bool = False,
+        max_api_calls: int = 10,
+        max_cost_usd: float = 1.0,
+    ) -> None:
         self.model = model
         self.cache_path = Path(cache_path) if cache_path else None
-        self._cache: dict[str, dict] = {}
+        self.allow_api = allow_api
+        self.max_api_calls = max_api_calls
+        self.max_cost_usd = max_cost_usd
+        self._cache: dict[str, LLMCacheEntry] = {}
         self.api_calls = 0
         self.tokens_in = 0
         self.tokens_out = 0
         self._load()
 
     def _load(self) -> None:
-        import json as _json
-
-        if self.cache_path and self.cache_path.exists():
-            self._cache = _json.loads(self.cache_path.read_text(encoding="utf-8"))
+        self._cache = load_versioned_cache(self.cache_path)
 
     def _save(self) -> None:
-        import json as _json
+        save_versioned_cache(self.cache_path, self._cache)
 
-        if not self.cache_path:
-            return
-        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-        self.cache_path.write_text(
-            _json.dumps(self._cache, ensure_ascii=False, indent=2), encoding="utf-8"
+    @property
+    def historical_tokens(self) -> tuple[int, int]:
+        return (
+            sum(e.tokens_input for e in self._cache.values()),
+            sum(e.tokens_output for e in self._cache.values()),
         )
+
+    @property
+    def historical_cost_usd(self) -> float:
+        return sum(e.historical_cost_usd for e in self._cache.values())
 
     def resumir_comunidad(
         self, normas: list[Norma], relaciones: list[RelacionNormativa]
     ) -> ResumenComunidad:
-        import hashlib
-
+        normas = sorted(normas, key=lambda n: n.id)
+        relaciones = sorted(relaciones, key=lambda r: (r.origen, r.tipo.value, r.destino))
         texto_normas = "\n".join(f"- {n.identificador}: {n.titulo}" for n in normas)
         texto_relaciones = "\n".join(
             f"- {r.origen} --[{r.tipo.value}]--> {r.destino}" for r in relaciones
         ) or "(ninguna relacion interna al grupo)"
         prompt = _PROMPT_RESUMEN_COMUNIDAD.format(normas=texto_normas, relaciones=texto_relaciones)
 
-        k = hashlib.sha1(f"{self.model}\n{prompt}".encode("utf-8")).hexdigest()
+        k = llm_cache_key(
+            model=self.model,
+            prompt=prompt,
+            schema=ResumenComunidad,
+            schema_version="resumen-comunidad-v1",
+            temperature=0.0,
+        )
         if k in self._cache:
-            return ResumenComunidad.model_validate(self._cache[k])
+            return ResumenComunidad.model_validate(self._cache[k].response)
+
+        if not self.allow_api:
+            raise OfflineCacheMiss(
+                f"cache miss de GraphRAG ({k[:12]}); use allow_api=True solo "
+                "durante la corrida controlada"
+            )
+        if self.api_calls >= self.max_api_calls:
+            raise RuntimeError(f"límite de llamadas alcanzado: {self.max_api_calls}")
+        costo_estimado = historical_cost(max(len(prompt) // 4, 1), 1_000)
+        if historical_cost(self.tokens_in, self.tokens_out) + costo_estimado > self.max_cost_usd:
+            raise RuntimeError(f"presupuesto API excedido antes de llamar: USD {self.max_cost_usd}")
 
         from dotenv import load_dotenv
 
@@ -893,10 +1325,23 @@ class GraphRAGIndexer:
             temperature=0.0,
         )
         resultado = resp.choices[0].message.parsed
-        if resp.usage:
-            self.tokens_in += resp.usage.prompt_tokens
-            self.tokens_out += resp.usage.completion_tokens
+        tokens_in = resp.usage.prompt_tokens if resp.usage else 0
+        tokens_out = resp.usage.completion_tokens if resp.usage else 0
+        self.tokens_in += tokens_in
+        self.tokens_out += tokens_out
         self.api_calls += 1
-        self._cache[k] = resultado.model_dump(mode="json")
+        self._cache[k] = LLMCacheEntry(
+            response=resultado.model_dump(mode="json"),
+            model_requested=self.model,
+            model_returned=resp.model,
+            prompt_version="resumen-comunidad-v1",
+            schema_version="resumen-comunidad-v1",
+            temperature=0.0,
+            prompt_sha256=prompt_sha256(prompt),
+            tokens_input=tokens_in,
+            tokens_output=tokens_out,
+            tariff_usd_per_m=DEFAULT_TARIFF_USD_PER_M,
+            historical_cost_usd=historical_cost(tokens_in, tokens_out),
+        )
         self._save()
         return resultado

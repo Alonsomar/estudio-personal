@@ -47,7 +47,7 @@ def demo_taxonomia_vs_tesauro_vs_ontologia() -> None:
         ("Ontología", "entidades + relaciones TIPADAS + reglas de qué es válido",
          "Norma MODIFICA Norma, Decreto REGLAMENTA Ley (§2 lo formaliza)"),
         ("Grafo de conocimiento", "una ontología INSTANCIADA con datos reales",
-         "el grafo de esta sección: 63 nodos reales del clasificador 2024"),
+         "el grafo de esta sección: nodos reales del clasificador 2024"),
     ]
     for termino, definicion, ejemplo in filas:
         print(f"\n{termino}")
@@ -102,6 +102,18 @@ def demo_competency_question(g) -> None:
         nombre = f"{p.codigo} {p.nombre}"
         print(f"{nombre:>45} | {len(asigs):>13} | {total:>22,.0f}")
 
+    print("\nReconciliación de totales declarados:")
+    for programa in nodos_por_nivel(g, NivelClasificador.PROGRAMA):
+        if programa.monto_reportado_miles is None:
+            continue
+        calculado = monto_total(g, programa.id)
+        diferencia = calculado - programa.monto_reportado_miles
+        print(
+            f"  {programa.doc_id} · Programa {programa.codigo}: "
+            f"calculado={calculado:,.0f}, reportado={programa.monto_reportado_miles:,.0f}, "
+            f"diferencia={diferencia:,.0f}"
+        )
+
     print(
         "\nCon el grafo, la consulta es dos líneas de código (nx.descendants +\n"
         "una suma). Sin él, es un parser ad-hoc que hay que escribir de nuevo\n"
@@ -110,30 +122,24 @@ def demo_competency_question(g) -> None:
 
 
 def demo_limite_honesto(g) -> None:
-    """Dónde el parser de regex se queda corto, sin esconderlo."""
-    seccion("4. Límite honesto: el parser de regex no alcanza para todo")
+    """Comprueba los dos formatos y deja explícito el límite restante."""
+    seccion("4. Dos formatos cubiertos; el límite restante es semántico")
 
     educ = next(
         p for p in nodos_por_nivel(g, NivelClasificador.PARTIDA) if p.codigo == "09"
     )
     asigs = descendientes_asignacion(g, educ.id)
     print(
-        f"Partida 09 (Educación) muestra {len(asigs)} asignación(es) en el grafo, "
-        "pero el\ndocumento fuente (glosa-02-presupuesto-educacion.txt) contiene "
-        "SEIS: cinco\nen una tabla ('Programa 20: Subvenciones...') y una en el "
-        "formato lineal\nque el parser sí reconoce (JUNAEB).\n"
+        f"Partida 09 (Educación) contiene {len(asigs)} asignaciones: cinco "
+        "filas tabulares\ny una en formato lineal. El parser conserva ambas "
+        "representaciones como\nel mismo tipo de nodo y reconcilia el TOTAL "
+        "Programa 20 sin sumarlo dos veces.\n"
     )
     print(
-        "El parser de esta sección reconoce el patrón lineal 'Asignación NNN -\n"
-        "nombre' + 'Monto: $X miles', porque es determinista y rápido de escribir\n"
-        "— apropiado para ILUSTRAR que el clasificador es una ontología. Pero el\n"
-        "mismo corpus, escrito por el mismo autor, ya usa un segundo formato\n"
-        "(tabla) para la misma información. Un parser de reglas se rompe cada\n"
-        "vez que aparece una variante nueva de formato.\n"
-        "\nEsto NO es un bug a esconder: es la razón concreta por la que §5 usa\n"
-        "extracción con LLM en vez de reglas escritas a mano para el corpus\n"
-        "completo — un extractor semántico no le importa si la info está en\n"
-        "una lista o en una tabla."
+        "La cobertura es deliberadamente sintáctica: formato lineal y tabla de\n"
+        "ancho fijo. Nuevas convenciones requieren una regla o una extracción\n"
+        "semántica. La lección de §5 se mantiene, pero estos casos conocidos ya\n"
+        "no se presentan como una limitación aceptable del resultado publicado."
     )
 
 

@@ -10,6 +10,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-for lib_dir in (ROOT, ROOT / "02-retrieval" / "code", ROOT / "03-produccion" / "code"):
+for lib_dir in (
+    ROOT,
+    ROOT / "02-retrieval" / "code",
+    ROOT / "03-produccion" / "code",
+    ROOT / "05-ontologias" / "code",
+):
     if str(lib_dir) not in sys.path:
         sys.path.insert(0, str(lib_dir))
