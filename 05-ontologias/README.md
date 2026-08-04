@@ -12,19 +12,24 @@ ontología. Esta masterclass le pone nombre técnico a una práctica que el
 autor ya ejerce, y la conecta con el retrieval construido en `02` y las
 herramientas de IA del resto del repo.
 
-## Estado: Terminada
+## Estado: En revisión posterior al cierre
 
-Plan maestro y las 9 secciones completas (00-09). Prerrequisito cumplido:
+Plan maestro y las 9 secciones están escritas (00-09). Prerrequisito cumplido:
 `B6` expandió el corpus de 16 a 40 documentos en cuatro clusters con cadenas
 de citas verificadas, diseñadas específicamente como insumo para el grafo de
 este módulo.
 
-**El cierre es honesto, no triunfalista**: el grafo no mejora el recall
-sobre `golden-retrieval.json` (`§8`, resultado negativo publicado tal como
-salió), pero responde con 100% de precisión preguntas de dependencia
-transitiva que un LLM sin la curación de este módulo responde con 50% de
-recall (`§9`, experimento directo). El foso no es la tecnología: es la
-curación de dominio que la tecnología todavía no sabe hacer sola.
+Una auditoría posterior al commit de cierre confirmó problemas en el ground
+truth, la reproducibilidad y el diseño de §8–§9. La conclusión negativa de §8
+—el grafo no mejora el retrieval— sobrevive, pero `recall@3` era invariante por
+construcción. El titular “100% contra 50%” de §9 no sobrevive al ground truth
+corregido ni permite generalizar con `n=1`.
+
+La evidencia completa y la separación entre baseline publicado y correcciones
+locales está en
+[`notes/01-auditoria-post-cierre.md`](notes/01-auditoria-post-cierre.md). La
+remediación se registra como `B13`; hasta cerrarla, los números de este README y
+de las secciones deben considerarse históricos, no resultados finales.
 
 ## Secciones
 

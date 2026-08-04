@@ -17,8 +17,8 @@ cambio.
 | 02 | Information Retrieval     | 9/9       | Terminado   |
 | 03 | Patrones de producción    | 12/12     | Terminado   |
 | 04 | Economía de inferencia    | 6/6       | Terminado   |
-| 05 | Ontologías y representación del conocimiento | 9/9 | Terminado |
-| 06 | Harness agéntico          | 0/9       | **Siguiente** |
+| 05 | Ontologías y representación del conocimiento | 9/9 | **En revisión** |
+| 06 | Harness agéntico          | 0/9       | Planificado |
 
 ---
 
@@ -43,8 +43,8 @@ graph LR
 | 0 | Higiene del repo | B1–B4 | ✅ Hecha (`ec94dea`) |
 | 1 | Cerrar 04-economia (re-especificado a 6 secciones) | B5 | ✅ Hecha |
 | 2 | Expandir corpus 16 → 40 documentos | B6 | ✅ Hecha |
-| 3 | 05-ontologias | B7 | ✅ Hecha |
-| 4 | 06-harness | B8 | ⬅️ **Siguiente** (4–6 sesiones) |
+| 3 | 05-ontologias | B7 + B13 | ⚠️ Reabierta por auditoría |
+| 4 | 06-harness | B8 | Bloqueada por cierre de B13 |
 
 ---
 
@@ -157,7 +157,13 @@ diferencias entre arquitecturas sean estadísticamente detectables, y un grafo s
       mueve (consistente con `02 §3`). Tabla completa en el README del corpus.
 - [x] `uv run pytest` sigue en verde (55 tests; no dependen del tamaño del corpus).
 
-### B7 · P0 · Masterclass 05 — Ontologías y representación del conocimiento — ✅ Cerrado (2026-08-04)
+### B7 · P0 · Masterclass 05 — Ontologías y representación del conocimiento — ⚠️ Reabierto por B13
+
+Las 9 secciones están escritas, pero la auditoría posterior al cierre invalidó
+parte de la evidencia y de las cifras propagadas abajo. Este bloque conserva el
+resultado **histórico** del cierre `91eaebf`; B13 define el estado vigente y debe
+cerrarse antes de volver a marcar B7 como terminado.
+
 **Encuadre:** una ontología es un sistema de clasificación formalizado. El
 clasificador presupuestario chileno (partida → capítulo → programa → subtítulo →
 ítem → asignación) *es* una ontología; COFOG, CIIU, CIUO y UNSPSC también. El
@@ -285,6 +291,31 @@ cambios de módulos terminados en un commit de otro módulo.
 - [ ] Verificar que cada script tocado sigue produciendo los mismos números que
       cita su documento de teoría.
 - [ ] Añadir `ruff check` al job de CI para que no vuelva a acumularse.
+
+### B13 · P0 · Remediar auditoría posterior al cierre de 05-ontologias
+
+La auditoría independiente del commit de cierre `91eaebf` confirmó el núcleo de
+19 de 20 hallazgos y clasificó uno como mixto. El detalle, evidencia reproducible
+y estado de las correcciones locales está en
+[`05-ontologias/notes/01-auditoria-post-cierre.md`](05-ontologias/notes/01-auditoria-post-cierre.md).
+
+B7 conserva 9/9 secciones escritas, pero se reabre su cierre: el ground truth
+incompleto y varias degeneraciones experimentales vuelven obsoletos números y
+afirmaciones propagados entre §1–§9, el README del módulo y este backlog. Por la
+doctrina secuencial del repo, B8 no comienza hasta cerrar esta remediación.
+
+- [ ] Aprobar un plan de remediación que ordene dependencias entre corpus,
+      ground truth, librería, experimentos y narrativa.
+- [ ] Integrar o ajustar las correcciones locales existentes sin perder sus
+      tests de regresión.
+- [ ] Recalcular todas las métricas afectadas desde artefactos reproducibles y
+      sin llamadas de red en tests.
+- [ ] Rediseñar §8 para que cada métrica pueda variar por construcción y agregar
+      un golden específico multi-hop si se mantiene esa conclusión.
+- [ ] Reemplazar el experimento `n=1` de §9 o rebajar explícitamente el alcance
+      de su conclusión; retirar el titular 100% vs. 50%.
+- [ ] Sincronizar teoría, scripts, diagramas, README y BACKLOG con los resultados
+      finales; `uv run pytest` debe permanecer en verde.
 
 ---
 
