@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "version": 1,
+    "created": "2026-08-04",
+    "description": "18 competency questions congeladas tras la auditoría B13; los esperados no se derivan durante la evaluación."
+  },
+  "items": [
+    {
+      "id": "cq-001", "question": "¿Qué normas modifica la Ley 21.210?", "category": "one_hop",
+      "target_node": "ley-02-ley-21210-modernizacion.txt", "direction": "out", "relation_types": ["modifica"], "max_hops": 1,
+      "expected_doc_ids": ["ley-01-dl-825-iva-base.txt", "ley-05-dl-824-renta-base.txt"],
+      "witness_paths": [["ley-02-ley-21210-modernizacion.txt", "ley-01-dl-825-iva-base.txt"], ["ley-02-ley-21210-modernizacion.txt", "ley-05-dl-824-renta-base.txt"]]
+    },
+    {
+      "id": "cq-002", "question": "¿Qué norma modifica al DL 825?", "category": "one_hop",
+      "target_node": "ley-01-dl-825-iva-base.txt", "direction": "in", "relation_types": ["modifica"], "max_hops": 1,
+      "expected_doc_ids": ["ley-02-ley-21210-modernizacion.txt"],
+      "witness_paths": [["ley-02-ley-21210-modernizacion.txt", "ley-01-dl-825-iva-base.txt"]]
+    },
+    {
+      "id": "cq-003", "question": "¿Qué documento reglamenta la Ley 19.886?", "category": "one_hop",
+      "target_node": "ley-03-ley-19886-compras-publicas.txt", "direction": "in", "relation_types": ["reglamenta"], "max_hops": 1,
+      "expected_doc_ids": ["decreto-03-reglamento-compras-publicas.txt"],
+      "witness_paths": [["decreto-03-reglamento-compras-publicas.txt", "ley-03-ley-19886-compras-publicas.txt"]]
+    },
+    {
+      "id": "cq-004", "question": "¿Qué documentos interpretan la Ley 21.210?", "category": "one_hop",
+      "target_node": "ley-02-ley-21210-modernizacion.txt", "direction": "in", "relation_types": ["interpreta"], "max_hops": 1,
+      "expected_doc_ids": ["circular-01-sii-iva-digital.txt", "circular-02-sii-renta-propyme.txt"],
+      "witness_paths": [["circular-01-sii-iva-digital.txt", "ley-02-ley-21210-modernizacion.txt"], ["circular-02-sii-renta-propyme.txt", "ley-02-ley-21210-modernizacion.txt"]]
+    },
+    {
+      "id": "cq-005", "question": "¿Qué documento aplica la Ley 19.886 a un caso concreto?", "category": "one_hop",
+      "target_node": "ley-03-ley-19886-compras-publicas.txt", "direction": "in", "relation_types": ["aplica"], "max_hops": 1,
+      "expected_doc_ids": ["oficio-02-contraloria-trato-directo.txt"],
+      "witness_paths": [["oficio-02-contraloria-trato-directo.txt", "ley-03-ley-19886-compras-publicas.txt"]]
+    },
+    {
+      "id": "cq-006", "question": "¿Qué documentos citan directamente la Ley 20.248?", "category": "one_hop",
+      "target_node": "ley-08-ley-20248-subvencion-preferencial.txt", "direction": "in", "relation_types": ["cita"], "max_hops": 1,
+      "expected_doc_ids": ["decreto-06-reglamento-servicios-locales.txt", "do-01-extracto-decreto-aranceles.txt", "glosa-02-presupuesto-educacion.txt", "ley-09-ley-21040-educacion-publica.txt", "oficio-01-contraloria-subvenciones.txt", "oficio-05-contraloria-traspaso-slep.txt"],
+      "witness_paths": [["decreto-06-reglamento-servicios-locales.txt", "ley-08-ley-20248-subvencion-preferencial.txt"], ["do-01-extracto-decreto-aranceles.txt", "ley-08-ley-20248-subvencion-preferencial.txt"], ["glosa-02-presupuesto-educacion.txt", "ley-08-ley-20248-subvencion-preferencial.txt"], ["ley-09-ley-21040-educacion-publica.txt", "ley-08-ley-20248-subvencion-preferencial.txt"], ["oficio-01-contraloria-subvenciones.txt", "ley-08-ley-20248-subvencion-preferencial.txt"], ["oficio-05-contraloria-traspaso-slep.txt", "ley-08-ley-20248-subvencion-preferencial.txt"]]
+    },
+    {
+      "id": "cq-007", "question": "¿Qué documentos citan directamente la Ley 21.640?", "category": "one_hop",
+      "target_node": "ley-06-ley-presupuestos-2024-articulado.txt", "direction": "in", "relation_types": ["cita"], "max_hops": 1,
+      "expected_doc_ids": ["decreto-04-modificacion-presupuestaria.txt", "oficio-04-dipres-ejecucion-presupuestaria.txt"],
+      "witness_paths": [["decreto-04-modificacion-presupuestaria.txt", "ley-06-ley-presupuestos-2024-articulado.txt"], ["oficio-04-dipres-ejecucion-presupuestaria.txt", "ley-06-ley-presupuestos-2024-articulado.txt"]]
+    },
+    {
+      "id": "cq-008", "question": "¿Qué documentos modifican o citan la glosa de Salud?", "category": "one_hop",
+      "target_node": "glosa-01-presupuesto-salud.txt", "direction": "in", "relation_types": ["modifica", "cita"], "max_hops": 1,
+      "expected_doc_ids": ["decreto-04-modificacion-presupuestaria.txt", "oficio-04-dipres-ejecucion-presupuestaria.txt"],
+      "witness_paths": [["decreto-04-modificacion-presupuestaria.txt", "glosa-01-presupuesto-salud.txt"], ["oficio-04-dipres-ejecucion-presupuestaria.txt", "glosa-01-presupuesto-salud.txt"]]
+    },
+    {
+      "id": "cq-009", "question": "¿Qué documentos dependen en hasta dos saltos de la Ley 18.575?", "category": "multi_hop",
+      "target_node": "ley-07-ley-18575-bases-administracion.txt", "direction": "in", "relation_types": ["cita", "modifica", "reglamenta", "aplica", "interpreta"], "max_hops": 2,
+      "expected_doc_ids": ["decreto-03-reglamento-compras-publicas.txt", "decreto-05-reglamento-declaracion-intereses.txt", "do-02-extracto-licitacion-publica.txt", "glosa-04-presupuesto-obras-publicas.txt", "glosa-05-presupuesto-interior.txt", "ley-03-ley-19886-compras-publicas.txt", "ley-04-ley-21634-moderniza-compras.txt", "ley-06-ley-presupuestos-2024-articulado.txt", "oficio-02-contraloria-trato-directo.txt", "oficio-05-contraloria-traspaso-slep.txt", "resolucion-01-chilecompra-compra-agil.txt", "resolucion-03-registro-lobbistas.txt"],
+      "witness_paths": [["decreto-03-reglamento-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["decreto-05-reglamento-declaracion-intereses.txt", "ley-07-ley-18575-bases-administracion.txt"], ["do-02-extracto-licitacion-publica.txt", "ley-03-ley-19886-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["glosa-04-presupuesto-obras-publicas.txt", "ley-03-ley-19886-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["glosa-05-presupuesto-interior.txt", "ley-03-ley-19886-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["ley-03-ley-19886-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["ley-04-ley-21634-moderniza-compras.txt", "ley-03-ley-19886-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["ley-06-ley-presupuestos-2024-articulado.txt", "ley-03-ley-19886-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["oficio-02-contraloria-trato-directo.txt", "ley-03-ley-19886-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["oficio-05-contraloria-traspaso-slep.txt", "ley-07-ley-18575-bases-administracion.txt"], ["resolucion-01-chilecompra-compra-agil.txt", "ley-03-ley-19886-compras-publicas.txt", "ley-07-ley-18575-bases-administracion.txt"], ["resolucion-03-registro-lobbistas.txt", "ley-07-ley-18575-bases-administracion.txt"]]
+    },
+    {
+      "id": "cq-010", "question": "¿Qué documentos dependen en hasta dos saltos de la Ley 19.886?", "category": "multi_hop",
+      "target_node": "ley-03-ley-19886-compras-publicas.txt", "direction": "in", "relation_types": ["cita", "modifica", "reglamenta", "aplica", "interpreta"], "max_hops": 2,
+      "expected_doc_ids": ["decreto-03-reglamento-compras-publicas.txt", "decreto-04-modificacion-presupuestaria.txt", "do-02-extracto-licitacion-publica.txt", "glosa-04-presupuesto-obras-publicas.txt", "glosa-05-presupuesto-interior.txt", "ley-04-ley-21634-moderniza-compras.txt", "ley-06-ley-presupuestos-2024-articulado.txt", "oficio-02-contraloria-trato-directo.txt", "oficio-04-dipres-ejecucion-presupuestaria.txt", "resolucion-01-chilecompra-compra-agil.txt"],
+      "witness_paths": [["decreto-03-reglamento-compras-publicas.txt", "ley-03-ley-19886-compras-publicas.txt"], ["decreto-04-modificacion-presupuestaria.txt", "ley-06-ley-presupuestos-2024-articulado.txt", "ley-03-ley-19886-compras-publicas.txt"], ["do-02-extracto-licitacion-publica.txt", "ley-03-ley-19886-compras-publicas.txt"], ["glosa-04-presupuesto-obras-publicas.txt", "ley-03-ley-19886-compras-publicas.txt"], ["glosa-05-presupuesto-interior.txt", "ley-03-ley-19886-compras-publicas.txt"], ["ley-04-ley-21634-moderniza-compras.txt", "ley-03-ley-19886-compras-publicas.txt"], ["ley-06-ley-presupuestos-2024-articulado.txt", "ley-03-ley-19886-compras-publicas.txt"], ["oficio-02-contraloria-trato-directo.txt", "ley-03-ley-19886-compras-publicas.txt"], ["oficio-04-dipres-ejecucion-presupuestaria.txt", "ley-06-ley-presupuestos-2024-articulado.txt", "ley-03-ley-19886-compras-publicas.txt"], ["resolucion-01-chilecompra-compra-agil.txt", "ley-03-ley-19886-compras-publicas.txt"]]
+    },
+    {
+      "id": "cq-011", "question": "¿Qué documentos dependen en hasta dos saltos del DS 250?", "category": "multi_hop",
+      "target_node": "decreto-03-reglamento-compras-publicas.txt", "direction": "in", "relation_types": ["cita", "modifica", "reglamenta", "aplica", "interpreta"], "max_hops": 2,
+      "expected_doc_ids": ["do-02-extracto-licitacion-publica.txt", "glosa-05-presupuesto-interior.txt", "oficio-02-contraloria-trato-directo.txt", "resolucion-01-chilecompra-compra-agil.txt"],
+      "witness_paths": [["do-02-extracto-licitacion-publica.txt", "resolucion-01-chilecompra-compra-agil.txt", "decreto-03-reglamento-compras-publicas.txt"], ["glosa-05-presupuesto-interior.txt", "decreto-03-reglamento-compras-publicas.txt"], ["oficio-02-contraloria-trato-directo.txt", "decreto-03-reglamento-compras-publicas.txt"], ["resolucion-01-chilecompra-compra-agil.txt", "decreto-03-reglamento-compras-publicas.txt"]]
+    },
+    {
+      "id": "cq-012", "question": "¿Qué documentos dependen en hasta dos saltos de la Ley 20.730?", "category": "multi_hop",
+      "target_node": "norma-01-ley-lobby.txt", "direction": "in", "relation_types": ["cita", "modifica", "reglamenta", "aplica", "interpreta"], "max_hops": 2,
+      "expected_doc_ids": ["decreto-02-reglamento-ley-lobby.txt", "decreto-05-reglamento-declaracion-intereses.txt", "ley-04-ley-21634-moderniza-compras.txt", "norma-02-ley-20880-probidad.txt", "resolucion-03-registro-lobbistas.txt"],
+      "witness_paths": [["decreto-02-reglamento-ley-lobby.txt", "norma-01-ley-lobby.txt"], ["decreto-05-reglamento-declaracion-intereses.txt", "norma-02-ley-20880-probidad.txt", "norma-01-ley-lobby.txt"], ["ley-04-ley-21634-moderniza-compras.txt", "norma-02-ley-20880-probidad.txt", "norma-01-ley-lobby.txt"], ["norma-02-ley-20880-probidad.txt", "norma-01-ley-lobby.txt"], ["resolucion-03-registro-lobbistas.txt", "norma-01-ley-lobby.txt"]]
+    },
+    {
+      "id": "cq-013", "question": "¿Qué documentos dependen en hasta dos saltos de la Ley 20.880?", "category": "multi_hop",
+      "target_node": "norma-02-ley-20880-probidad.txt", "direction": "in", "relation_types": ["cita", "modifica", "reglamenta", "aplica", "interpreta"], "max_hops": 2,
+      "expected_doc_ids": ["decreto-05-reglamento-declaracion-intereses.txt", "do-02-extracto-licitacion-publica.txt", "ley-04-ley-21634-moderniza-compras.txt", "oficio-02-contraloria-trato-directo.txt", "resolucion-01-chilecompra-compra-agil.txt", "resolucion-03-registro-lobbistas.txt"],
+      "witness_paths": [["decreto-05-reglamento-declaracion-intereses.txt", "norma-02-ley-20880-probidad.txt"], ["do-02-extracto-licitacion-publica.txt", "ley-04-ley-21634-moderniza-compras.txt", "norma-02-ley-20880-probidad.txt"], ["ley-04-ley-21634-moderniza-compras.txt", "norma-02-ley-20880-probidad.txt"], ["oficio-02-contraloria-trato-directo.txt", "ley-04-ley-21634-moderniza-compras.txt", "norma-02-ley-20880-probidad.txt"], ["resolucion-01-chilecompra-compra-agil.txt", "ley-04-ley-21634-moderniza-compras.txt", "norma-02-ley-20880-probidad.txt"], ["resolucion-03-registro-lobbistas.txt", "norma-02-ley-20880-probidad.txt"]]
+    },
+    {
+      "id": "cq-014", "question": "¿Qué documentos dependen en hasta dos saltos del DL 824?", "category": "multi_hop",
+      "target_node": "ley-05-dl-824-renta-base.txt", "direction": "in", "relation_types": ["cita", "modifica", "reglamenta", "aplica", "interpreta"], "max_hops": 2,
+      "expected_doc_ids": ["circular-01-sii-iva-digital.txt", "circular-02-sii-renta-propyme.txt", "circular-05-sii-factura-electronica.txt", "ley-01-dl-825-iva-base.txt", "ley-02-ley-21210-modernizacion.txt", "oficio-03-sii-consulta-plataforma-intermediacion.txt", "resolucion-02-sii-registro-plataformas.txt", "tabla-02-tasas-impuesto-renta-2024.txt"],
+      "witness_paths": [["circular-01-sii-iva-digital.txt", "ley-02-ley-21210-modernizacion.txt", "ley-05-dl-824-renta-base.txt"], ["circular-02-sii-renta-propyme.txt", "ley-02-ley-21210-modernizacion.txt", "ley-05-dl-824-renta-base.txt"], ["circular-05-sii-factura-electronica.txt", "ley-02-ley-21210-modernizacion.txt", "ley-05-dl-824-renta-base.txt"], ["ley-01-dl-825-iva-base.txt", "ley-02-ley-21210-modernizacion.txt", "ley-05-dl-824-renta-base.txt"], ["ley-02-ley-21210-modernizacion.txt", "ley-05-dl-824-renta-base.txt"], ["oficio-03-sii-consulta-plataforma-intermediacion.txt", "ley-02-ley-21210-modernizacion.txt", "ley-05-dl-824-renta-base.txt"], ["resolucion-02-sii-registro-plataformas.txt", "ley-02-ley-21210-modernizacion.txt", "ley-05-dl-824-renta-base.txt"], ["tabla-02-tasas-impuesto-renta-2024.txt", "ley-05-dl-824-renta-base.txt"]]
+    },
+    {
+      "id": "cq-015", "question": "¿Qué documentos dependen en hasta dos saltos del Decreto Exento 1.423?", "category": "multi_hop",
+      "target_node": "decreto-01-subvencion-escolar.txt", "direction": "in", "relation_types": ["cita", "modifica", "reglamenta", "aplica", "interpreta"], "max_hops": 2,
+      "expected_doc_ids": ["oficio-01-contraloria-subvenciones.txt", "oficio-05-contraloria-traspaso-slep.txt"],
+      "witness_paths": [["oficio-01-contraloria-subvenciones.txt", "decreto-01-subvencion-escolar.txt"], ["oficio-05-contraloria-traspaso-slep.txt", "oficio-01-contraloria-subvenciones.txt", "decreto-01-subvencion-escolar.txt"]]
+    },
+    {
+      "id": "cq-016", "question": "¿Qué documento deroga la Ley 19.886?", "category": "negative",
+      "target_node": "ley-03-ley-19886-compras-publicas.txt", "direction": "in", "relation_types": ["deroga"], "max_hops": 1,
+      "expected_doc_ids": [], "witness_paths": []
+    },
+    {
+      "id": "cq-017", "question": "¿Qué documento modifica la Ley 20.248?", "category": "negative",
+      "target_node": "ley-08-ley-20248-subvencion-preferencial.txt", "direction": "in", "relation_types": ["modifica"], "max_hops": 1,
+      "expected_doc_ids": [], "witness_paths": []
+    },
+    {
+      "id": "cq-018", "question": "¿Qué documento interpreta la Ley 21.634?", "category": "negative",
+      "target_node": "ley-04-ley-21634-moderniza-compras.txt", "direction": "in", "relation_types": ["interpreta"], "max_hops": 1,
+      "expected_doc_ids": [], "witness_paths": []
+    }
+  ]
+}

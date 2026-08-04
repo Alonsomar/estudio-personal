@@ -1,15 +1,1395 @@
 {
-  "bc629de9609bc7bad5ba568bee2d629177233d69": {
-    "respuesta": {
-      "documentos": [
-        "decreto-01-subvencion-escolar.txt",
-        "glosa-02-presupuesto-educacion.txt",
-        "oficio-01-contraloria-subvenciones.txt",
-        "oficio-05-contraloria-traspaso-slep.txt"
-      ],
-      "razonamiento": "1. **decreto-01-subvencion-escolar.txt**: Este decreto aprueba el reglamento de la Ley Nº 20.248, estableciendo la subvención escolar preferencial, por lo que menciona directamente la ley.  \n2. **glosa-02-presupuesto-educacion.txt**: Esta glosa detalla las asignaciones del programa de subvenciones, incluyendo la Subvención Escolar Preferencial, que se rige por la Ley Nº 20.248.  \n3. **oficio-01-contraloria-subvenciones.txt**: Este oficio se refiere a la utilización de recursos de la Subvención Escolar Preferencial, regulada por la Ley Nº 20.248, y su reglamento.  \n4. **oficio-05-contraloria-traspaso-slep.txt**: Este oficio menciona que el Servicio Local de Educación Pública sucede a la municipalidad en todos sus derechos y obligaciones relativos al servicio educacional traspasado, incluyendo la gestión de la Subvención Escolar Preferencial, que está regulada por la Ley Nº 20.248."
+  "format_version": 2,
+  "entries": {
+    "027c0ea7cf60d16bf6e7163bea7666c05d55686d371427481881a1b8ecf41406": {
+      "response": {
+        "documentos": [
+          "decreto-01-subvencion-escolar.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "glosa-02-presupuesto-educacion.txt",
+          "glosa-01-presupuesto-salud.txt"
+        ],
+        "razonamiento": "El Decreto Exento Nº 1.423 aprueba el reglamento de la Ley Nº 20.248 sobre subvención escolar preferencial, por lo que los documentos relacionados con esta ley y su reglamento dependen de él. Esto incluye el oficio de la Contraloría que se refiere a la utilización de recursos de la subvención escolar preferencial y las glosas presupuestarias que mencionan asignaciones relacionadas con la subvención escolar."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "4b8973ca0fe5376ec1484c097e566885de7d6e42a2301791da079d3b46e46c81",
+      "tokens_input": 25678,
+      "tokens_output": 146,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039393,
+      "replica": 0
     },
-    "tokens_in": 25694,
-    "tokens_out": 298
+    "0400e40cacbddaf37ea7c645a3e538f4651476e1c8f5fc8fd5b266b0f111159d": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.210 modifica la Ley Nº 20.248, que establece la Ley de Subvención Escolar Preferencial, al introducir cambios en la legislación tributaria."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c56a7acb1300913c2c0740710d68a2e0da750ae0607caca3c43a1e3e712ae01b",
+      "tokens_input": 25670,
+      "tokens_output": 59,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038859,
+      "replica": 0
+    },
+    "0ae893c03693fd63fff8560c8ff683c2086f18330130544fa6eb4d2301396f1d": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.210 modifica al Decreto Ley Nº 825, de 1974, sobre Impuesto a las Ventas y Servicios."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b4b3a4ce6956ed228121e4932fa94712a7f605f2b6079b2e0e5fb0ddbdcc626d",
+      "tokens_input": 25668,
+      "tokens_output": 52,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038813999999999997,
+      "replica": 0
+    },
+    "169ab2af7743ccfc45c8023837bc3437596568e0e03abb7f8885619b425beeb6": {
+      "response": {
+        "documentos": [
+          "decreto-01-subvencion-escolar.txt",
+          "decreto-02-reglamento-ley-lobby.txt",
+          "decreto-03-reglamento-compras-publicas.txt",
+          "decreto-04-modificacion-presupuestaria.txt",
+          "decreto-05-reglamento-declaracion-intereses.txt",
+          "decreto-06-reglamento-servicios-locales.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-03-sii-consulta-plataforma-intermediacion.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt"
+        ],
+        "razonamiento": "La Ley 18.575 establece las bases generales de la administración del Estado y se relaciona directamente con varios documentos que regulan aspectos administrativos y de probidad en la función pública. Los documentos listados dependen de esta ley en el contexto de la administración pública y la regulación de la probidad."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b789368949233b58226adda7e3d509f065d48af3583c118aa25dc06068a84086",
+      "tokens_input": 25677,
+      "tokens_output": 222,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00398475,
+      "replica": 0
+    },
+    "1881d05253471eaa56bff23fdffccbb5c7c959582bde5c69a4211e6211ce7130": {
+      "response": {
+        "documentos": [
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "decreto-01-subvencion-escolar.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "glosa-02-presupuesto-educacion.txt",
+          "ley-08-ley-20248-subvencion-preferencial.txt"
+        ],
+        "razonamiento": "Los documentos que citan directamente la Ley 20.248 son aquellos que abordan temas relacionados con la subvención escolar preferencial, la cual es establecida por dicha ley. En las circulares y oficios se menciona la ley en el contexto de la regulación de la subvención escolar y su aplicación en el sistema educativo."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c27fb098561bf941d13887258630adb1fd94044d15e5b71bfd713ffd9e332ace",
+      "tokens_input": 25672,
+      "tokens_output": 170,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.003952799999999999,
+      "replica": 1
+    },
+    "1926450ffbd76a862212c56bec32e91300f9c8cd8f138e1bbad2c088b95b2363": {
+      "response": {
+        "documentos": [
+          "decreto-05-reglamento-declaracion-intereses.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-05-contraloria-traspaso-slep.txt"
+        ],
+        "razonamiento": "La Ley Nº 18.575 establece las bases generales de la administración del Estado y se relaciona directamente con la Ley Nº 20.880 sobre probidad en la función pública, que a su vez se relaciona con el reglamento de declaración de intereses y patrimonio (decreto-05-reglamento-declaracion-intereses.txt). Además, la Ley Nº 18.575 también se relaciona con los oficios de la Contraloría que abordan temas de trato directo y traspaso de servicios, que son aspectos administrativos regulados por la ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b789368949233b58226adda7e3d509f065d48af3583c118aa25dc06068a84086",
+      "tokens_input": 25677,
+      "tokens_output": 169,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.003952949999999999,
+      "replica": 1
+    },
+    "2da8c2c45cae7f96e9c164f7501fd62614d8693cafe7a7e0ffd54d84603a4881": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-03-sii-ppm-honorarios.txt",
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "circular-06-sii-credito-especial-construccion.txt",
+          "decreto-01-subvencion-escolar.txt",
+          "decreto-02-reglamento-ley-lobby.txt",
+          "decreto-03-reglamento-compras-publicas.txt",
+          "decreto-04-modificacion-presupuestaria.txt",
+          "decreto-05-reglamento-declaracion-intereses.txt",
+          "decreto-06-reglamento-servicios-locales.txt",
+          "ley-02-ley-21210-modernizacion.txt",
+          "ley-05-dl-824-renta-base.txt",
+          "ley-06-ley-presupuestos-2024-articulado.txt",
+          "ley-07-ley-18575-bases-administracion.txt",
+          "ley-08-ley-20248-subvencion-preferencial.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-03-sii-consulta-plataforma-intermediacion.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt"
+        ],
+        "razonamiento": "Los documentos listados dependen del DL 824 (Ley sobre Impuesto a la Renta) en hasta dos saltos, ya que se relacionan con la normativa tributaria y regulaciones que se derivan de este decreto ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "341864c50b3b62583ced8262688f948b55803a735d75c0d82be92ac0f0c0423c",
+      "tokens_input": 25674,
+      "tokens_output": 347,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0040593,
+      "replica": 0
+    },
+    "2e2180b6282cea9591c6c1a48b429d86d7fe04e9f632ab469192003a9de7f13a": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.210 modifica la Ley Nº 20.248, que establece la Ley de Subvención Escolar Preferencial."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c56a7acb1300913c2c0740710d68a2e0da750ae0607caca3c43a1e3e712ae01b",
+      "tokens_input": 25670,
+      "tokens_output": 50,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038805,
+      "replica": 1
+    },
+    "32a9d345b91a92a3bb0e425cc16e2837dea1acb0c359af00769f677011c28299": {
+      "response": {
+        "documentos": [
+          "ley-04-ley-21634-moderniza-compras.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.634 moderniza la Ley Nº 19.886, que regula los procedimientos de compra pública, y su interpretación se encuentra en el propio texto de la ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "21ef0240b7c0d9d3cdd162383dffd61f13e5e9fc4d774e94156be638fe1511aa",
+      "tokens_input": 25670,
+      "tokens_output": 62,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038876999999999996,
+      "replica": 2
+    },
+    "43ac0727885a7b6111ec2bcc2f78d6f4b3752aa1d6070ee264922e253e9e9968": {
+      "response": {
+        "documentos": [
+          "ley-03-ley-19886-compras-publicas.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula los contratos administrativos de suministro y prestación de servicios, y se aplica a las contrataciones que celebre la Administración del Estado."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "a03ec07ef214131508b58bb238cba0a50366e11ab4eb83208aecbc8d0b1d018e",
+      "tokens_input": 25674,
+      "tokens_output": 57,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038852999999999995,
+      "replica": 1
+    },
+    "447224fb5744b6a09ddb6a914d7e60b4e92e061163dfaee8b2c9329d75996ab2": {
+      "response": {
+        "documentos": [
+          "circular-01-sii-iva-digital.txt",
+          "circular-02-sii-renta-propyme.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley 21.210, que moderniza la legislación tributaria, es interpretada y complementada por varias circulares del Servicio de Impuestos Internos (SII) que abordan aspectos específicos de su aplicación, como el IVA a servicios digitales, el régimen Pro Pyme y la obligación de emitir documentos tributarios electrónicos."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "9a1257c9b4336b7404c0931cb94a37142e8a47adb176c5806237569a321f3d90",
+      "tokens_input": 25671,
+      "tokens_output": 128,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00392745,
+      "replica": 0
+    },
+    "45a371ccc4eaec1f5d47fc7523289889b856ad0fff2333c5fdc7ddaae2ce0e82": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt",
+          "ley-01-dl-825-iva-base.txt",
+          "ley-05-dl-824-renta-base.txt"
+        ],
+        "razonamiento": "La Ley 21.210 modifica el Decreto Ley Nº 825, de 1974, sobre Impuesto a las Ventas y Servicios, y también introduce cambios en la Ley sobre Impuesto a la Renta contenida en el Decreto Ley Nº 824, de 1974."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b8a1304ef7c02428cc02ac20d08ecd301c2cce889e7f856b3f13d013f9706ea4",
+      "tokens_input": 25670,
+      "tokens_output": 104,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039128999999999995,
+      "replica": 2
+    },
+    "48cb4c2e41c68c410589ec1637d75f633b4faef5b0936e44d394514ff09b39c4": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-03-sii-ppm-honorarios.txt",
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "circular-06-sii-credito-especial-construccion.txt",
+          "decreto-01-subvencion-escolar.txt",
+          "decreto-02-reglamento-ley-lobby.txt",
+          "decreto-03-reglamento-compras-publicas.txt",
+          "decreto-04-modificacion-presupuestaria.txt",
+          "decreto-05-reglamento-declaracion-intereses.txt",
+          "decreto-06-reglamento-servicios-locales.txt",
+          "ley-02-ley-21210-modernizacion.txt",
+          "ley-05-dl-824-renta-base.txt",
+          "ley-06-ley-presupuestos-2024-articulado.txt",
+          "ley-07-ley-18575-bases-administracion.txt",
+          "ley-08-ley-20248-subvencion-preferencial.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-03-sii-consulta-plataforma-intermediacion.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt"
+        ],
+        "razonamiento": "Los documentos que dependen en hasta dos saltos del DL 824 son aquellos que se relacionan directamente con la Ley sobre Impuesto a la Renta (DL 824) y sus modificaciones, así como aquellos que regulan aspectos tributarios y administrativos que se derivan de esta ley. Se incluyen circulares y decretos que establecen normativas y procedimientos relacionados con el impuesto a la renta y su aplicación."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "341864c50b3b62583ced8262688f948b55803a735d75c0d82be92ac0f0c0423c",
+      "tokens_input": 25674,
+      "tokens_output": 383,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.004080899999999999,
+      "replica": 1
+    },
+    "4fd967a9443284575cbc26c82e4f41a10fe48e3394842c7cac484ed6d288915d": {
+      "response": {
+        "documentos": [
+          "decreto-04-modificacion-presupuestaria.txt",
+          "glosa-01-presupuesto-salud.txt"
+        ],
+        "razonamiento": "El documento 'decreto-04-modificacion-presupuestaria.txt' menciona la modificación del presupuesto del sector público para el año 2024, específicamente en la partida del Ministerio de Salud, lo que implica una relación directa con la glosa de salud. Además, la 'glosa-01-presupuesto-salud.txt' es la glosa que se refiere a los recursos del Ministerio de Salud, por lo que también se incluye."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "7da45170946ffc52390310e383fa1bc9b551f449f89513feda491df651eb4669",
+      "tokens_input": 25673,
+      "tokens_output": 123,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00392475,
+      "replica": 0
+    },
+    "50a2dddec926ca8348ee33a5561b6f88e410ec474aece14f390c2c4237496635": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-03-sii-ppm-honorarios.txt",
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "circular-06-sii-credito-especial-construccion.txt",
+          "decreto-02-reglamento-ley-lobby.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-03-sii-consulta-plataforma-intermediacion.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt",
+          "resolucion-03-registro-lobbistas.txt"
+        ],
+        "razonamiento": "La Ley 20.730 regula el lobby y las gestiones que representan intereses particulares ante las autoridades y funcionarios. Los documentos que dependen de esta ley, ya sea directamente o a través de otras normativas relacionadas, incluyen circulares y oficios que abordan temas de probidad, contratación pública, y procedimientos de registro de lobbistas, entre otros."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "92367eec4a861237744a232783d2764da0c52bb04dab2a468c018f55294df440",
+      "tokens_input": 25677,
+      "tokens_output": 279,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.004018949999999999,
+      "replica": 2
+    },
+    "58b1974f1021a6fa50897f4dbbfc96642d96078aaec8838e3a22f8602a318545": {
+      "response": {
+        "documentos": [
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-05-contraloria-traspaso-slep.txt"
+        ],
+        "razonamiento": "El Decreto Exento Nº 1.423 establece el reglamento de la Ley Nº 20.248 sobre la subvención escolar preferencial. Los documentos que dependen de este decreto son aquellos que abordan la aplicación y fiscalización de dicha subvención, como el oficio de la Contraloría General que trata sobre la rendición de cuentas de los sostenedores de establecimientos educacionales subvencionados y el oficio que se pronuncia sobre la responsabilidad por saldos no ejecutados de la subvención escolar preferencial."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "4b8973ca0fe5376ec1484c097e566885de7d6e42a2301791da079d3b46e46c81",
+      "tokens_input": 25678,
+      "tokens_output": 143,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.003937499999999999,
+      "replica": 1
+    },
+    "5a0436550de09cc0b8ada6308c14aa956a99afa64fb4d879522f80ee71f5187d": {
+      "response": {
+        "documentos": [
+          "circular-01-sii-iva-digital.txt",
+          "circular-02-sii-renta-propyme.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley 21.210 introduce modificaciones al sistema tributario chileno, y los documentos que interpretan o explican su aplicación son las circulares emitidas por el Servicio de Impuestos Internos (SII) y la propia ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "9a1257c9b4336b7404c0931cb94a37142e8a47adb176c5806237569a321f3d90",
+      "tokens_input": 25671,
+      "tokens_output": 110,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00391665,
+      "replica": 1
+    },
+    "614c7a6f2215f0c8bfdd6fa30add6973e018093c3685e5841d5dbf84b6934284": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt",
+          "ley-01-dl-825-iva-base.txt",
+          "ley-05-dl-824-renta-base.txt"
+        ],
+        "razonamiento": "La Ley 21.210 modifica el Decreto Ley Nº 825, de 1974, sobre Impuesto a las Ventas y Servicios, y también introduce modificaciones a la Ley sobre Impuesto a la Renta contenida en el artículo 1º del Decreto Ley Nº 824, de 1974."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b8a1304ef7c02428cc02ac20d08ecd301c2cce889e7f856b3f13d013f9706ea4",
+      "tokens_input": 25670,
+      "tokens_output": 109,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039159,
+      "replica": 1
+    },
+    "63428eccb1d920d373759c2021bd6ccf51c2eba5b681c7569e39a1b115494872": {
+      "response": {
+        "documentos": [
+          "decreto-04-modificacion-presupuestaria.txt",
+          "glosa-01-presupuesto-salud.txt"
+        ],
+        "razonamiento": "El documento 'decreto-04-modificacion-presupuestaria.txt' menciona la modificación del presupuesto del sector público para el año 2024, específicamente en la partida del Ministerio de Salud, lo que afecta directamente a la glosa de salud. Además, la 'glosa-01-presupuesto-salud.txt' es la que contiene la información específica sobre el presupuesto de salud, por lo que también se considera relevante."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "7da45170946ffc52390310e383fa1bc9b551f449f89513feda491df651eb4669",
+      "tokens_input": 25673,
+      "tokens_output": 120,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00392295,
+      "replica": 1
+    },
+    "6ce2fb6283e270c3936a2e8cab05df7ecd2fd64a2385e4ae8304a952aefbd8ea": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.210 modifica al Decreto Ley Nº 825, de 1974, sobre Impuesto a las Ventas y Servicios."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b4b3a4ce6956ed228121e4932fa94712a7f605f2b6079b2e0e5fb0ddbdcc626d",
+      "tokens_input": 25668,
+      "tokens_output": 52,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038813999999999997,
+      "replica": 2
+    },
+    "6f31fda84f5d148ae3c3095652da0a280fbdf798182e02517c010b2dddff52cd": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "decreto-04-modificacion-presupuestaria.txt",
+          "decreto-06-reglamento-servicios-locales.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "resolucion-01-chilecompra-compra-agil.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula las bases sobre contratos administrativos de suministro y prestación de servicios. Los documentos que dependen de esta ley en hasta dos saltos incluyen circulares que instruyen sobre regímenes tributarios relacionados, decretos que aprueban reglamentos de contratación y resoluciones que establecen procedimientos de compra, todos vinculados a la normativa de contratación pública."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "873aae778012290e3752d0f044f6cdc7b9efe9eb750010b8d49b149e017a78ef",
+      "tokens_input": 25677,
+      "tokens_output": 168,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039523499999999994,
+      "replica": 1
+    },
+    "738329bae0fa361a9dcc07210be2713db9baee8ce53e933e3b5f8d36a1b24f5d": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.210 modifica el Decreto Ley Nº 825, de 1974, sobre Impuesto a las Ventas y Servicios."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b4b3a4ce6956ed228121e4932fa94712a7f605f2b6079b2e0e5fb0ddbdcc626d",
+      "tokens_input": 25668,
+      "tokens_output": 52,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038813999999999997,
+      "replica": 1
+    },
+    "75e6ba237dbd9b1aa7ac1ddc2a66df5229def0bd549e0da1041df2552f7f17b7": {
+      "response": {
+        "documentos": [
+          "decreto-04-modificacion-presupuestaria.txt",
+          "ley-06-ley-presupuestos-2024-articulado.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.640 es mencionada en el Decreto Nº 1.187, que modifica el presupuesto del sector público, y en la Ley de Presupuestos del Sector Público correspondiente al año 2024. Además, el oficio circular de la Dirección de Presupuestos también hace referencia a esta ley en el contexto de la ejecución presupuestaria."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c3bbdd7a58b47dd6950d38e2118c333e8257e64fbfc94a0d7234364fef97d2b3",
+      "tokens_input": 25672,
+      "tokens_output": 127,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.003927,
+      "replica": 2
+    },
+    "76d5529341e0998e29466f670f4f951d6166bfbf663511367c50f6a0231c089e": {
+      "response": {
+        "documentos": [
+          "ley-04-ley-21634-moderniza-compras.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.634 moderniza la Ley Nº 19.886, que regula los contratos administrativos de suministro y prestación de servicios."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8e7c9b47e53e374a0209ff12932a7fcce1776f8281b47e658f756c857d619851",
+      "tokens_input": 25671,
+      "tokens_output": 53,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038824499999999995,
+      "replica": 1
+    },
+    "7ea4936a1a3a731b5de02265df7762ec7ce3d1aa1fabe689fa7eef103d23ef6f": {
+      "response": {
+        "documentos": [
+          "decreto-03-reglamento-compras-publicas.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt"
+        ],
+        "razonamiento": "El Decreto Supremo Nº 250 establece el reglamento de la Ley Nº 19.886, que regula los contratos administrativos de suministro y prestación de servicios. Dependiendo de este decreto, se encuentran documentos que regulan procedimientos de contratación pública y compras ágiles, así como la regulación de plataformas de servicios."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8703b0d4a2df4386a29a3fe8659b6fe074412827fee74e0bc46fb5e1df7ccc37",
+      "tokens_input": 25674,
+      "tokens_output": 113,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039188999999999995,
+      "replica": 0
+    },
+    "8406351eca8b33c66c726d5ff54b59d30d1fa549158d48180b0f5fff929793f2": {
+      "response": {
+        "documentos": [
+          "circular-03-sii-ppm-honorarios.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-05-contraloria-traspaso-slep.txt"
+        ],
+        "razonamiento": "La Ley Nº 20.880 regula la probidad en la función pública y la prevención de conflictos de intereses. Los documentos que dependen de esta ley en hasta dos saltos son aquellos que abordan temas relacionados con la probidad administrativa y la declaración de intereses, como el oficio sobre la responsabilidad por saldos no ejecutados de subvención escolar preferencial, que se relaciona con la Ley 20.248, y la circular sobre los pagos provisionales mensuales, que también se vincula a la normativa tributaria y de probidad."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "79702305b52d9b7bed886c31e7d5cf390c0f86ebeb06104a54e378264fb87d34",
+      "tokens_input": 25677,
+      "tokens_output": 164,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00394995,
+      "replica": 0
+    },
+    "97b478c2085e56ba6faa652cc6345d78bd03244bf5fdb73259f8fc45bf6797b5": {
+      "response": {
+        "documentos": [
+          "ley-04-ley-21634-moderniza-compras.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.634 moderniza la Ley Nº 19.886, que regula las bases sobre contratos administrativos de suministro y prestación de servicios."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8e7c9b47e53e374a0209ff12932a7fcce1776f8281b47e658f756c857d619851",
+      "tokens_input": 25671,
+      "tokens_output": 55,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038836499999999998,
+      "replica": 2
+    },
+    "993d74cd218ea558c5fd50860461f3e0572ce8d3b7cade444a5f50238591de33": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "decreto-04-modificacion-presupuestaria.txt",
+          "decreto-06-reglamento-servicios-locales.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula las bases sobre contratos administrativos de suministro y prestación de servicios. Los documentos que dependen de esta ley en hasta dos saltos incluyen circulares y resoluciones que establecen procedimientos y regulaciones relacionadas con la contratación pública y la ejecución presupuestaria."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "873aae778012290e3752d0f044f6cdc7b9efe9eb750010b8d49b149e017a78ef",
+      "tokens_input": 25677,
+      "tokens_output": 181,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00396015,
+      "replica": 2
+    },
+    "a11540fd5d479a97ea401f0789660afe7666cfce2d135aebd0deaaddece3f831": {
+      "response": {
+        "documentos": [
+          "decreto-03-reglamento-compras-publicas.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula los contratos administrativos de suministro y prestación de servicios, y su reglamento es el Decreto Supremo Nº 250, que aprueba el reglamento de dicha ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "78195e9b61720b9c4f0deb51723450588d7c905f83153b26e76b4569a42e48c0",
+      "tokens_input": 25672,
+      "tokens_output": 63,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038886,
+      "replica": 1
+    },
+    "a1bbabc1097491b9f649912d366a264912ea46d643722402153d49bae0568093": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "decreto-04-modificacion-presupuestaria.txt",
+          "decreto-06-reglamento-servicios-locales.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "resolucion-01-chilecompra-compra-agil.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula las bases sobre contratos administrativos de suministro y prestación de servicios. Los documentos que dependen de esta ley en hasta dos saltos incluyen circulares y decretos que establecen procedimientos y regulaciones relacionadas con la contratación pública y la administración de recursos, así como oficios que interpretan y aplican estas normativas."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "873aae778012290e3752d0f044f6cdc7b9efe9eb750010b8d49b149e017a78ef",
+      "tokens_input": 25677,
+      "tokens_output": 162,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00394875,
+      "replica": 0
+    },
+    "a1dc936df2ac6ab29414e25c8f887a7336e5586f1c806d8348695cc872a0b359": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-03-sii-ppm-honorarios.txt",
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "circular-06-sii-credito-especial-construccion.txt",
+          "decreto-02-reglamento-ley-lobby.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-03-sii-consulta-plataforma-intermediacion.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt",
+          "resolucion-03-registro-lobbistas.txt"
+        ],
+        "razonamiento": "La Ley 20.730 regula el lobby y las gestiones que representan intereses particulares ante las autoridades y funcionarios. Los documentos que dependen de esta ley, ya sea directamente o a través de otras normativas relacionadas, incluyen circulares y oficios que abordan temas de probidad, contratación pública, y procedimientos de registro de lobbistas, entre otros."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "92367eec4a861237744a232783d2764da0c52bb04dab2a468c018f55294df440",
+      "tokens_input": 25677,
+      "tokens_output": 279,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.004018949999999999,
+      "replica": 1
+    },
+    "a2a339a176a1b0c975ec4331a8892001b66d2db19af338a8cbe0d3d09b2da267": {
+      "response": {
+        "documentos": [
+          "decreto-05-reglamento-declaracion-intereses.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "resolucion-03-registro-lobbistas.txt"
+        ],
+        "razonamiento": "La Ley Nº 20.880 regula la probidad en la función pública y la prevención de conflictos de intereses. Los documentos que dependen de esta ley en hasta dos saltos son aquellos que se relacionan directamente con la probidad y la declaración de intereses, así como aquellos que establecen procedimientos y regulaciones que se derivan de su aplicación."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "79702305b52d9b7bed886c31e7d5cf390c0f86ebeb06104a54e378264fb87d34",
+      "tokens_input": 25677,
+      "tokens_output": 137,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00393375,
+      "replica": 2
+    },
+    "ab13f8e01af03c199c9b4b48f61c2736e00d2a46a9a1120505926ba4f09a49ac": {
+      "response": {
+        "documentos": [
+          "ley-04-ley-21634-moderniza-compras.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.634 moderniza la Ley Nº 19.886, que regula los contratos administrativos de suministro y prestación de servicios."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8e7c9b47e53e374a0209ff12932a7fcce1776f8281b47e658f756c857d619851",
+      "tokens_input": 25671,
+      "tokens_output": 53,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038824499999999995,
+      "replica": 0
+    },
+    "acf77cc7847e7a353e88dfb50ba7a9d8dc8da48d25bd95502d4bf83a88d82646": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.210 modifica la Ley Nº 20.248, que establece la Ley de Subvención Escolar Preferencial, al introducir cambios en la legislación tributaria."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c56a7acb1300913c2c0740710d68a2e0da750ae0607caca3c43a1e3e712ae01b",
+      "tokens_input": 25670,
+      "tokens_output": 59,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038859,
+      "replica": 2
+    },
+    "adc1ad14196941e5eedeed39e3335230b2837e600597270ae5bf379fae871fdf": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-03-sii-ppm-honorarios.txt",
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "circular-06-sii-credito-especial-construccion.txt",
+          "decreto-01-subvencion-escolar.txt",
+          "decreto-02-reglamento-ley-lobby.txt",
+          "decreto-03-reglamento-compras-publicas.txt",
+          "decreto-04-modificacion-presupuestaria.txt",
+          "decreto-05-reglamento-declaracion-intereses.txt",
+          "decreto-06-reglamento-servicios-locales.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-03-sii-consulta-plataforma-intermediacion.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt",
+          "resolucion-03-registro-lobbistas.txt",
+          "tabla-02-tasas-impuesto-renta-2024.txt"
+        ],
+        "razonamiento": "Los documentos listados dependen del DL 824 (Ley sobre Impuesto a la Renta) en hasta dos saltos, ya que abordan temas relacionados con la tributación, la renta y las obligaciones fiscales que se derivan de dicha ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "341864c50b3b62583ced8262688f948b55803a735d75c0d82be92ac0f0c0423c",
+      "tokens_input": 25674,
+      "tokens_output": 334,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0040514999999999995,
+      "replica": 2
+    },
+    "b0d3b50be4e61896780d0aa19a8a76b0923c881570a4ec86657fca6bf501f0cb": {
+      "response": {
+        "documentos": [
+          "ley-04-ley-21634-moderniza-compras.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.634 moderniza la Ley Nº 19.886, que regula los contratos administrativos de suministro y prestación de servicios, y su contenido se encuentra en el documento correspondiente a la ley mencionada."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "21ef0240b7c0d9d3cdd162383dffd61f13e5e9fc4d774e94156be638fe1511aa",
+      "tokens_input": 25670,
+      "tokens_output": 68,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038913,
+      "replica": 1
+    },
+    "b52d2ed41c045c976fc722a909a8f357a944badd1ee927e107a10bbe392beeea": {
+      "response": {
+        "documentos": [
+          "ley-02-ley-21210-modernizacion.txt",
+          "ley-01-dl-825-iva-base.txt",
+          "ley-05-dl-824-renta-base.txt"
+        ],
+        "razonamiento": "La Ley 21.210 modifica el Decreto Ley Nº 825, de 1974, sobre Impuesto a las Ventas y Servicios, y el Decreto Ley Nº 824, sobre Impuesto a la Renta, según se indica en su texto."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b8a1304ef7c02428cc02ac20d08ecd301c2cce889e7f856b3f13d013f9706ea4",
+      "tokens_input": 25670,
+      "tokens_output": 98,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039093,
+      "replica": 0
+    },
+    "b6e847d541656d98517d1122e8fd9bcaa3c42197ad45efba575506e878c94457": {
+      "response": {
+        "documentos": [
+          "decreto-03-reglamento-compras-publicas.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula los contratos administrativos de suministro y prestación de servicios, y su reglamento es el Decreto Supremo Nº 250, que aprueba el reglamento de dicha ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "78195e9b61720b9c4f0deb51723450588d7c905f83153b26e76b4569a42e48c0",
+      "tokens_input": 25672,
+      "tokens_output": 63,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038886,
+      "replica": 2
+    },
+    "bc0bd59e2850fc6ee3d1908a67d7ad8a23450c5e084e031b9bb22d9cd734e005": {
+      "response": {
+        "documentos": [
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-05-contraloria-traspaso-slep.txt"
+        ],
+        "razonamiento": "El Decreto Exento Nº 1.423 regula la Ley de Subvención Escolar Preferencial, y los documentos que dependen de este decreto son aquellos que abordan la aplicación y fiscalización de dicha subvención, como el oficio de la Contraloría que trata sobre la rendición de cuentas de los sostenedores y el uso de los recursos de la subvención escolar preferencial."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "4b8973ca0fe5376ec1484c097e566885de7d6e42a2301791da079d3b46e46c81",
+      "tokens_input": 25678,
+      "tokens_output": 117,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039219,
+      "replica": 2
+    },
+    "be7f6e5ba18866be8ec327de0557cc43808928969330a7785d0d934d065e1253": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-03-sii-ppm-honorarios.txt",
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "circular-06-sii-credito-especial-construccion.txt",
+          "decreto-02-reglamento-ley-lobby.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-03-sii-consulta-plataforma-intermediacion.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt",
+          "resolucion-03-registro-lobbistas.txt"
+        ],
+        "razonamiento": "La Ley 20.730 regula el lobby y las gestiones que representan intereses particulares ante las autoridades y funcionarios. Los documentos que dependen de esta ley en hasta dos saltos incluyen circulares y oficios que abordan temas relacionados con la probidad, la fiscalización de recursos públicos, y la regulación de la contratación pública, así como la emisión de documentos tributarios y la gestión de subvenciones."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "92367eec4a861237744a232783d2764da0c52bb04dab2a468c018f55294df440",
+      "tokens_input": 25677,
+      "tokens_output": 288,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0040243499999999995,
+      "replica": 0
+    },
+    "c30f07ee90be70442268284c119534133ab137355eb4a5da7d1774ff2b3369ac": {
+      "response": {
+        "documentos": [
+          "decreto-03-reglamento-compras-publicas.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula los contratos administrativos de suministro y prestación de servicios, y su reglamento es el Decreto Supremo Nº 250, que aprueba el reglamento de dicha ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "78195e9b61720b9c4f0deb51723450588d7c905f83153b26e76b4569a42e48c0",
+      "tokens_input": 25672,
+      "tokens_output": 63,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038886,
+      "replica": 0
+    },
+    "c8cc533ffda40567e1f9ae591dd9e74955fba1f3cbe4ab15eddee4b88130b42e": {
+      "response": {
+        "documentos": [
+          "decreto-03-reglamento-compras-publicas.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt"
+        ],
+        "razonamiento": "El Decreto Supremo Nº 250 establece el reglamento de la Ley Nº 19.886, que regula los contratos administrativos de suministro y prestación de servicios. Los documentos que dependen de este decreto en hasta dos saltos son: 1) El reglamento de la Ley Nº 19.886 (decreto-03-reglamento-compras-publicas.txt), que es el documento base. 2) La resolución sobre el procedimiento de compra ágil (resolucion-01-chilecompra-compra-agil.txt) y la resolución sobre el registro de plataformas (resolucion-02-sii-registro-plataformas.txt), que se relacionan con la aplicación de la Ley Nº 19.886."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8703b0d4a2df4386a29a3fe8659b6fe074412827fee74e0bc46fb5e1df7ccc37",
+      "tokens_input": 25674,
+      "tokens_output": 199,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039705,
+      "replica": 2
+    },
+    "cc0081de77ee0b1c7f81c933d2ae1ef7c543a2195b40c7930cf587657b35496b": {
+      "response": {
+        "documentos": [
+          "decreto-04-modificacion-presupuestaria.txt",
+          "ley-06-ley-presupuestos-2024-articulado.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.640 es mencionada en el Decreto Nº 1.187, que modifica el presupuesto del sector público, en la Ley de Presupuestos del Sector Público correspondiente al año 2024, y en el oficio circular de la Dirección de Presupuestos que imparte instrucciones sobre la ejecución presupuestaria."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c3bbdd7a58b47dd6950d38e2118c333e8257e64fbfc94a0d7234364fef97d2b3",
+      "tokens_input": 25672,
+      "tokens_output": 121,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039234,
+      "replica": 0
+    },
+    "d1432351f95a7976f125af34a36262bda0593cd3164c011ef96e024358cdd12a": {
+      "response": {
+        "documentos": [
+          "ley-03-ley-19886-compras-publicas.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula los contratos administrativos de suministro y prestación de servicios, y su aplicación se encuentra en el documento correspondiente a dicha ley."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "a03ec07ef214131508b58bb238cba0a50366e11ab4eb83208aecbc8d0b1d018e",
+      "tokens_input": 25674,
+      "tokens_output": 55,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038840999999999997,
+      "replica": 0
+    },
+    "d2505a94bdf8c06f61262d95c9140a742a9df1addba1f0ce779bcf326a3bca54": {
+      "response": {
+        "documentos": [
+          "decreto-03-reglamento-compras-publicas.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt"
+        ],
+        "razonamiento": "El Decreto Supremo Nº 250 regula las bases sobre contratos administrativos de suministro y prestación de servicios, y está relacionado con la Ley Nº 19.886. Los documentos que dependen de este decreto en hasta dos saltos son: el reglamento de la Ley Nº 19.886 (decreto-03-reglamento-compras-publicas.txt), la resolución sobre el procedimiento de compra ágil (resolucion-01-chilecompra-compra-agil.txt), y la resolución sobre el registro de plataformas (resolucion-02-sii-registro-plataformas.txt)."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8703b0d4a2df4386a29a3fe8659b6fe074412827fee74e0bc46fb5e1df7ccc37",
+      "tokens_input": 25674,
+      "tokens_output": 171,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.003953699999999999,
+      "replica": 1
+    },
+    "d6b47adc579efe42886e26a474820f2b708668cb6a3b6ebb40567934b3a4581e": {
+      "response": {
+        "documentos": [
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "decreto-01-subvencion-escolar.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "ley-08-ley-20248-subvencion-preferencial.txt"
+        ],
+        "razonamiento": "La Ley Nº 20.248 establece la Ley de Subvención Escolar Preferencial, y los documentos citados hacen referencia a esta ley en el contexto de las subvenciones escolares y su regulación."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c27fb098561bf941d13887258630adb1fd94044d15e5b71bfd713ffd9e332ace",
+      "tokens_input": 25672,
+      "tokens_output": 132,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039299999999999995,
+      "replica": 2
+    },
+    "dae0589e875a899c851e140d3afcc60c147302028013a62e4a0879bc831fa882": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt",
+          "circular-03-sii-ppm-honorarios.txt",
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "circular-06-sii-credito-especial-construccion.txt",
+          "decreto-01-subvencion-escolar.txt",
+          "decreto-02-reglamento-ley-lobby.txt",
+          "decreto-03-reglamento-compras-publicas.txt",
+          "decreto-04-modificacion-presupuestaria.txt",
+          "decreto-05-reglamento-declaracion-intereses.txt",
+          "decreto-06-reglamento-servicios-locales.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-02-contraloria-trato-directo.txt",
+          "oficio-03-sii-consulta-plataforma-intermediacion.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "resolucion-01-chilecompra-compra-agil.txt",
+          "resolucion-02-sii-registro-plataformas.txt",
+          "resolucion-03-registro-lobbistas.txt"
+        ],
+        "razonamiento": "La Ley Nº 18.575 establece las bases generales de la administración del Estado y se relaciona directamente con varias normativas que regulan la función pública, la probidad administrativa y la gestión de recursos públicos. Los documentos listados dependen de esta ley en el sentido de que regulan aspectos de la administración pública, la probidad y la gestión de recursos, que son temas centrales de la Ley Nº 18.575."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b789368949233b58226adda7e3d509f065d48af3583c118aa25dc06068a84086",
+      "tokens_input": 25677,
+      "tokens_output": 356,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00406515,
+      "replica": 2
+    },
+    "dea1886ac8a1d2383a16e1d55c3c5b915fd3e4ca3a8271bc2d0189117a7eef77": {
+      "response": {
+        "documentos": [
+          "ley-04-ley-21634-moderniza-compras.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.634 moderniza la Ley Nº 19.886, que regula los contratos administrativos de suministro y prestación de servicios, y su contenido se encuentra en el documento correspondiente a la ley mencionada."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "21ef0240b7c0d9d3cdd162383dffd61f13e5e9fc4d774e94156be638fe1511aa",
+      "tokens_input": 25670,
+      "tokens_output": 68,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0038913,
+      "replica": 0
+    },
+    "e34d3d0f887d952b025f44b8c9e82c2c838b801d35ebce72d22b0a0a9ec28e2b": {
+      "response": {
+        "documentos": [
+          "circular-01-sii-iva-digital.txt",
+          "circular-02-sii-renta-propyme.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "ley-02-ley-21210-modernizacion.txt"
+        ],
+        "razonamiento": "La Ley 21.210 introduce modificaciones al sistema tributario chileno, y los documentos que interpretan o explican su aplicación son aquellos que abordan específicamente sus disposiciones, como las circulares del Servicio de Impuestos Internos que detallan la implementación de los cambios en IVA y en el régimen Pro Pyme, así como la ley misma."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "9a1257c9b4336b7404c0931cb94a37142e8a47adb176c5806237569a321f3d90",
+      "tokens_input": 25671,
+      "tokens_output": 132,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039298499999999995,
+      "replica": 2
+    },
+    "ef0645ff528ae86d68658478a39e56df3d6a7a46967709eb6cc9ca1e51c1626f": {
+      "response": {
+        "documentos": [
+          "circular-04-sii-iva-exenciones.txt",
+          "circular-05-sii-factura-electronica.txt",
+          "decreto-01-subvencion-escolar.txt",
+          "oficio-01-contraloria-subvenciones.txt",
+          "oficio-05-contraloria-traspaso-slep.txt",
+          "ley-08-ley-20248-subvencion-preferencial.txt"
+        ],
+        "razonamiento": "La Ley Nº 20.248 establece la Ley de Subvención Escolar Preferencial, y se menciona en varios documentos que abordan temas relacionados con la subvención escolar, su reglamento y la fiscalización de su uso."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c27fb098561bf941d13887258630adb1fd94044d15e5b71bfd713ffd9e332ace",
+      "tokens_input": 25672,
+      "tokens_output": 139,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039342,
+      "replica": 0
+    },
+    "f04e273eaf5696dc31f4bb9ce61ba9f7b99c7d43e9411e9d2499d0d2421ded97": {
+      "response": {
+        "documentos": [
+          "decreto-05-reglamento-declaracion-intereses.txt",
+          "oficio-02-contraloria-trato-directo.txt"
+        ],
+        "razonamiento": "La Ley Nº 20.880 regula la probidad en la función pública y la prevención de conflictos de intereses. El Decreto Supremo Nº 2, que aprueba su reglamento, depende directamente de esta ley. Además, el Oficio de la Contraloría General de la República se refiere a la aplicación de la Ley Nº 20.880 en el contexto de la declaración de intereses y patrimonio, lo que lo vincula indirectamente a la ley en cuestión."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "79702305b52d9b7bed886c31e7d5cf390c0f86ebeb06104a54e378264fb87d34",
+      "tokens_input": 25677,
+      "tokens_output": 132,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.003930749999999999,
+      "replica": 1
+    },
+    "f310be65260be0ce9506182c6c91997cd905224660e3c01b3727cb9e12c7ec7f": {
+      "response": {
+        "documentos": [
+          "decreto-04-modificacion-presupuestaria.txt",
+          "ley-06-ley-presupuestos-2024-articulado.txt",
+          "oficio-04-dipres-ejecucion-presupuestaria.txt"
+        ],
+        "razonamiento": "La Ley Nº 21.640 es mencionada en el Decreto Nº 1.187, que modifica el presupuesto del sector público para el año 2024, y en la Ley de Presupuestos del Sector Público correspondiente al año 2024. Además, el oficio circular de la Dirección de Presupuestos también hace referencia a esta ley en el contexto de la ejecución presupuestaria."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c3bbdd7a58b47dd6950d38e2118c333e8257e64fbfc94a0d7234364fef97d2b3",
+      "tokens_input": 25672,
+      "tokens_output": 133,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.003930599999999999,
+      "replica": 1
+    },
+    "fc236ef7f9e5c995ce5bf883f3bb961bb13d70d7679694992194c99884dc171f": {
+      "response": {
+        "documentos": [
+          "circular-02-sii-renta-propyme.txt"
+        ],
+        "razonamiento": "La Ley Nº 19.886 regula los contratos administrativos de suministro y prestación de servicios, y la Circular Nº 62 de 2020 instruye sobre el nuevo Régimen Pro Pyme establecido en la Ley sobre Impuesto a la Renta, que se relaciona con la aplicación de la Ley 19.886 en el contexto de las micro, pequeñas y medianas empresas."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "a03ec07ef214131508b58bb238cba0a50366e11ab4eb83208aecbc8d0b1d018e",
+      "tokens_input": 25674,
+      "tokens_output": 100,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0039111,
+      "replica": 2
+    },
+    "fee14f7c6e2d4316ef18587e81d4822957376fb194db08c52ef8762aad094cdf": {
+      "response": {
+        "documentos": [
+          "decreto-04-modificacion-presupuestaria.txt",
+          "glosa-01-presupuesto-salud.txt"
+        ],
+        "razonamiento": "El documento 'decreto-04-modificacion-presupuestaria.txt' menciona la modificación del presupuesto del sector público para el año 2024, específicamente en la partida del Ministerio de Salud, lo que afecta directamente a la glosa de salud. Además, la 'glosa-01-presupuesto-salud.txt' es la que detalla los recursos y su uso en el sector salud, por lo que también se considera relevante."
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "cq-corpus-completo-v1",
+      "schema_version": "respuesta-cq-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "7da45170946ffc52390310e383fa1bc9b551f449f89513feda491df651eb4669",
+      "tokens_input": 25673,
+      "tokens_output": 122,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00392415,
+      "replica": 2
+    }
   }
 }
