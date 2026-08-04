@@ -20,7 +20,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(ROOT / "02-retrieval" / "code"))
 
 from ontology_lib import (  # noqa: E402
+    EstadoVigencia,
     ModificacionArticulo,
+    TipoCambioArticulo,
     que_sabia_el_sistema,
     texto_vigente,
 )
@@ -39,7 +41,15 @@ MODIFICACIONES = [
         norma_modificadora="ley-02-ley-21210-modernizacion.txt",
         norma_modificada="ley-01-dl-825-iva-base.txt",
         articulo="8",
-        valido_desde="2020-02-24",
+        # VACANCIA LEGIS. La Ley 21.210 se publicó el 24-02-2020, pero su
+        # artículo primero transitorio difiere la entrada en vigencia de las
+        # normas sobre servicios digitales: "entrarán en vigencia el primer
+        # día del tercer mes siguiente a la publicación de esta ley". La
+        # fecha resultante la confirma un segundo documento del corpus:
+        # resolucion-02 cierra con "La presente resolución rige a contar del
+        # 1 de junio de 2020". Usar la fecha de publicación acá era cometer
+        # el error exacto que esta sección denuncia (auditoría 2026-08-04).
+        valido_desde="2020-06-01",
         registrado_el="2026-05-27",
         fundamento="Incorpórase en el artículo 8º una nueva letra n)",
     ),
@@ -47,6 +57,9 @@ MODIFICACIONES = [
         norma_modificadora="ley-02-ley-21210-modernizacion.txt",
         norma_modificada="ley-05-dl-824-renta-base.txt",
         articulo="14",
+        # SIN vacancia: el transitorio solo alcanza a "las modificaciones
+        # relativas a la tributación de los servicios digitales". El Régimen
+        # Pro Pyme rige desde la publicación. Misma ley, dos vigencias.
         valido_desde="2020-02-24",
         registrado_el="2026-08-03",  # ley-05 entró recién en B6
         fundamento="Sustitúyese el artículo 14 de la Ley sobre Impuesto a la Renta",
@@ -74,6 +87,7 @@ MODIFICACIONES = [
         valido_desde="2024-12-11",  # vacancia legis de 12 meses, EXPLÍCITA en el texto
         registrado_el="2026-08-03",
         fundamento="Artículo segundo: compra ágil entra en vigencia a los 12 meses de publicada la ley",
+        tipo_cambio=TipoCambioArticulo.CREA,
     ),
 ]
 
@@ -95,11 +109,26 @@ def demo_el_limite_de_02_9() -> None:
     print(f"Consultando ley-01 completa en {fecha}: ¿vigente? -> {vigente}")
     print(
         "\nEl modelo de documento dice 'NO' para TODO el DL 825 a partir del\n"
-        "2020-02-23 — correcto para el artículo 8º (modificado por la Ley 21.210),\n"
-        "pero FALSO para cualquier otro artículo que la 21.210 nunca tocó. El\n"
-        "artículo 12º (exenciones, citado por circular-04) es uno de esos: sigue\n"
-        "rigiendo el texto de 1974, y el modelo de documento lo declara 'no\n"
-        "vigente' igual, porque no distingue artículos."
+        "2020-02-23. Falla por DOS razones independientes:\n"
+        "\n"
+        "  (a) GRANULARIDAD: es correcto para el artículo 8º (modificado por la\n"
+        "      Ley 21.210) y falso para cualquier otro artículo que la 21.210\n"
+        "      nunca tocó. El artículo 12º (exenciones, citado por circular-04)\n"
+        "      sigue rigiendo el texto de 1974 y el modelo lo declara 'no\n"
+        "      vigente' igual, porque no distingue artículos.\n"
+        "\n"
+        "  (b) FECHA: 2020-02-23 es el día anterior a la PUBLICACIÓN de la Ley\n"
+        "      21.210, no el anterior a su VIGENCIA. El artículo primero\n"
+        "      transitorio de esa ley difiere las normas sobre servicios\n"
+        "      digitales al 'primer día del tercer mes siguiente a la\n"
+        "      publicación' — el 1 de junio de 2020, fecha que resolucion-02\n"
+        "      confirma de forma independiente ('rige a contar del 1 de junio\n"
+        "      de 2020'). Entre el 24-02 y el 31-05 de 2020 el texto vigente\n"
+        "      del art. 8º seguía siendo el de 1974.\n"
+        "\n"
+        "El error (b) no es del modelo de documento: es de quien cargó la fecha\n"
+        "sin leer las disposiciones transitorias. Esta sección lo cometió en su\n"
+        "primera versión y lo corrige acá."
     )
 
 
@@ -109,9 +138,12 @@ def demo_texto_vigente_por_articulo() -> None:
 
     fecha = "2024-06-01"
     for articulo in ("8", "12"):
-        fuente, desde = texto_vigente("ley-01-dl-825-iva-base.txt", articulo, MODIFICACIONES, fecha)
-        etiqueta = f"modificado, vigente desde {desde}" if desde else "texto original, sin modificar"
-        print(f"  Art. {articulo:>3} del DL 825 en {fecha}: fuente={fuente}  ({etiqueta})")
+        version = texto_vigente("ley-01-dl-825-iva-base.txt", articulo, MODIFICACIONES, fecha)
+        print(
+            f"  Art. {articulo:>3} del DL 825 en {fecha}: "
+            f"fuente={version.fuente_doc_id} ({version.estado.value}, "
+            f"desde={version.vigente_desde})"
+        )
 
     print(
         "\nMismo documento base, misma fecha de consulta, DOS respuestas distintas\n"
@@ -122,14 +154,39 @@ def demo_texto_vigente_por_articulo() -> None:
     print("\nAhora la pregunta con la que 02 §9 abrió el caso: '¿qué regía en 2018?'")
     fecha_2018 = "2018-06-30"
     for articulo in ("8", "12"):
-        fuente, desde = texto_vigente("ley-01-dl-825-iva-base.txt", articulo, MODIFICACIONES, fecha_2018)
-        etiqueta = f"modificado, vigente desde {desde}" if desde else "texto original"
-        print(f"  Art. {articulo:>3} del DL 825 en {fecha_2018}: fuente={fuente}  ({etiqueta})")
+        version = texto_vigente(
+            "ley-01-dl-825-iva-base.txt", articulo, MODIFICACIONES, fecha_2018
+        )
+        print(
+            f"  Art. {articulo:>3} del DL 825 en {fecha_2018}: "
+            f"fuente={version.fuente_doc_id} ({version.estado.value})"
+        )
     print(
         "\nEn 2018 ambos artículos están regidos por el texto original — ninguna\n"
         "modificación tenía vigencia todavía. Coincide con 02 §9 en este caso\n"
         "simple; la diferencia aparece cuando la fecha SÍ cruza la vigencia de\n"
-        "una modificación puntual, como en el ejemplo de arriba."
+        "una modificación puntual."
+    )
+
+    print(
+        "\nY la ventana que solo el modelo de artículo CON vacancia puede ver:\n"
+        "los tres meses en que la Ley 21.210 ya estaba publicada y el artículo\n"
+        "8º todavía regía en su texto de 1974."
+    )
+    for fecha_v in ("2020-02-25", "2020-05-31", "2020-06-01"):
+        version = texto_vigente(
+            "ley-01-dl-825-iva-base.txt", "8", MODIFICACIONES, fecha_v
+        )
+        etiqueta = (
+            f"texto de la Ley 21.210 (desde {version.vigente_desde})"
+            if version.estado == EstadoVigencia.MODIFICADO
+            else "texto original de 1974"
+        )
+        print(f"  Art.   8 del DL 825 en {fecha_v}: {etiqueta}")
+    print(
+        "\nUn sistema que hubiera respondido 'los servicios digitales pagan IVA'\n"
+        "el 25 de febrero de 2020 habría citado una ley real, publicada, con el\n"
+        "número correcto — y habría estado equivocado por tres meses."
     )
 
 
@@ -142,20 +199,28 @@ def demo_ley_04_vigencias_desparejas() -> None:
     print("-" * 84)
     for m in MODIFICACIONES:
         if m.norma_modificadora == "ley-04-ley-21634-moderniza-compras.txt":
-            print(f"{m.articulo:>10} | {m.valido_desde:>13} | {m.fundamento[:53]:>55}")
+            print(
+                f"{m.articulo:>10} | {m.valido_desde.isoformat():>13} | "
+                f"{m.fundamento[:53]:>55}"
+            )
 
+    # El art. 7 bis es un artículo NUEVO (`crea_articulo=True`): antes de su
+    # `valido_desde` no hay "texto original" al que caer. `texto_vigente`
+    # devuelve (None, None) para ese caso — la distinción vive en la librería,
+    # no en un `if` de esta demo.
     for fecha in ("2024-06-01", "2025-01-01"):
         print(f"\nConsultando ley-03 (Ley 19.886) en {fecha}:")
-        for articulo in ("4", "5"):
-            fuente, desde = texto_vigente("ley-03-ley-19886-compras-publicas.txt", articulo, MODIFICACIONES, fecha)
-            print(f"  Art. {articulo:>5}: {fuente}  (desde {desde})")
-        # El art. 7 bis es un artículo NUEVO (no existía antes de la ley-04):
-        # antes de su valido_desde no hay "texto original" al que caer.
-        mod_7bis = next(m for m in MODIFICACIONES if m.articulo == "7 bis")
-        if fecha >= mod_7bis.valido_desde:
-            print(f"  Art. 7 bis: {mod_7bis.norma_modificadora}  (desde {mod_7bis.valido_desde})")
-        else:
-            print("  Art. 7 bis: NO EXISTE todavía — artículo nuevo, sin texto previo al que volver")
+        for articulo in ("4", "5", "7 bis"):
+            version = texto_vigente(
+                "ley-03-ley-19886-compras-publicas.txt", articulo, MODIFICACIONES, fecha
+            )
+            if version.estado == EstadoVigencia.NO_EXISTE:
+                print(f"  Art. {articulo:>5}: NO EXISTE todavía — artículo nuevo, sin texto previo")
+            else:
+                print(
+                    f"  Art. {articulo:>5}: {version.fuente_doc_id}  "
+                    f"(estado={version.estado.value}, desde={version.vigente_desde})"
+                )
 
     print(
         "\nEn 2024-06-01 la compra ágil (art. 7 bis) legalmente no existe aún,\n"
@@ -178,7 +243,10 @@ def demo_bitemporalidad() -> None:
     print("-" * 76)
     for m in MODIFICACIONES:
         etiqueta = f"{_corto(m.norma_modificadora)} art.{m.articulo} -> {_corto(m.norma_modificada)}"
-        print(f"{etiqueta:>45} | {m.valido_desde:>13} | {m.registrado_el:>13}")
+        print(
+            f"{etiqueta:>45} | {m.valido_desde.isoformat():>13} | "
+            f"{m.registrado_el.isoformat():>13}"
+        )
 
     print(
         "\n`registrado_el` no es una fecha inventada para la demo: es la fecha de\n"
@@ -213,7 +281,6 @@ def grafico_bitemporal() -> None:
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    from datetime import date
 
     fig, ax = plt.subplots(figsize=(10, 4.5))
 
@@ -224,8 +291,8 @@ def grafico_bitemporal() -> None:
         etiqueta = f"{partes_mod[0]}-{partes_mod[1]} art.{m.articulo} → {partes_base[0]}-{partes_base[1]}"
         etiquetas.append(etiqueta)
         y = len(MODIFICACIONES) - i
-        d_vigente = date.fromisoformat(m.valido_desde)
-        d_registro = date.fromisoformat(m.registrado_el)
+        d_vigente = m.valido_desde
+        d_registro = m.registrado_el
         ax.plot([d_vigente, d_registro], [y, y], color="#bdc3c7", lw=2, zorder=1)
         ax.scatter([d_vigente], [y], color="#2ecc71", s=90, zorder=2, label="vigente desde" if i == 0 else None)
         ax.scatter([d_registro], [y], color="#3498db", s=90, zorder=2, label="registrado el" if i == 0 else None)
