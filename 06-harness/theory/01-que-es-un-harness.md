@@ -93,8 +93,8 @@ separado.
 ```
 métrica                         opaco+completa   contrato+completa       opaco+acotada    contrato+acotada
 ----------------------------------------------------------------------------------------------------------
-acierto exacto                           0.583               0.583               0.500               0.500
-F1 de docs citados                       0.639               0.639               0.500               0.500
+acierto exacto                           0.500               0.500               0.417               0.417
+F1 de docs citados                       0.556               0.556               0.417               0.417
 pasos promedio                            4.75                4.83                5.33                5.33
 pasos con error                             10                   3                  15                   6
 recuperación tras error                  0.222               1.000               0.429               1.000
@@ -109,11 +109,20 @@ Efectos principales:
 métrica                       efecto contrato      efecto acotar
 ----------------------------------------------------------------
 acierto exacto                          0.000             -0.083
+F1 de docs citados                      0.000             -0.139
 pasos con error                            -8                  4
 recuperación tras error                 0.675              0.103
 llamadas redundantes                       -2                  4
 tokens de entrada                        2996               5578
 ```
+
+> **Nota sobre la métrica.** Una tarea que se queda sin pasos también termina
+> con cero documentos citados, igual que una abstención correcta. La primera
+> versión de la medición las confundía y regalaba acierto perfecto en toda la
+> familia de abstención; el agujero apareció al correr §2 y está tapado:
+> `evaluar_trayectoria` exige que el bucle haya **respondido** para puntuar.
+> No responder es un fallo, no una abstención. Los números de arriba ya son
+> los corregidos.
 
 ![Efecto de cada factor del harness](../diagrams/harness-factorial.png)
 
@@ -169,28 +178,38 @@ las califica idéntico**. Esa ceguera es el argumento de §7 y acá ya se puede 
 > entorno que no le informa qué falló. El arreglo cuesta veinte líneas en el
 > `ToolRegistry` y no requiere cambiar de modelo.
 
-## Resultado 2: acotar la observación no pierde información, pero cuesta el doble
+## Resultado 2: acotar la observación no pierde información, la cobra en tokens
 
-Acotar la observación a 1.200 caracteres baja el acierto de 0,583 a 0,500 y triplica
-las tareas que ni siquiera llegan a responder (de 2 a 5). La conclusión tentadora
-—"truncar destruye información"— es falsa, y el quinto brazo lo demuestra: el mismo
-entorno acotado, con el tope de pasos subido de 8 a 16, recupera el acierto por
-completo.
+Acotar la observación a 1.200 caracteres baja el acierto de 0,500 a 0,417 y
+triplica las tareas que ni siquiera llegan a responder (de 2 a 5). La conclusión
+tentadora —"truncar destruye información"— es falsa, y hace falta un par de brazos
+más para verlo: el mismo factor, repetido con el tope de pasos al doble.
 
 ```
-métrica                       contrato+acotada    contrato+acotada (16 pasos)
-------------------------------------------------------------------------------
-acierto exacto                           0.500                          0.583
-pasos promedio                            5.33                           7.00
-tareas sin respuesta                         5                              2
-tokens de entrada                        75192                         130315
+métrica                      contrato+completa   contrato+acotada   +completa (16)   +acotada (16)
+--------------------------------------------------------------------------------------------------
+acierto exacto                           0.500              0.417            0.583           0.583
+F1 de docs citados                       0.556              0.417            0.639           0.583
+pasos promedio                            4.83               5.33             5.58            7.00
+tareas sin respuesta                         2                  5                1               2
+tokens de entrada                        69896              75192            88579          130315
+
+efecto de acotar con  8 pasos: -0.083
+efecto de acotar con 16 pasos: +0.000
 ```
 
-Mismo acierto que el brazo sin truncar (0,583) con **casi el doble de tokens de
-entrada** (130.315 contra 66.618). El truncado no borró la información: la puso
-detrás de una iteración más. Y una iteración más no cuesta el fragmento que se
-ahorró — cuesta **reenviar toda la conversación anterior**, porque cada llamada del
-bucle manda el historial completo.
+Con presupuesto holgado, el efecto de acotar sobre el acierto es **exactamente
+cero**: 0,583 en los dos brazos. Lo que no es cero es el precio — 130.315 contra
+88.579 tokens de entrada, **un 47% más** por el mismo resultado.
+
+Hacía falta el cuarto brazo. Comparar el brazo acotado de 16 pasos contra el
+completo de 8 —la comparación que salía sola— movía dos cosas a la vez y habría
+dejado concluir que truncar *mejora* el acierto, cuando lo que mejora es tener más
+iteraciones.
+
+El truncado no borró la información: la puso detrás de una iteración más. Y una
+iteración más no cuesta el fragmento que se ahorró — cuesta **reenviar toda la
+conversación anterior**, porque cada llamada del bucle manda el historial completo.
 
 Esa es la asimetría central del context engineering y el punto de partida de §2:
 
@@ -206,14 +225,19 @@ explica nada de esa diferencia:
 ```
 familia          acierto (los cuatro brazos)
 ------------------------------------------------
-abstencion       1.000
+abstencion       0.667
 estructural      0.500
 recuperacion     0.400 (0.200 con observación acotada)
 ```
 
-La abstención sale perfecta en los cuatro brazos: las tres tareas donde la respuesta
-correcta es "no consta en el corpus" se resuelven siempre. Es un resultado a favor
-del corpus y del prompt de sistema, no del harness.
+La abstención es la familia más sólida y es idéntica en los cuatro brazos: dos de
+las tres tareas donde la respuesta correcta es "no consta en el corpus" se resuelven
+siempre, y la tercera (`t-10`, sobre la Ley de Transparencia) agota los ocho pasos
+alternando `buscar_corpus` y `leer_norma` sobre algo que no existe. Con dieciséis
+pasos sí concluye —en el paso dieciséis, justo en el límite—, lo que dice que el
+agente no se niega a abstenerse: tarda mucho en convencerse. Cuánto buscar antes de
+declarar que algo no está es una decisión de diseño que ninguno de los dos factores
+de este experimento toca.
 
 Las estructurales se parten al medio, y la mitad que falla lo hace por una razón que
 `t-08` deja a la vista: la pregunta pide el cierre transitivo a dos saltos, y

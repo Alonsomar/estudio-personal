@@ -21,22 +21,32 @@ from harness_lib import (
     EstadoPaso,
     Herramienta,
     HarnessConfig,
+    MemoriaExterna,
     MotivoCorte,
     OfflineCacheMiss,
+    Partida,
     Percepcion,
     PoliticaGuionada,
     PoliticaLLM,
+    SinCompactar,
     Tarea,
     ToolError,
     ToolRegistry,
     Trayectoria,
+    VentanaConIndice,
+    VentanaDeslizante,
     cargar_tareas,
     construir_herramientas,
+    contar_tokens,
+    docs_mencionados,
     estimar_tokens,
     evaluar_trayectoria,
     harness_cache_key,
+    herramienta_memoria,
     llamadas_redundantes,
+    presupuesto_contexto,
     recuperacion_tras_error,
+    tokenizador_exacto,
 )
 
 
@@ -277,16 +287,204 @@ def test_evaluar_trayectoria_metrica_de_conjuntos(esperados, citados, acierto, f
         id="t", familia="recuperacion", dificultad="facil", pregunta="p",
         docs_esperados=esperados,
     )
-    tray = Trayectoria(tarea_id="t", pregunta="p", harness="h", docs_citados=citados)
+    tray = Trayectoria(
+        tarea_id="t", pregunta="p", harness="h", docs_citados=citados,
+        motivo_corte=MotivoCorte.RESPONDIO,
+    )
     res = evaluar_trayectoria(tray, tarea)
     assert res.acierto_exacto is acierto
     assert res.f1 == pytest.approx(f1)
     assert 0.0 <= res.precision <= 1.0 and 0.0 <= res.recall <= 1.0
 
 
+@pytest.mark.parametrize(
+    "motivo", [MotivoCorte.MAX_PASOS, MotivoCorte.SIN_PROGRESO, MotivoCorte.ERROR_POLITICA]
+)
+def test_quedarse_sin_pasos_no_cuenta_como_abstencion(motivo):
+    """El agujero que la parte C de §2 destapó: una tarea de abstención
+    también termina con cero citas cuando el bucle se quedó sin pasos. Sin
+    esta condición, no responder cobraba acierto perfecto."""
+    tarea = Tarea(
+        id="t", familia="abstencion", dificultad="facil", pregunta="p",
+        docs_esperados=[],
+    )
+    tray = Trayectoria(
+        tarea_id="t", pregunta="p", harness="h", docs_citados=[], motivo_corte=motivo
+    )
+    res = evaluar_trayectoria(tray, tarea)
+    assert res.acierto_exacto is False
+    assert res.f1 == 0.0
+
+
+def test_abstencion_explicita_si_cuenta():
+    tarea = Tarea(
+        id="t", familia="abstencion", dificultad="facil", pregunta="p",
+        docs_esperados=[],
+    )
+    tray = Trayectoria(
+        tarea_id="t", pregunta="p", harness="h", docs_citados=[],
+        respuesta_final="No consta en el corpus.",
+        motivo_corte=MotivoCorte.RESPONDIO,
+    )
+    assert evaluar_trayectoria(tray, tarea).acierto_exacto is True
+
+
 def test_estimar_tokens_es_monotono_y_positivo():
     assert estimar_tokens("") >= 1
     assert estimar_tokens("a" * 400) > estimar_tokens("a" * 100)
+
+
+# --------------------------------------------------------------------------- #
+# §2 Presupuesto de contexto y compactación.
+# --------------------------------------------------------------------------- #
+def _historial(n_pares: int) -> list[dict]:
+    mensajes = [
+        {"role": "system", "content": "instrucciones"},
+        {"role": "user", "content": "¿pregunta?"},
+    ]
+    for i in range(n_pares):
+        mensajes.append(
+            {
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [
+                    {
+                        "id": f"c{i}",
+                        "type": "function",
+                        "function": {"name": "buscar_corpus", "arguments": "{}"},
+                    }
+                ],
+            }
+        )
+        mensajes.append(
+            {
+                "role": "tool",
+                "tool_call_id": f"c{i}",
+                "content": f"resultado {i} en ley-0{i % 9}-alguna-norma.txt " + "x" * 200,
+            }
+        )
+    return mensajes
+
+
+def test_presupuesto_reparte_en_las_cinco_partidas():
+    specs = [_tool_eco().spec_openai()]
+    reparto = presupuesto_contexto(_historial(2), specs)
+    assert set(reparto) == {p.value for p in Partida}
+    assert reparto[Partida.SISTEMA.value] > 0
+    assert reparto[Partida.PREGUNTA.value] > 0
+    assert reparto[Partida.OBSERVACIONES.value] > 0
+    assert reparto[Partida.HERRAMIENTAS.value] > 0
+
+
+def test_los_esquemas_de_herramientas_se_cobran_aunque_no_sean_mensajes():
+    """La partida que se olvida: no viaja como texto en los mensajes pero el
+    proveedor la serializa y la cobra en cada iteración."""
+    mensajes = _historial(1)
+    sin = presupuesto_contexto(mensajes, [])[Partida.HERRAMIENTAS.value]
+    con = presupuesto_contexto(mensajes, [_tool_eco().spec_openai()])[
+        Partida.HERRAMIENTAS.value
+    ]
+    assert sin == 0 and con > 0
+
+
+def test_la_historia_crece_y_el_prefijo_no():
+    specs = [_tool_eco().spec_openai()]
+    corto = presupuesto_contexto(_historial(1), specs)
+    largo = presupuesto_contexto(_historial(4), specs)
+    assert largo[Partida.OBSERVACIONES.value] > corto[Partida.OBSERVACIONES.value]
+    assert largo[Partida.SISTEMA.value] == corto[Partida.SISTEMA.value]
+    assert largo[Partida.HERRAMIENTAS.value] == corto[Partida.HERRAMIENTAS.value]
+
+
+def test_sin_compactar_es_la_identidad():
+    mensajes = _historial(3)
+    assert SinCompactar().compactar(mensajes) == mensajes
+
+
+@pytest.mark.parametrize("k", [1, 2, 3])
+def test_ventana_conserva_los_ultimos_k_pares_y_el_encabezado(k):
+    mensajes = _historial(5)
+    salida = VentanaDeslizante(k=k).compactar(mensajes)
+    assert salida[0]["role"] == "system"
+    assert salida[1]["role"] == "user"
+    assert len(salida) == 2 + 2 * k
+    # El emparejamiento assistant/tool tiene que sobrevivir o la API rechaza.
+    for asistente, herramienta in zip(salida[2::2], salida[3::2]):
+        assert asistente["role"] == "assistant" and herramienta["role"] == "tool"
+        assert herramienta["tool_call_id"] == asistente["tool_calls"][0]["id"]
+
+
+def test_ventana_con_indice_archiva_y_deja_direccion():
+    memoria = MemoriaExterna()
+    salida = VentanaConIndice(memoria, k=2).compactar(_historial(5))
+    indice = [m for m in salida if (m.get("content") or "").startswith("[contexto compactado]")]
+    assert len(indice) == 1
+    assert len(memoria) == 3  # 5 pares - 2 conservados
+    # El índice tiene que nombrar los documentos: es lo que lo hace utilizable.
+    assert "ley-00-alguna-norma.txt" in indice[0]["content"]
+    assert "recuperar_memoria" in indice[0]["content"]
+
+
+def test_ventana_con_indice_no_toca_historiales_cortos():
+    memoria = MemoriaExterna()
+    mensajes = _historial(2)
+    assert VentanaConIndice(memoria, k=2).compactar(mensajes) == mensajes
+    assert len(memoria) == 0
+
+
+def test_compactar_ahorra_tokens():
+    specs = [_tool_eco().spec_openai()]
+    mensajes = _historial(6)
+    base = sum(presupuesto_contexto(mensajes, specs).values())
+    for pol in (VentanaDeslizante(k=2), VentanaConIndice(MemoriaExterna(), k=2)):
+        assert sum(presupuesto_contexto(pol.compactar(mensajes), specs).values()) < base
+
+
+def test_memoria_externa_guarda_recupera_y_falla_con_contrato():
+    memoria = MemoriaExterna()
+    memoria.guardar("p0", "contenido")
+    assert memoria.recuperar("p0") == "contenido"
+    with pytest.raises(ToolError):
+        memoria.recuperar("p9")
+
+
+def test_herramienta_memoria_se_integra_al_registry():
+    memoria = MemoriaExterna()
+    memoria.guardar("p0", "texto archivado")
+    reg = ToolRegistry([herramienta_memoria(memoria)])
+    assert reg.invocar("recuperar_memoria", {"clave": "p0"}, HarnessConfig()).texto == (
+        "texto archivado"
+    )
+    fallo = reg.invocar("recuperar_memoria", {"clave": "zz"}, HarnessConfig())
+    assert not fallo.ok
+
+
+def test_docs_mencionados_extrae_ids_sin_repetir():
+    texto = "ver ley-01-dl-825-iva-base.txt y ley-01-dl-825-iva-base.txt y otro.txt"
+    assert docs_mencionados(texto) == ["ley-01-dl-825-iva-base.txt", "otro.txt"]
+
+
+def test_el_bucle_aplica_el_compactador_al_enviar_y_conserva_la_historia():
+    """El compactador afecta lo que se manda, no lo que se registra: si no,
+    la trayectoria dejaría de ser auditable."""
+    reg = ToolRegistry([_tool_eco()])
+    guion = [
+        Decision(accion="usar_herramienta", herramienta="eco", argumentos={"texto": str(i)})
+        for i in range(5)
+    ]
+    traza: list[list[dict]] = []
+    tray = AgentLoop(
+        reg, PoliticaGuionada(guion), HarnessConfig(max_pasos=5),
+        VentanaDeslizante(k=1), medir_contexto=True,
+    ).correr("t", "p", traza=traza)
+    assert tray.n_pasos == 5  # la trayectoria conserva todo
+    assert all(len(m) <= 4 for m in traza)  # lo enviado va acotado
+    assert all(p.contexto for p in tray.pasos)
+
+
+def test_contar_tokens_degrada_sin_romperse():
+    assert contar_tokens("una frase corta") > 0
+    assert isinstance(tokenizador_exacto(), bool)
 
 
 # --------------------------------------------------------------------------- #

@@ -7,6 +7,11 @@ Acumula los componentes que las secciones introducen:
       decisión (`PoliticaLLM` con caché, `PoliticaGuionada` para tests).
       `HarnessConfig` es el objeto central del módulo: reúne en un solo
       lugar las reglas del entorno cuyo efecto se mide.
+  §2  El contexto como problema de asignación: `presupuesto_contexto`
+      reparte los tokens enviados entre sus cinco partidas, y los
+      compactadores (`SinCompactar`, `VentanaDeslizante`,
+      `VentanaConIndice` + `MemoriaExterna`) son las políticas de gasto que
+      se comparan sobre las mismas trayectorias.
 
 Diseño: sin framework de agentes de terceros. El bucle son ~120 líneas y
 esconderlas detrás de la abstracción de un tercero haría el módulo menos
@@ -22,6 +27,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from difflib import get_close_matches
@@ -73,6 +79,39 @@ def estimar_tokens(texto: str) -> int:
     """Estimación de tokens por longitud. Es una aproximación declarada, no
     una medición: el número real de la API vive en el caché."""
     return max(1, round(len(texto) / CHARS_POR_TOKEN))
+
+
+_CODIFICADOR: Any = None
+_CODIFICADOR_INTENTADO = False
+
+
+def contar_tokens(texto: str, modelo: str = "gpt-4o-mini") -> int:
+    """Cuenta tokens con el tokenizador real del modelo si está disponible,
+    y cae a la estimación por longitud si no.
+
+    La degradación es deliberada: el repo exige que todo corra sin red, y
+    `tiktoken` descarga su vocabulario la primera vez. Cuando cae al
+    estimador, los repartos relativos entre partidas siguen siendo válidos;
+    los absolutos, no. `TOKENIZADOR_EXACTO` dice cuál de los dos se usó.
+    """
+    global _CODIFICADOR, _CODIFICADOR_INTENTADO
+    if not _CODIFICADOR_INTENTADO:
+        _CODIFICADOR_INTENTADO = True
+        try:
+            import tiktoken
+
+            _CODIFICADOR = tiktoken.encoding_for_model(modelo)
+        except Exception:  # noqa: BLE001 — sin red o sin la dependencia
+            _CODIFICADOR = None
+    if _CODIFICADOR is None:
+        return estimar_tokens(texto)
+    return len(_CODIFICADOR.encode(texto))
+
+
+def tokenizador_exacto() -> bool:
+    """True si `contar_tokens` está usando el tokenizador real del modelo."""
+    contar_tokens("")
+    return _CODIFICADOR is not None
 
 
 class ToolError(Exception):
@@ -221,6 +260,9 @@ class Paso(BaseModel):
     tokens_in: int = 0
     tokens_out: int = 0
     costo_usd: float = 0.0
+    #: Reparto por partida del contexto enviado en esta iteración (§2).
+    #: Vacío salvo que el bucle corra con `medir_contexto=True`.
+    contexto: dict[str, int] = {}
 
 
 class Trayectoria(BaseModel):
@@ -430,10 +472,19 @@ class AgentLoop:
         registry: ToolRegistry,
         politica: Politica,
         config: HarnessConfig | None = None,
+        compactador: Compactador | None = None,
+        *,
+        medir_contexto: bool = False,
     ) -> None:
         self.registry = registry
         self.politica = politica
         self.config = config or HarnessConfig()
+        # El compactador se aplica al enviar, no al registrar: el bucle
+        # conserva la historia completa y decide cuánta muestra. Separar
+        # ambas cosas es lo que permite comparar políticas de gasto (§2)
+        # sobre la misma trayectoria.
+        self.compactador: Compactador = compactador or SinCompactar()
+        self.medir_contexto = medir_contexto
 
     def _sistema(self) -> str:
         base = PROMPT_SISTEMA
@@ -441,7 +492,16 @@ class AgentLoop:
             base = f"{base}\n\n{self.config.instrucciones_extra}"
         return base
 
-    def correr(self, tarea_id: str, pregunta: str) -> Trayectoria:
+    def correr(
+        self,
+        tarea_id: str,
+        pregunta: str,
+        traza: list[list[dict[str, Any]]] | None = None,
+    ) -> Trayectoria:
+        """`traza`, si se pasa, recibe una copia de los mensajes efectivamente
+        enviados en cada iteración. Es lo que permite a §2 calcular el costo
+        contrafáctico de otras políticas de compactación sobre la misma
+        trayectoria."""
         cfg = self.config
         tray = Trayectoria(tarea_id=tarea_id, pregunta=pregunta, harness=cfg.nombre)
         mensajes: list[dict[str, Any]] = [
@@ -452,8 +512,14 @@ class AgentLoop:
         firmas: list[str] = []
 
         for i in range(cfg.max_pasos):
+            enviados = self.compactador.compactar(mensajes)
+            if traza is not None:
+                traza.append(json.loads(json.dumps(enviados, ensure_ascii=False)))
+            reparto = (
+                presupuesto_contexto(enviados, specs) if self.medir_contexto else {}
+            )
             percepcion = Percepcion(
-                pregunta=pregunta, mensajes=mensajes, herramientas=specs, paso=i
+                pregunta=pregunta, mensajes=enviados, herramientas=specs, paso=i
             )
             try:
                 decision = self.politica.decidir(percepcion)
@@ -475,6 +541,7 @@ class AgentLoop:
                         tokens_in=decision.tokens_in,
                         tokens_out=decision.tokens_out,
                         costo_usd=decision.costo_usd,
+                        contexto=reparto,
                     )
                 )
                 tray.respuesta_final = decision.respuesta
@@ -500,6 +567,7 @@ class AgentLoop:
                     tokens_in=decision.tokens_in,
                     tokens_out=decision.tokens_out,
                     costo_usd=decision.costo_usd,
+                    contexto=reparto,
                 )
             )
 
@@ -758,6 +826,219 @@ class PoliticaLLM:
 
 
 # --------------------------------------------------------------------------- #
+# §2 El contexto como problema de asignación.
+#
+# La ventana no es memoria, es un presupuesto: cada token gastado en una
+# partida desplaza otra cosa. Estas funciones lo reparten y estas clases son
+# las políticas de gasto que se comparan.
+# --------------------------------------------------------------------------- #
+class Partida(str, Enum):
+    """Las cinco partidas del presupuesto de contexto. Dos son fijas por
+    iteración (sistema, herramientas), una es fija por tarea (pregunta) y
+    dos crecen con el bucle (decisiones, observaciones). Que dos crezcan y
+    tres no es lo que hace del contexto un problema dinámico."""
+
+    SISTEMA = "sistema"
+    HERRAMIENTAS = "herramientas"
+    PREGUNTA = "pregunta"
+    DECISIONES = "decisiones"
+    OBSERVACIONES = "observaciones"
+
+
+def presupuesto_contexto(
+    mensajes: list[dict[str, Any]],
+    herramientas: list[dict[str, Any]],
+    modelo: str = "gpt-4o-mini",
+) -> dict[str, int]:
+    """Reparte en partidas los tokens de una llamada del bucle.
+
+    Los esquemas de herramientas se cuentan aunque no viajen como texto en
+    los mensajes: el proveedor los serializa y los cobra igual. Ignorarlos
+    —el error habitual— subestima la partida que más se olvida y que además
+    se paga en *todas* las iteraciones.
+    """
+    reparto = {p.value: 0 for p in Partida}
+    # Sin herramientas el proveedor no manda el campo, así que la partida es
+    # cero y no el token de un `[]` serializado.
+    reparto[Partida.HERRAMIENTAS.value] = (
+        contar_tokens(json.dumps(herramientas, ensure_ascii=False), modelo)
+        if herramientas
+        else 0
+    )
+    primer_usuario = True
+    for m in mensajes:
+        rol = m.get("role")
+        texto = m.get("content") or ""
+        if rol == "system":
+            reparto[Partida.SISTEMA.value] += contar_tokens(texto, modelo)
+        elif rol == "user" and primer_usuario:
+            reparto[Partida.PREGUNTA.value] += contar_tokens(texto, modelo)
+            primer_usuario = False
+        elif rol == "assistant":
+            llamadas = json.dumps(m.get("tool_calls") or [], ensure_ascii=False)
+            reparto[Partida.DECISIONES.value] += contar_tokens(texto + llamadas, modelo)
+        else:  # tool, o el 'user' sintético de las políticas sin proveedor
+            reparto[Partida.OBSERVACIONES.value] += contar_tokens(texto, modelo)
+    return reparto
+
+
+class MemoriaExterna:
+    """Almacén fuera del contexto, direccionable por clave.
+
+    Es la misma idea de `02` aplicada al bucle: si algo se puede recuperar
+    cuando haga falta, mantenerlo en contexto durante quince iteraciones es
+    pagar quince veces por leerlo una.
+    """
+
+    def __init__(self) -> None:
+        self._datos: dict[str, str] = {}
+
+    def guardar(self, clave: str, texto: str) -> str:
+        self._datos[clave] = texto
+        return clave
+
+    def recuperar(self, clave: str) -> str:
+        if clave not in self._datos:
+            raise ToolError(
+                esperado=f"una clave de memoria en {sorted(self._datos) or '(vacía)'}",
+                recibido=clave,
+                siguiente_paso="volvé a llamar con una de las claves del índice",
+            )
+        return self._datos[clave]
+
+    @property
+    def claves(self) -> list[str]:
+        return sorted(self._datos)
+
+    def __len__(self) -> int:
+        return len(self._datos)
+
+
+_DOC_ID_RE = re.compile(r"\b[a-z0-9-]+\.txt\b")
+
+
+def docs_mencionados(texto: str) -> list[str]:
+    """Identificadores de documento que aparecen en un texto. Es el índice
+    mínimo que hace recuperable una observación archivada: sin él, la
+    memoria externa existe pero el agente no sabe qué hay adentro."""
+    vistos: dict[str, None] = {}
+    for doc in _DOC_ID_RE.findall(texto):
+        vistos.setdefault(doc, None)
+    return list(vistos)
+
+
+class Compactador(Protocol):
+    """Política de gasto del presupuesto de contexto."""
+
+    nombre: str
+
+    def compactar(self, mensajes: list[dict[str, Any]]) -> list[dict[str, Any]]: ...
+
+
+class SinCompactar:
+    """Todo lo que pasó sigue en contexto. Es el default de casi toda
+    implementación inicial y el que hace que el costo crezca cuadráticamente
+    en el número de pasos."""
+
+    nombre = "sin compactar"
+
+    def compactar(self, mensajes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return mensajes
+
+
+def _pares(mensajes: list[dict[str, Any]]) -> tuple[list[dict], list[tuple[dict, dict]]]:
+    """Separa el encabezado fijo (sistema + pregunta) de los pares
+    (decisión, observación). Compactar sin respetar el emparejamiento
+    produce un historial que la API rechaza."""
+    encabezado = [m for m in mensajes if m.get("role") in ("system",)]
+    resto = [m for m in mensajes if m.get("role") not in ("system",)]
+    pregunta = resto[:1]
+    cuerpo = resto[1:]
+    pares = [(cuerpo[i], cuerpo[i + 1]) for i in range(0, len(cuerpo) - 1, 2)]
+    return encabezado + pregunta, pares
+
+
+class VentanaDeslizante:
+    """Conserva los últimos `k` pares y descarta los anteriores.
+
+    La política más barata y la más peligrosa: lo descartado no deja rastro,
+    así que el agente puede repetir una búsqueda que ya hizo sin enterarse.
+    """
+
+    def __init__(self, k: int = 2) -> None:
+        self.k = k
+        self.nombre = f"ventana k={k}"
+
+    def compactar(self, mensajes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        cabeza, pares = _pares(mensajes)
+        conservados = pares[-self.k :] if self.k else []
+        return cabeza + [m for par in conservados for m in par]
+
+
+class VentanaConIndice:
+    """Conserva los últimos `k` pares y reemplaza los anteriores por **una**
+    línea de índice, archivando el contenido en memoria externa.
+
+    Es la política que convierte el problema de contexto en un problema de
+    retrieval: en vez de tirar la observación o arrastrarla, se guarda y se
+    deja en contexto lo justo para saber que existe y cómo pedirla.
+    """
+
+    def __init__(self, memoria: MemoriaExterna, k: int = 2) -> None:
+        self.memoria = memoria
+        self.k = k
+        self.nombre = f"ventana+índice k={k}"
+
+    def compactar(self, mensajes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        cabeza, pares = _pares(mensajes)
+        if len(pares) <= self.k:
+            return mensajes
+        viejos = pares[: len(pares) - self.k] if self.k else pares
+        lineas = []
+        for i, (decision, observacion) in enumerate(viejos):
+            clave = f"p{i}"
+            texto = observacion.get("content") or ""
+            self.memoria.guardar(clave, texto)
+            llamadas = decision.get("tool_calls") or [{}]
+            nombre = llamadas[0].get("function", {}).get("name", "?")
+            docs = docs_mencionados(texto)
+            lineas.append(
+                f"- {clave}: {nombre} → {len(texto)} caracteres"
+                + (f", menciona {', '.join(docs[:4])}" if docs else "")
+            )
+        resumen = {
+            "role": "user",
+            "content": (
+                "[contexto compactado] Los pasos anteriores se archivaron en "
+                "memoria externa. Índice:\n"
+                + "\n".join(lineas)
+                + "\nSi necesitás alguno completo, llamá a "
+                "'recuperar_memoria' con su clave."
+            ),
+        }
+        conservados = pares[len(pares) - self.k :] if self.k else []
+        return cabeza + [resumen] + [m for par in conservados for m in par]
+
+
+class ArgsMemoria(BaseModel):
+    clave: str
+
+
+def herramienta_memoria(memoria: MemoriaExterna) -> Herramienta:
+    """La tool que hace utilizable a `VentanaConIndice`. Sin ella, el índice
+    es una promesa que el agente no puede cobrar."""
+    return Herramienta(
+        nombre="recuperar_memoria",
+        descripcion=(
+            "Recupera el contenido completo de un paso archivado en memoria "
+            "externa. La clave aparece en el índice de contexto compactado."
+        ),
+        args_model=ArgsMemoria,
+        fn=lambda args: memoria.recuperar(args.clave),
+    )
+
+
+# --------------------------------------------------------------------------- #
 # Tareas y medición.
 #
 # La métrica es objetiva y no usa juez LLM: se compara el conjunto de
@@ -837,7 +1118,30 @@ def evaluar_trayectoria(tray: Trayectoria, tarea: Tarea) -> ResultadoTarea:
     como una regla aparte: si no se espera ningún documento, citar cero es
     precisión y recall perfectos. Es la misma convención de `01 §5`, que
     evita tener dos métricas incomparables.
+
+    Pero **abstenerse no es lo mismo que no llegar a responder**. Un bucle
+    que se quedó sin pasos también termina con cero citas, y sin esta
+    condición cobraría el punto de las tareas de abstención sin haber dicho
+    nada. La primera versión de esta función tenía ese agujero y regalaba
+    acierto perfecto en toda la familia de abstención.
     """
+    if tray.motivo_corte is not MotivoCorte.RESPONDIO:
+        return ResultadoTarea(
+            tarea_id=tarea.id,
+            familia=tarea.familia,
+            harness=tray.harness,
+            acierto_exacto=False,
+            precision=0.0,
+            recall=0.0,
+            f1=0.0,
+            n_pasos=tray.n_pasos,
+            n_errores=tray.n_errores,
+            tokens_in=tray.tokens_in,
+            tokens_out=tray.tokens_out,
+            costo_usd=tray.costo_usd,
+            motivo_corte=tray.motivo_corte,
+        )
+
     esperados = set(tarea.docs_esperados)
     citados = set(tray.docs_citados)
     if not esperados:

@@ -84,15 +84,24 @@ BRAZOS = [
     ),
 ]
 
-# Quinto brazo: el mismo entorno acotado, con presupuesto de pasos amplio.
-# Sirve para separar "truncar pierde información" de "truncar exige más
-# iteraciones y el tope no las daba".
-BRAZO_HOLGADO = HarnessConfig(
-    nombre="contrato+acotada (16 pasos)",
-    max_pasos=16,
-    max_chars_observacion=MAX_CHARS,
-    estilo_error="contrato",
-)
+# Brazos 5 y 6: el factor "acotar" repetido con presupuesto de pasos amplio.
+# Hacen falta los DOS para separar "truncar pierde información" de "truncar
+# exige más iteraciones y el tope no las daba": con un solo brazo holgado,
+# la comparación contra el brazo de 8 pasos mueve dos cosas a la vez.
+BRAZOS_HOLGADOS = [
+    HarnessConfig(
+        nombre="contrato+completa (16)",
+        max_pasos=16,
+        max_chars_observacion=None,
+        estilo_error="contrato",
+    ),
+    HarnessConfig(
+        nombre="contrato+acotada (16)",
+        max_pasos=16,
+        max_chars_observacion=MAX_CHARS,
+        estilo_error="contrato",
+    ),
+]
 
 
 def seccion(titulo: str) -> None:
@@ -184,7 +193,7 @@ def por_familia(resultados: list[ResultadoTarea]) -> dict[str, float]:
 
 
 def diagrama(
-    resumenes: dict[str, dict[str, float]], nombres: list[str], holgado: str
+    resumenes: dict[str, dict[str, float]], nombres: list[str], holgados: list[str]
 ) -> None:
     """Dos paneles, uno por hallazgo.
 
@@ -223,14 +232,14 @@ def diagrama(
         "El contrato de error mueve el proceso,\nno el resultado", fontsize=11
     )
 
-    todos = nombres + [holgado]
+    todos = nombres + holgados
     aciertos = [resumenes[n]["acierto"] for n in todos]
     tokens = [resumenes[n]["tokens_in"] / 1000 for n in todos]
-    ax2.bar(range(len(todos)), tokens, 0.55, color=colores + ["#55a868"])
+    ax2.bar(range(len(todos)), tokens, 0.55, color=colores + ["#8172b3", "#55a868"])
     ax2.set_xticks(range(len(todos)))
     ax2.set_xticklabels(
-        [n.replace("+", "\n+") for n in nombres] + ["contrato\n+acotada\n(16 pasos)"],
-        fontsize=8,
+        [n.replace("+", "\n+").replace(" (16)", "\n(16 pasos)") for n in todos],
+        fontsize=7,
     )
     ax2.set_ylabel("tokens de entrada acumulados (miles)")
     ax2.grid(axis="y", alpha=0.3)
@@ -290,15 +299,29 @@ def main() -> None:
             cortes[r.motivo_corte.value] = cortes.get(r.motivo_corte.value, 0) + 1
         print(f"{nombre:<26} {json.dumps(cortes, ensure_ascii=False)}")
 
-    seccion("Control: el mismo entorno acotado con presupuesto de pasos amplio")
-    res_h, tray_h = correr_brazo(BRAZO_HOLGADO, politica, tareas)
-    resumenes[BRAZO_HOLGADO.nombre] = resumen(res_h, tray_h)
-    trayectorias_todas[BRAZO_HOLGADO.nombre] = tray_h
+    seccion("Control: el mismo factor 'acotar' con presupuesto de 16 pasos")
+    print(
+        "Con 8 pasos, acotar cuesta acierto. La pregunta es si eso es pérdida de\n"
+        "información o falta de iteraciones: se repite el factor con el tope al doble.\n"
+    )
+    for config in BRAZOS_HOLGADOS:
+        res_h, tray_h = correr_brazo(config, politica, tareas)
+        resumenes[config.nombre] = resumen(res_h, tray_h)
+        trayectorias_todas[config.nombre] = tray_h
     tabla(
         {
+            "contrato+completa": resumenes["contrato+completa"],
             "contrato+acotada": resumenes["contrato+acotada"],
-            BRAZO_HOLGADO.nombre: resumenes[BRAZO_HOLGADO.nombre],
+            **{c.nombre: resumenes[c.nombre] for c in BRAZOS_HOLGADOS},
         }
+    )
+    print(
+        f"\nefecto de acotar con  8 pasos: "
+        f"{resumenes['contrato+acotada']['acierto'] - resumenes['contrato+completa']['acierto']:+.3f}"
+    )
+    print(
+        f"efecto de acotar con 16 pasos: "
+        f"{resumenes[BRAZOS_HOLGADOS[1].nombre]['acierto'] - resumenes[BRAZOS_HOLGADOS[0].nombre]['acierto']:+.3f}"
     )
 
     seccion("Uso de API")
@@ -321,7 +344,7 @@ def main() -> None:
         encoding="utf-8",
     )
     print(f"\nTrayectorias: {TRAYECTORIAS.relative_to(AQUI.parent)}")
-    diagrama(resumenes, [c.nombre for c in BRAZOS], BRAZO_HOLGADO.nombre)
+    diagrama(resumenes, [c.nombre for c in BRAZOS], [c.nombre for c in BRAZOS_HOLGADOS])
 
 
 if __name__ == "__main__":

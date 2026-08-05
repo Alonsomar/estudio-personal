@@ -1628,6 +1628,32 @@
       "historical_cost_usd": 0.00012465000000000002,
       "replica": 0
     },
+    "7f967cfee46cae986bfe26f74e81c466f8c202fe34258ac2dd2d1ec7da92f2da": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_2lc3L3FQZNZHFkaBQPPw9SDE",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"No consta en el corpus.\",\"docs_citados\":[]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c27814035f000a42df7f7a629f3d0ea3ea38c5eb54b2f12653bd7e2ecf0d9705",
+      "tokens_input": 3131,
+      "tokens_output": 23,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00048345,
+      "replica": 0
+    },
     "819538a58199aab60f6064b1311c76229fc5d33f7456d62490e64bbed34c5239": {
       "response": {
         "content": null,
