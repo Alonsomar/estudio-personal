@@ -37,6 +37,7 @@ from harness_lib import (
     VentanaDeslizante,
     cargar_tareas,
     construir_herramientas,
+    costo_esquema,
     contar_tokens,
     docs_mencionados,
     estimar_tokens,
@@ -559,6 +560,80 @@ def test_vecinos_grafo_devuelve_el_fundamento_literal():
     assert obs.ok
     assert "ley-02-ley-21210-modernizacion.txt" in obs.texto
     assert "fundamento" in obs.texto
+
+
+def test_alcance_acotado_reproduce_los_goldens_multihop_de_05():
+    """La herramienta de grano grueso de §3 no se diseñó a ojo: tiene que
+    devolver exactamente lo que las competency questions multi-hop
+    congeladas de `05` esperan. Si el grafo o el BFS cambian, esto grita."""
+    import json as _json
+    from pathlib import Path as _Path
+
+    from harness_lib import alcance_acotado, cargar_grafo_normativo
+
+    raiz = _Path(__file__).resolve().parent.parent
+    golden = _json.loads(
+        (raiz / "05-ontologias" / "examples" / "golden-ontology.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    grafo = cargar_grafo_normativo()
+    multihop = [i for i in golden["items"] if i["category"] == "multi_hop"]
+    assert multihop, "el golden de 05 debería traer preguntas multi-hop"
+    for item in multihop:
+        obtenido = set(
+            alcance_acotado(grafo, item["target_node"], item["max_hops"], "in")
+        )
+        assert obtenido == set(item["expected_doc_ids"]), item["id"]
+
+
+def test_alcance_normativo_resuelve_en_una_llamada_lo_que_vecinos_no():
+    """El argumento de granularidad, como invariante: la misma pregunta
+    necesita una llamada con la herramienta gruesa y muchas con la fina."""
+    reg = construir_herramientas(con_alcance=True)
+    cfg = HarnessConfig(estilo_error="contrato")
+    obs = reg.invocar(
+        "alcance_normativo",
+        {"doc_id": "decreto-03-reglamento-compras-publicas.txt",
+         "max_saltos": 2, "direccion": "in"},
+        cfg,
+    )
+    assert obs.ok
+    for esperado in (
+        "do-02-extracto-licitacion-publica.txt",
+        "glosa-05-presupuesto-interior.txt",
+        "oficio-02-contraloria-trato-directo.txt",
+        "resolucion-01-chilecompra-compra-agil.txt",
+    ):
+        assert esperado in obs.texto
+
+
+def test_alcance_normativo_valida_saltos_y_doc_id():
+    reg = construir_herramientas(con_alcance=True)
+    cfg = HarnessConfig(estilo_error="contrato")
+    malo = reg.invocar("alcance_normativo", {"doc_id": "ds-250"}, cfg)
+    assert not malo.ok and "Siguiente paso" in malo.texto
+    saltos = reg.invocar(
+        "alcance_normativo",
+        {"doc_id": "ley-01-dl-825-iva-base.txt", "max_saltos": 99},
+        cfg,
+    )
+    assert not saltos.ok
+
+
+def test_alcance_no_se_expone_por_defecto():
+    """Cada herramienta del menú cobra peaje en cada iteración (§3): el
+    default no puede ser exponerlas todas."""
+    assert "alcance_normativo" not in construir_herramientas().nombres
+    assert "alcance_normativo" in construir_herramientas(con_alcance=True).nombres
+
+
+def test_costo_esquema_es_positivo_y_ordenable():
+    reg = construir_herramientas(con_alcance=True)
+    costos = {n: costo_esquema(reg.get(n)) for n in reg.nombres}
+    assert all(c > 0 for c in costos.values())
+    # El menú completo tiene que costar la suma de sus partes.
+    assert sum(costos.values()) == sum(costo_esquema(reg.get(n)) for n in reg.nombres)
 
 
 def test_tareas_congeladas_son_coherentes():

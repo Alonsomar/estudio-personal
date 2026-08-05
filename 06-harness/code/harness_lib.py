@@ -1200,9 +1200,54 @@ class ArgsVecinos(BaseModel):
     direccion: Literal["in", "out"] = "out"
 
 
+class ArgsAlcance(BaseModel):
+    doc_id: str
+    max_saltos: int = 2
+    direccion: Literal["in", "out"] = "in"
+
+
 class ArgsResponder(BaseModel):
     respuesta: str
     docs_citados: list[str] = []
+
+
+def alcance_acotado(
+    grafo, doc_id: str, max_saltos: int, direccion: str
+) -> list[str]:
+    """Cierre transitivo **acotado a N saltos**, sin filtrar por tipo.
+
+    `ontology_lib.alcance_transitivo` hace el cierre completo y sin tope de
+    saltos; las *competency questions* de `05` preguntan "hasta dos saltos",
+    que es otra cosa. Esta es la primitiva que responde la pregunta tal como
+    está formulada — y `tests/test_harness_lib.py` verifica que reproduce
+    exactamente los siete goldens multi-hop congelados de `05`.
+
+    Que la herramienta tenga la forma de la pregunta es todo el argumento de
+    §3 sobre granularidad.
+    """
+    if doc_id not in grafo:
+        return []
+    vistos: set[str] = set()
+    frontera = {doc_id}
+    for _ in range(max(0, max_saltos)):
+        siguiente: set[str] = set()
+        for nodo in frontera:
+            vecinos = (
+                grafo.predecessors(nodo) if direccion == "in" else grafo.successors(nodo)
+            )
+            siguiente |= set(vecinos)
+        siguiente -= vistos | {doc_id}
+        vistos |= siguiente
+        frontera = siguiente
+    return sorted(vistos)
+
+
+def costo_esquema(herramienta: Herramienta, modelo: str = "gpt-4o-mini") -> int:
+    """Tokens que el esquema de una herramienta paga en **cada** iteración
+    de **cada** tarea. Es el precio de tenerla en el menú, se use o no."""
+    return contar_tokens(
+        json.dumps(herramienta.spec_openai(), ensure_ascii=False), modelo
+    )
 
 
 def cargar_grafo_normativo():
@@ -1214,13 +1259,21 @@ def cargar_grafo_normativo():
 
 
 def construir_herramientas(
-    *, con_grafo: bool = True, chars_por_pagina: int = CARACTERES_POR_PAGINA
+    *,
+    con_grafo: bool = True,
+    con_alcance: bool = False,
+    chars_por_pagina: int = CARACTERES_POR_PAGINA,
 ) -> ToolRegistry:
     """Registro de herramientas sobre el corpus chileno.
 
     `con_grafo=False` deja al agente solo con búsqueda y lectura: es el brazo
     de control de §7 para medir si recorrer el grafo de `05` bajo demanda
     aporta algo que el retrieval de `02` no daba.
+
+    `con_alcance=True` agrega la herramienta de grano grueso que responde una
+    dependencia transitiva de una sola llamada. Es el tratamiento de §3: la
+    misma capacidad que `vecinos_grafo`, envuelta en la unidad de delegación
+    que la pregunta necesita.
     """
     chunks = load_corpus_chunks(CORPUS_DIR)
     bm25 = BM25Retriever().fit(chunks)
@@ -1351,6 +1404,60 @@ def construir_herramientas(
                 # la fuente — que es la doctrina de trazabilidad del repo.
                 lineas.append(arista + (f"\n    fundamento: «{fund}»" if fund else ""))
             return "\n".join(lineas)
+
+        if con_alcance:
+
+            def alcance(args: ArgsAlcance) -> str:
+                if args.doc_id not in grafo:
+                    cercanos = get_close_matches(
+                        args.doc_id, sorted(grafo.nodes), n=3, cutoff=0.4
+                    )
+                    raise ToolError(
+                        esperado="un doc_id presente en el grafo normativo",
+                        recibido=args.doc_id,
+                        siguiente_paso=(
+                            f"probá con uno de estos: {', '.join(cercanos)}"
+                            if cercanos
+                            else "usá 'buscar_corpus' para ubicar el documento primero"
+                        ),
+                    )
+                if not 1 <= args.max_saltos <= 5:
+                    raise ToolError(
+                        esperado="max_saltos entre 1 y 5",
+                        recibido=str(args.max_saltos),
+                        siguiente_paso="volvé a llamar con max_saltos entre 1 y 5",
+                    )
+                alcanzados = alcance_acotado(
+                    grafo, args.doc_id, args.max_saltos, args.direccion
+                )
+                if not alcanzados:
+                    verbo = "dependen de" if args.direccion == "in" else "dependen"
+                    return f"Ningún documento {verbo} {args.doc_id} en {args.max_saltos} saltos."
+                encabezado = (
+                    f"{len(alcanzados)} documentos dependen de {args.doc_id} "
+                    if args.direccion == "in"
+                    else f"{args.doc_id} alcanza {len(alcanzados)} documentos "
+                )
+                return encabezado + f"en hasta {args.max_saltos} saltos:\n" + "\n".join(
+                    f"- {d}" for d in alcanzados
+                )
+
+            herramientas.insert(
+                2,
+                Herramienta(
+                    nombre="alcance_normativo",
+                    descripcion=(
+                        "Devuelve de una sola llamada todos los documentos "
+                        "conectados a uno dado en hasta max_saltos saltos, por "
+                        "cualquier tipo de relación. direccion='in' responde "
+                        "'¿qué documentos dependen de este?'; 'out', la inversa. "
+                        "Usalo para preguntas de dependencia transitiva en vez "
+                        "de encadenar llamadas a 'vecinos_grafo'."
+                    ),
+                    args_model=ArgsAlcance,
+                    fn=alcance,
+                ),
+            )
 
         herramientas.insert(
             2,

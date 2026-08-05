@@ -1,0 +1,1253 @@
+{
+  "format_version": 2,
+  "entries": {
+    "07e6ef2c8c903e1a201a0d76e2b2b223cb4816e280ee1449180537e38ad83789": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_P6GArgC0ydXddKB7Oa4dEFjR",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La norma que modifica al DL 825 es la Ley 21.210 de modernización.\",\"docs_citados\":[\"ley-02-ley-21210-modernizacion.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c5dc79ca9b861e2b297521082784dd98640cf85467d502a7995bad8de55819e3",
+      "tokens_input": 781,
+      "tokens_output": 48,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00014595,
+      "replica": 0
+    },
+    "0951a7dd0c67246217fed4d8c2112b5b5a358b2e60cfb4b976831c0cf9a5eb09": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_dgSEhwb3JGUMrqdWSholnkw8",
+            "name": "vecinos_grafo",
+            "arguments": "{\"doc_id\":\"ley-01-dl-825-iva-base.txt\",\"tipo_relacion\":\"modifica\",\"direccion\":\"in\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "959b6d419d6c9ca94177bb54b9a94934d3c3214952e77baa2f45b6b96d222f77",
+      "tokens_input": 679,
+      "tokens_output": 38,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00012465,
+      "replica": 0
+    },
+    "0ac767de21d6b8f35dc5fb548a7cbf421b175e384aa60c185e09c9b809824769": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_qyVg9iG7kEWcob4tvicK4aSq",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"Programa Nacional de Inmunizaciones presupuesto 2024\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "e9c437ec3fe253055b0769d69afd819d9e0c960b0d139677524d653117eb80cc",
+      "tokens_input": 689,
+      "tokens_output": 24,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00011775,
+      "replica": 0
+    },
+    "0e07eedc0b62cee8c40e3e2d07b36f47e79a6fe0b5b657599d0af292ab6cdce8": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_w9PaI6iCxfhqBt52eXw1UbX2",
+            "name": "vecinos_grafo",
+            "arguments": "{\"doc_id\":\"ley-19-886.txt\",\"tipo_relacion\":\"reglamenta\",\"direccion\":\"out\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "4f9222d31702cc6a7a0d6a01ef4412b7a6497a79c3d7343129ee426e02511027",
+      "tokens_input": 683,
+      "tokens_output": 34,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00012285,
+      "replica": 0
+    },
+    "150958dfff54a16fe7c34429bc95376d0063b637c98494141c196ff308b9adb0": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_wjXnsG8Lv4HZMnT9r6rEwiFd",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"subvenciones escolares afectas IVA\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "f3bc8a943325fcd01b6efef78a05ce775d76729dbda3f2ed00c15ecd82325f1a",
+      "tokens_input": 850,
+      "tokens_output": 21,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001401,
+      "replica": 0
+    },
+    "1d6597f555b4c18f7b41a83a5d8972f23caabe590127bce295b9b96ab82ec50e": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_tKCAQMuUyJHblVxm00bnQR5N",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"Los sujetos pasivos de la Ley de Lobby son: \\n\\na) El Presidente de la República, los ministros de Estado, los subsecretarios, los jefes de servicio, los directores regionales de servicios públicos, los intendentes y gobernadores.\\n\\nb) Los embajadores y los jefes de misiones diplomáticas.\\n\\nc) Los consejeros del Consejo de Defensa del Estado, del Banco Central de Chile, del Tribunal Constitucional, del Tribunal Calificador de Elecciones y de los Tribunales Electorales Regionales.\\n\\nd) Los diputados y senadores.\\n\\ne) Los alcaldes y concejales.\",\"docs_citados\":[\"norma-01-ley-lobby.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "d8eecdf8ec02a54c03833330a4314a28d80db6c4e5981b0548093fb51efc48ca",
+      "tokens_input": 1440,
+      "tokens_output": 165,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.000315,
+      "replica": 0
+    },
+    "1e6dd95396c68d34d60ac5065745d37a25aec0114cad614a4ec2df6ca0aba6c6": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_meljKGovUgW5E5ynCR6jFeIP",
+            "name": "vecinos_grafo",
+            "arguments": "{\"doc_id\":\"ley-03-ley-19886-compras-publicas.txt\",\"tipo_relacion\":\"reglamenta\",\"direccion\":\"out\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "0a0ac6eba69595a173b07afb32e5e2bb5e762c3f892481cf68baefa472250f8f",
+      "tokens_input": 808,
+      "tokens_output": 41,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001458,
+      "replica": 0
+    },
+    "21b822b3bf681400f0937746e6ce36f5805bb4f0d0d920f056ee592d756753b0": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_VR9roAOBTKMa1N4oEbCvzuQR",
+            "name": "leer_norma",
+            "arguments": "{\"doc_id\":\"circular-03-sii-ppm-honorarios.txt\",\"pagina\":1}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "39f8cd3184ecb4632edc425d0ef912e6019e5e6a5ce789dba35bb86bdc183b4d",
+      "tokens_input": 2516,
+      "tokens_output": 32,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0003966,
+      "replica": 0
+    },
+    "24a1a14dee8ea1edefb0327d257bf5f570f17293698da303dbbac068e4326c20": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_goa8kR2jKdyIhXZQXOsP8dtJ",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La ley que introdujo el IVA a los servicios digitales en Chile es la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios.\",\"docs_citados\":[\"circular-01-sii-iva-digital.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "4f6b6a48008caca85506256667ce035c8caeda6551c492f08722d7b019b6ddac",
+      "tokens_input": 927,
+      "tokens_output": 65,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00017805,
+      "replica": 0
+    },
+    "31f44f9b2def0384d8c7c96193e830c5ff7507b950a66b37daf887abb94c5a41": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_6eEDXOiiqPqyCBABUrJTH8ek",
+            "name": "vecinos_grafo",
+            "arguments": "{\"doc_id\":\"ley-19-886\",\"tipo_relacion\":\"deroga\",\"direccion\":\"out\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "15c5dbc322f81eb0ccf2d3a7b063eac7e0958766c15c6a818b3b8c9c099971fb",
+      "tokens_input": 682,
+      "tokens_output": 32,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001215,
+      "replica": 0
+    },
+    "379bc2383a0894b292d6a2d87cca6f70f7ab3f61f686021957eb9a0fc8cbcca7": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_diNOiAADX68j0tMWGqkztKEs",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"sanciones Ley de Transparencia\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "3fc43673287722d048f85d919d08ee5f7b0f6f7ae06c70b92217c7c6f82a1b5e",
+      "tokens_input": 1071,
+      "tokens_output": 21,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00017324999999999998,
+      "replica": 0
+    },
+    "44f39c2d61dea847ccfd757e427725f071619cf2ff8162f2113176ca8e364e96": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_bCh3FWH0DI0bZHOCQaofEzC0",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"Ley de Transparencia 2022\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "10f1eec5f73f0e8c75562167a0094d84b1a29fb3413d594ffbefb9792cea8d39",
+      "tokens_input": 909,
+      "tokens_output": 21,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00014895,
+      "replica": 0
+    },
+    "507b1700244bfb23362e6b0cc9fc814f1a3a49aaecf4eebd711dee182fd15c48": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_zrrze0JpYVfMmERMkIW7z3CQ",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"Ley de Transparencia Chile 2022\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "714a7ee94179cb19e60ae8d254d77658e84e74da94e3b85d3d6caaea26115094",
+      "tokens_input": 3126,
+      "tokens_output": 22,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00048209999999999995,
+      "replica": 0
+    },
+    "50d6eb8f2c47b0af4cb7da39be0a395e16050c2518b9aae63148c1c36ab47dbc": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_2MVl4kluWOz34rFaPnNB9Dk4",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"DS 250\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "ce59c810f61ee3f891b60eb8f54a7d40ccde62f3d12b3f99402e0d93c1f8225c",
+      "tokens_input": 769,
+      "tokens_output": 17,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00012555,
+      "replica": 0
+    },
+    "5259bdc6e624fd9605743ab5be6082ffb9a1e31476991a32eefae68fb72cb59c": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_4Z5Rs7CHOBCXM1Swzz3qNMPH",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"Los prestadores de servicios digitales domiciliados o residentes en el extranjero tienen la obligación de registrarse ante el Servicio de Impuestos Internos y declarar el impuesto en forma trimestral. Esta obligación se relaciona con la tributación simplificada que deben seguir, pero no se menciona específicamente una obligación trimestral compartida con el Ministerio de Salud respecto a inmunizaciones en los documentos consultados.\",\"docs_citados\":[\"circular-01-sii-iva-digital.txt#12\",\"ley-02-ley-21210-modernizacion.txt#6\",\"circular-05-sii-factura-electronica.txt#13\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "6bc9b9806fac67d1e8abc602ca63c200e8746ddeb9a42c9032e72a0d0fc4faa7",
+      "tokens_input": 902,
+      "tokens_output": 139,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0002187,
+      "replica": 0
+    },
+    "5850079d26e86c43b8a5bf659b16fbbaa23fa7e419b97ae95251d82e916ca59e": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_8gtCPFkjCKSLNnXDaPMBuI8N",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"Las subvenciones escolares no están afectas a IVA, ya que conforme al artículo 12, letra E, número 5, están exentos del IVA los ingresos que perciban los establecimientos de educación en razón de su actividad docente propiamente tal. Sin embargo, es importante señalar que los servicios accesorios prestados por terceros, como transporte escolar contratado a empresas externas, alimentación provista por concesionarios y venta de materiales, sí quedan afectos a IVA.\",\"docs_citados\":[\"circular-04-sii-iva-exenciones.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "88fb555ddc7e2e95e16330fb1f31412266c7c5c58a796678be83c87668435b2e",
+      "tokens_input": 1230,
+      "tokens_output": 121,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0002571,
+      "replica": 0
+    },
+    "59baf441446378797a7725ed51919bf16c8821a1c04fdbed39194e28ba7714e2": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_PtusuP83hB4Dl1XhqFbROLxI",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"DFL 3 subvenciones especiales educación rural\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "92b82e726942fb7cb77ea89e395331c684934abf482a1ab4636bcb141cffd161",
+      "tokens_input": 686,
+      "tokens_output": 23,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00011669999999999999,
+      "replica": 0
+    },
+    "5e79d7662c8f33ab53012a0e8b7efcff70593b9af4668cd03fbc595a89b00e36": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_i5hb05Uzy0zktS3itpWNCV8E",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"Para el año 2024, se asigna al Programa Nacional de Inmunizaciones un presupuesto de $14.320.000 miles.\",\"docs_citados\":[\"decreto-04-modificacion-presupuestaria.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "5ff73154f6b4a5b409af7200fb53af077c84b5e58cc0ef8b30e9d6c866adae72",
+      "tokens_input": 927,
+      "tokens_output": 57,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00017324999999999998,
+      "replica": 0
+    },
+    "6aac74552befade710cbff5d4319ddcc6d6d3ef3923c8f1a6f76ebf45752f199": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_i3DmgCprtLRFCFgT0panVo4W",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"sujetos pasivos Ley de Lobby\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "9742d7f11c2729011266d8b8dd9c256cb02a5e6fffdbcc7bb1bbdf6310a41c55",
+      "tokens_input": 683,
+      "tokens_output": 22,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00011564999999999999,
+      "replica": 0
+    },
+    "705d9d90bb226b81bd5a382d211e6f60b40239c115b0161f678a8e2b952513d7": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_wTWhdGWc2bytGWgZGhUZSTsC",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"No consta en el corpus información específica sobre las subvenciones especiales para educación rural en el DFL 3.\",\"docs_citados\":[]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "1ce518a94cf3cc8d27c7fa59463607bc1e3742227febefae41311c1d343d7872",
+      "tokens_input": 1235,
+      "tokens_output": 39,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00020865,
+      "replica": 0
+    },
+    "75546fbd70514b632c364eea0c16570cbbde9e4b28efde046d08333ef84bdf2e": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_7LR7GTQwDXWLF2Gxrajfqnz2",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"El documento que reglamenta la Ley 19.886 es el \\\"Reglamento de la Ley Nº 19.886, de Bases sobre Contratos Administrativos de Suministro y Prestación de Servicios\\\".\",\"docs_citados\":[\"decreto-03-reglamento-compras-publicas.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c288eab596c1be626a5065e9dbfd286f8d9d6914c6a3da8f8c05e74a9589e1d2",
+      "tokens_input": 1127,
+      "tokens_output": 75,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00021404999999999997,
+      "replica": 0
+    },
+    "7ae1129adf9d8f36808219e537fb76529adbb7bef98510d3ec4214708a1bd235": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_UpgldmmgYBAk3m4KFgwELkhx",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"subvenciones escolares IVA exención\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "64b734ce8efa83a034bfc01ad8380d91a6a0dceea8b0fd61526cd71fd88194c4",
+      "tokens_input": 1020,
+      "tokens_output": 21,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00016560000000000001,
+      "replica": 0
+    },
+    "83d50d098b46f2ad96d60499e3d643ca863283ec7a5599f5cde14d5190713a81": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_W6rMc4DpAciC9Hp027pWQczm",
+            "name": "alcance_normativo",
+            "arguments": "{\"doc_id\":\"decreto-03-reglamento-compras-publicas.txt\",\"max_saltos\":2}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "52abd3551b94160fe27faa1573154f02b592f3b98bb4af4d28f67058e898a065",
+      "tokens_input": 1062,
+      "tokens_output": 36,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001809,
+      "replica": 0
+    },
+    "86bd55cdf4c6b1dd001861c73dc8fdb3769f5908515e324664b3fc806c9b9e93": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_FzxC91RAgTGOmBimqDIQQepK",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"reglamento Ley 19.886\",\"k\":3}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "5b5ee095f62168ce590c829c5419eb0fcf19f311d68c178b6ab56ec51fe06f60",
+      "tokens_input": 886,
+      "tokens_output": 26,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00014849999999999998,
+      "replica": 0
+    },
+    "907dd750ca2b3ff4fa5ddf01f729a7b77e80540bd542f8cc98dbba4f8bca0ca3": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_fMGkTbKJv91tCdfevbmcqu93",
+            "name": "vecinos_grafo",
+            "arguments": "{\"doc_id\":\"ley-03-ley-19886-compras-publicas.txt\",\"tipo_relacion\":\"deroga\",\"direccion\":\"out\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "a145d22c66a3e00eef48817cd0567e83ad17096b0d769419bec5921eb2a1b4f2",
+      "tokens_input": 967,
+      "tokens_output": 40,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00016905000000000002,
+      "replica": 0
+    },
+    "90d10f4e717903ecfb02ee45ebf9d0e5c19ebdaa7da493ce2aa2806f65ecc573": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_mvcj5NnSmhWCGOfrQWGBOvPp",
+            "name": "alcance_normativo",
+            "arguments": "{\"doc_id\":\"ds-250\",\"max_saltos\":2}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "007a4bd79db86f5ec6eb80d81699b2de48c0db17859e2fa0c51c7b79fb8aa5c6",
+      "tokens_input": 685,
+      "tokens_output": 27,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00011894999999999999,
+      "replica": 0
+    },
+    "91e64ff826f6561c1668b1af893434ad0b33562a6d6f2f10bbd7486c12d9d261": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_6OzpPrSMIl81RMrt22s7kcNA",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"presupuesto de salud 2025\",\"k\":5}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b33b1e9ba1e44006c0dc41250d0fd3d77255745d8ef138417e0471d560b0ad21",
+      "tokens_input": 907,
+      "tokens_output": 25,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00015105,
+      "replica": 0
+    },
+    "92c58409a954f6e34772fa19924398495cdb784f1188b9210700eaeb5b1d4da2": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_jhgjpYGLebjgUAvXyeXRagIh",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La Ley 21.634 moderniza la Ley 19.886, pero no la deroga. No consta en el corpus un documento que derogue la Ley 19.886.\",\"docs_citados\":[\"ley-03-ley-19886-compras-publicas.txt\",\"ley-04-ley-21634-moderniza-compras.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "0ad6b6b5fb45f214a33a136a603dac1b38a3aad373473ca27172ef3399150d0e",
+      "tokens_input": 1559,
+      "tokens_output": 83,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00028365,
+      "replica": 0
+    },
+    "98831f514b049b437db4865b5d3f8282e88928dad8eac46296941e8d59fbbea4": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_aPHVVFIIJivtSaSRXGipBC5H",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"subvenciones especiales educación rural DFL 3\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8d1aa00e6d482a0b41bddfc5a58989663823e8c65e86642f92b850f2a0ebb731",
+      "tokens_input": 1078,
+      "tokens_output": 24,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001761,
+      "replica": 0
+    },
+    "9b48b5fa1765575db32e450481421f33363403b464820c45c04370f6ff7af2b8": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_rtJzRMXO7ctVSQ1G0Pi5nJzQ",
+            "name": "alcance_normativo",
+            "arguments": "{\"doc_id\":\"resolucion-01-chilecompra-compra-agil.txt\",\"max_saltos\":2}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "92f3504f3bbaf0b2096e0197612f79ac81ad7ab1d2260437b8f8acc4e07cc5bc",
+      "tokens_input": 1184,
+      "tokens_output": 38,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0002004,
+      "replica": 0
+    },
+    "a48a76d71a57192bd1070c2be578819bee44858798cdaf1e774afd15f0471e00": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_4494FL2mMPM0j2pV85vBoX7Y",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"subvenciones escolares IVA\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "def0ef13190c83a9a5eeec6ba86e75f2bc87ee173509aafe9998ba812aa8bc04",
+      "tokens_input": 682,
+      "tokens_output": 19,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001137,
+      "replica": 0
+    },
+    "a9225264393666a142e8d569f188ccec32fe2563d50eb9ea29e31b10b1600383": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_E9sGwZ068EDDlw06LuCMfP9o",
+            "name": "leer_norma",
+            "arguments": "{\"doc_id\":\"resolucion-03-registro-lobbistas.txt\",\"pagina\":2}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "5c9d76417a304533673f12c08d4815e7b44e44c3ffa2925a83617c5c09446bbb",
+      "tokens_input": 2339,
+      "tokens_output": 31,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00036945,
+      "replica": 0
+    },
+    "afd06b7c8930812eff0bd57232cc418bf85e30917ec453ba6923cf4d06fa2a07": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_d6IX7xIcNPeRIf4Fr4wbELRS",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"obligación trimestral prestadores de servicios digitales extranjeros Ministerio de Salud inmunizaciones\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "f8bcd228b5ed95ca8dfd575a3b0411185cb27cbc4dbe2af98e7ee6a9c9856d72",
+      "tokens_input": 694,
+      "tokens_output": 30,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00012209999999999999,
+      "replica": 0
+    },
+    "b5017034a2161a711e24faca2e1615b410ff2475fa4736be223bf805099c06c2": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_jUu8AWib0d0jYIol8ox4N4sh",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"deroga Ley 19.886\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b176a178982b8035fbf97d727b30c30d700bb1cf084792ef6239e26377e0bda0",
+      "tokens_input": 1043,
+      "tokens_output": 21,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00016905000000000002,
+      "replica": 0
+    },
+    "b6cd01cc4f3758c4757c94cbccc303118d31fec881978f9ad59393762eabf010": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_tKay9Yifr7seKwn6Z8VE9trA",
+            "name": "alcance_normativo",
+            "arguments": "{\"doc_id\":\"glosa-05-presupuesto-interior.txt\",\"max_saltos\":2}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "f0161f2378b3a51c0fb66835bc05842bffb2cf400ff91502c655ede9996b24f8",
+      "tokens_input": 1413,
+      "tokens_output": 33,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00023175,
+      "replica": 0
+    },
+    "b94e80b5564c0c8e57f817ee62c0bd78140fac81cbcf88cde2ca74ff5f131eed": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_9ZWavoRJRSpSz69YjAozmEZc",
+            "name": "alcance_normativo",
+            "arguments": "{\"doc_id\":\"do-02-extracto-licitacion-publica.txt\",\"max_saltos\":2,\"direccion\":\"in\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "2db04e06f698bf006b5cf723eb5a99867e98c650383de960608b0ab98a287102",
+      "tokens_input": 1478,
+      "tokens_output": 40,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00024569999999999995,
+      "replica": 0
+    },
+    "c1fbb9322f121920cb4f8149291ff87d048121c13c2e9d27da7121cccd3b6cf6": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_ccK5yDgJWtVWVyAI6zVXd4t5",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"Ley 19.886\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "360b00ecb35bfca5457fe75b7a619067155988980fb65720463d1ad4df60b55c",
+      "tokens_input": 773,
+      "tokens_output": 19,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00012735,
+      "replica": 0
+    },
+    "c2dd3e9f1fbed681d80b47e911c276b4d7e57c2ec28dbb72ee564a08c179db65": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_BJVmbUPIV8NlNWYUHtL4CqyH",
+            "name": "leer_norma",
+            "arguments": "{\"doc_id\":\"resolucion-03-registro-lobbistas.txt\",\"pagina\":1}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "efe578252a88468a4bca3f286d60fbe044ca157ff9b3d1bf50c429acbc02bc56",
+      "tokens_input": 1202,
+      "tokens_output": 31,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00019889999999999998,
+      "replica": 0
+    },
+    "c2e97a43b75e0b94cfe66085fcbae142b67e0af79167bc63d06a1a83bb629678": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_Iwl4MT8c1Ra8bh1t7arnYRgD",
+            "name": "alcance_normativo",
+            "arguments": "{\"doc_id\":\"do-02-extracto-licitacion-publica.txt\",\"max_saltos\":2}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "6f1a6a940f6838741d0d175d0f6f5d4abcd5cdee2b47a28c4080466fcaa91173",
+      "tokens_input": 1342,
+      "tokens_output": 36,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00022290000000000002,
+      "replica": 0
+    },
+    "c307a3b60711cb3921e99e8ecb8288f2f758fdeb3cba9de7763a0d3737c4c939": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_v49FO49YufixUVYg1Hrh1PwX",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"DFL 3 educación rural\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "38133a2589b7910ee693b62cba04d421be08f855bf9bfa67fd52f38b47628908",
+      "tokens_input": 842,
+      "tokens_output": 20,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00013829999999999997,
+      "replica": 0
+    },
+    "c4ff9fc80f1b3f668cd4ca15d3cf79caceebd9d1e17416cc8b672539d2982ee4": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_lLMYiqtdaKzU1d57BKRbK8qK",
+            "name": "leer_norma",
+            "arguments": "{\"doc_id\":\"norma-01-ley-lobby.txt\",\"pagina\":1}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "9687cefeffad30368693d821260b78da69842cab67403e24b0dcb4fa7aea4076",
+      "tokens_input": 917,
+      "tokens_output": 29,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00015494999999999997,
+      "replica": 0
+    },
+    "cc53a501ab76f044c38dabe9d44d25330e7f36a1e6d79b0ea29e20cd937cf5c1": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_gA08F1t9OqY1RGrouK4LFHG9",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"IVA servicios digitales\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "f578d816041db75f967aabce49a218191bec1b33dec3eb96d624416d03439e61",
+      "tokens_input": 684,
+      "tokens_output": 17,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001128,
+      "replica": 0
+    },
+    "cd755f49b6fd07c9f7d7392dbf6f385304b1f54fa93f84ba86b3fa12d84f0bf1": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_pgohkOj1VPbx5vGejJwhYfOG",
+            "name": "leer_norma",
+            "arguments": "{\"doc_id\":\"norma-02-ley-20880-probidad.txt\",\"pagina\":1}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "6bbf9de98f4d37bc4a003a288c28259b755a1656307cb7f4cdb604f6994bf7ef",
+      "tokens_input": 1783,
+      "tokens_output": 33,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00028725,
+      "replica": 0
+    },
+    "deb52cb3c0501017c29b0448e5ddb1a37ccb7bbb00f65a880c775855d063606a": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_SHVDcH0rhoYsvCMal2BTc2Cv",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"Ley 21.634\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "27529680cfd32fe11661bcb1c637bad9181a7f0a262f0e584d16cba18b05359a",
+      "tokens_input": 1239,
+      "tokens_output": 19,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00019725000000000002,
+      "replica": 0
+    },
+    "e126f0b775effd603a4be97c6164e6e38d1194c251273a8ad3c54bbe242325c8": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_K3LfZk0cT3rOWmq4vCmYIwUl",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"multa infracción Ley de Transparencia 2022\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "8e8a2fe4d6ca5c26e42d2fb79f7e12ecdcc46309c8e6fac7f2eba43ce2f13b37",
+      "tokens_input": 690,
+      "tokens_output": 25,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001185,
+      "replica": 0
+    },
+    "e16dafc0817c4578c62563dbb743efaeffad6601f43436033a9be18274c4aae0": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_3Vji62blugtNZrIGkDzZ2zGU",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"No consta en el corpus información sobre el presupuesto de Salud para el año 2025.\",\"docs_citados\":[]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "92f269bb8d8786e5aaea4621799a2ac00b4e2566ca117f386aa2ea7fc5623a10",
+      "tokens_input": 1274,
+      "tokens_output": 35,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00021209999999999998,
+      "replica": 0
+    },
+    "edded14728d2d00d479d9cf7553605087321cb4ae9902900f6de53bd42116d5d": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_abDRGZhd9bMBg8HgODCQdeFX",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"presupuesto de salud 2025\"}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "95d9a40b1446b25628bc5602f4fb19d7b12b2bc1980ee663322185177b3c7e2e",
+      "tokens_input": 683,
+      "tokens_output": 21,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00011504999999999999,
+      "replica": 0
+    },
+    "edf3d4631de1000c1b4d86edeb801b867eddbb0ccaaef4cf25b78b1c98edf487": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_RuWRooCYTSqppbuYVSAqtdfL",
+            "name": "alcance_normativo",
+            "arguments": "{\"doc_id\":\"oficio-02-contraloria-trato-directo.txt\",\"max_saltos\":2}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "c444e516da7a0eaca1f0ccaee88f1f3aef1a1d547af7f0cff6c1b38ce4af8886",
+      "tokens_input": 1270,
+      "tokens_output": 37,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0002127,
+      "replica": 0
+    }
+  }
+}
