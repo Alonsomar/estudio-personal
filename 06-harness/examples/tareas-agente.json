@@ -1,0 +1,169 @@
+{
+  "metadata": {
+    "nombre": "Tareas del agente — 06-harness",
+    "version": 1,
+    "created": "2026-08-05",
+    "descripcion": "12 tareas congeladas para los experimentos de harness. NO se anota nada nuevo: cada tarea copia literalmente la pregunta y los documentos esperados de un golden ya auditado del repo, y registra su procedencia. La métrica es objetiva y no usa juez LLM: se compara el conjunto de documentos que el agente cita con el conjunto esperado.",
+    "familias": {
+      "recuperacion": "la evidencia está en el texto; se resuelve buscando y leyendo",
+      "estructural": "la respuesta es una relación entre normas; vive en el grafo de 05",
+      "abstencion": "la respuesta correcta es que no consta en el corpus (docs_esperados vacío)"
+    },
+    "metrica": "acierto_exacto = conjunto de docs citados == conjunto esperado. f1_docs = media armónica de precisión y recall sobre documentos citados; para las tareas de abstención, f1 = 1.0 si no cita nada y 0.0 si cita algo."
+  },
+  "items": [
+    {
+      "id": "t-01",
+      "familia": "recuperacion",
+      "dificultad": "facil",
+      "pregunta": "¿Qué ley introdujo el IVA a los servicios digitales en Chile?",
+      "docs_esperados": [
+        "circular-01-sii-iva-digital.txt"
+      ],
+      "origen": {
+        "golden": "01-evals/examples/golden-dataset-rag-fiscal.json",
+        "item": "gd-001"
+      }
+    },
+    {
+      "id": "t-02",
+      "familia": "recuperacion",
+      "dificultad": "facil",
+      "pregunta": "¿Cuánto presupuesto se asigna al Programa Nacional de Inmunizaciones en 2024?",
+      "docs_esperados": [
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "origen": {
+        "golden": "01-evals/examples/golden-dataset-rag-fiscal.json",
+        "item": "gd-011"
+      }
+    },
+    {
+      "id": "t-03",
+      "familia": "recuperacion",
+      "dificultad": "facil",
+      "pregunta": "¿Qué autoridades son sujetos pasivos de la Ley de Lobby?",
+      "docs_esperados": [
+        "norma-01-ley-lobby.txt"
+      ],
+      "origen": {
+        "golden": "01-evals/examples/golden-dataset-rag-fiscal.json",
+        "item": "gd-019"
+      }
+    },
+    {
+      "id": "t-04",
+      "familia": "recuperacion",
+      "dificultad": "dificil",
+      "pregunta": "¿Qué obligación trimestral comparten los prestadores de servicios digitales extranjeros y el Ministerio de Salud respecto a inmunizaciones?",
+      "docs_esperados": [
+        "circular-01-sii-iva-digital.txt",
+        "glosa-01-presupuesto-salud.txt"
+      ],
+      "origen": {
+        "golden": "01-evals/examples/golden-dataset-rag-fiscal.json",
+        "item": "gd-024"
+      }
+    },
+    {
+      "id": "t-05",
+      "familia": "recuperacion",
+      "dificultad": "dificil",
+      "pregunta": "¿Las subvenciones escolares están afectas a IVA?",
+      "docs_esperados": [
+        "circular-01-sii-iva-digital.txt",
+        "decreto-01-subvencion-escolar.txt"
+      ],
+      "origen": {
+        "golden": "01-evals/examples/golden-dataset-rag-fiscal.json",
+        "item": "gd-028"
+      }
+    },
+    {
+      "id": "t-06",
+      "familia": "estructural",
+      "dificultad": "facil",
+      "pregunta": "¿Qué norma modifica al DL 825?",
+      "docs_esperados": [
+        "ley-02-ley-21210-modernizacion.txt"
+      ],
+      "origen": {
+        "golden": "05-ontologias/examples/golden-ontology.json",
+        "item": "cq-002"
+      }
+    },
+    {
+      "id": "t-07",
+      "familia": "estructural",
+      "dificultad": "facil",
+      "pregunta": "¿Qué documento reglamenta la Ley 19.886?",
+      "docs_esperados": [
+        "decreto-03-reglamento-compras-publicas.txt"
+      ],
+      "origen": {
+        "golden": "05-ontologias/examples/golden-ontology.json",
+        "item": "cq-003"
+      }
+    },
+    {
+      "id": "t-08",
+      "familia": "estructural",
+      "dificultad": "dificil",
+      "pregunta": "¿Qué documentos dependen en hasta dos saltos del DS 250?",
+      "docs_esperados": [
+        "do-02-extracto-licitacion-publica.txt",
+        "glosa-05-presupuesto-interior.txt",
+        "oficio-02-contraloria-trato-directo.txt",
+        "resolucion-01-chilecompra-compra-agil.txt"
+      ],
+      "origen": {
+        "golden": "05-ontologias/examples/golden-ontology.json",
+        "item": "cq-011"
+      }
+    },
+    {
+      "id": "t-09",
+      "familia": "estructural",
+      "dificultad": "facil",
+      "pregunta": "¿Qué documento deroga la Ley 19.886?",
+      "docs_esperados": [],
+      "origen": {
+        "golden": "05-ontologias/examples/golden-ontology.json",
+        "item": "cq-016"
+      }
+    },
+    {
+      "id": "t-10",
+      "familia": "abstencion",
+      "dificultad": "facil",
+      "pregunta": "¿Cuál es la multa por infracción a la Ley de Transparencia de 2022?",
+      "docs_esperados": [],
+      "origen": {
+        "golden": "01-evals/examples/golden-dataset-rag-fiscal.json",
+        "item": "gd-025"
+      }
+    },
+    {
+      "id": "t-11",
+      "familia": "abstencion",
+      "dificultad": "facil",
+      "pregunta": "¿Qué dice el DFL 3 sobre subvenciones especiales para educación rural?",
+      "docs_esperados": [],
+      "origen": {
+        "golden": "01-evals/examples/golden-dataset-rag-fiscal.json",
+        "item": "gd-026"
+      }
+    },
+    {
+      "id": "t-12",
+      "familia": "abstencion",
+      "dificultad": "facil",
+      "pregunta": "¿Cuál será el presupuesto de Salud para 2025?",
+      "docs_esperados": [],
+      "origen": {
+        "golden": "01-evals/examples/golden-dataset-rag-fiscal.json",
+        "item": "gd-027"
+      }
+    }
+  ]
+}

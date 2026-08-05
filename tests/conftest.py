@@ -15,6 +15,7 @@ for lib_dir in (
     ROOT / "02-retrieval" / "code",
     ROOT / "03-produccion" / "code",
     ROOT / "05-ontologias" / "code",
+    ROOT / "06-harness" / "code",
 ):
     if str(lib_dir) not in sys.path:
         sys.path.insert(0, str(lib_dir))
