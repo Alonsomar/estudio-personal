@@ -48,6 +48,7 @@ from harness_lib import (
     costo_esquema,
     contar_tokens,
     docs_mencionados,
+    docs_observados,
     estimar_tokens,
     envenenar,
     evaluar_trayectoria,
@@ -56,6 +57,8 @@ from harness_lib import (
     herramienta_marcar_obsoleta,
     herramienta_memoria,
     llamadas_redundantes,
+    metricas_trayectoria,
+    normalizar_cita,
     presupuesto_contexto,
     recuperacion_tras_error,
     rechazar_todo,
@@ -813,6 +816,99 @@ def test_el_registro_de_efectos_cuenta_duplicados():
     r.registrar("a", "x")
     r.registrar("a", "y")
     assert r.cuenta() == 3 and r.cuenta("a") == 3 and r.duplicados() == 1
+
+
+# --------------------------------------------------------------------------- #
+# §7 Métricas de trayectoria.
+# --------------------------------------------------------------------------- #
+def _tray_con_observaciones(obs: list[str], citados: list[str]) -> Trayectoria:
+    from harness_lib import Paso
+
+    return Trayectoria(
+        tarea_id="t", pregunta="p", harness="h",
+        docs_citados=citados,
+        motivo_corte=MotivoCorte.RESPONDIO,
+        pasos=[
+            Paso(indice=i, herramienta="buscar_corpus", argumentos={"consulta": str(i)},
+                 estado=EstadoPaso.OK, observacion=o)
+            for i, o in enumerate(obs)
+        ],
+    )
+
+
+def test_docs_observados_reconstruye_lo_que_paso_por_el_contexto():
+    tray = _tray_con_observaciones(
+        ["fragmento de ley-01-dl-825-iva-base.txt", "nada relevante"], []
+    )
+    assert docs_observados(tray) == {"ley-01-dl-825-iva-base.txt"}
+
+
+def test_citas_fundadas_detecta_lo_que_el_agente_no_vio():
+    tray = _tray_con_observaciones(
+        ["texto de ley-01-dl-825-iva-base.txt"],
+        ["ley-01-dl-825-iva-base.txt", "inventada.txt"],
+    )
+    m = metricas_trayectoria(tray)
+    assert m.citas_fantasma == 1
+    assert m.citas_fundadas == pytest.approx(0.5)
+
+
+def test_sin_citas_el_fundamento_es_trivialmente_perfecto():
+    """Abstenerse no puede penalizar el fundamento de citas que no existen."""
+    tray = _tray_con_observaciones(["algo"], [])
+    assert metricas_trayectoria(tray).citas_fundadas == 1.0
+    assert metricas_trayectoria(tray).citas_fantasma == 0
+
+
+def test_docs_observados_atraviesa_las_subtrayectorias():
+    """En un sistema orquestado, la evidencia la vio el trabajador: el
+    fundamento de la cita hay que buscarlo dos niveles abajo."""
+    orq = _tray_con_observaciones(["[trabajador 'documental' — 2 pasos]"], ["ley-01-dl-825-iva-base.txt"])
+    sub = _tray_con_observaciones(["texto de ley-01-dl-825-iva-base.txt"], [])
+    assert docs_observados(orq) == set()
+    assert docs_observados(orq, [sub]) == {"ley-01-dl-825-iva-base.txt"}
+    assert metricas_trayectoria(orq, [sub]).citas_fantasma == 0
+
+
+def test_eficiencia_es_la_fraccion_de_pasos_sin_error():
+    tray = _tray(
+        [EstadoPaso.OK, EstadoPaso.OK, EstadoPaso.ERROR_EJECUCION, EstadoPaso.OK]
+    )
+    m = metricas_trayectoria(tray)
+    assert m.eficiencia == pytest.approx(0.75)
+    assert m.llamadas_invalidas == 1
+
+
+def test_las_denegaciones_no_cuentan_como_llamadas_invalidas():
+    """Un permiso denegado no es un fallo del agente: la llamada era válida
+    y el control la frenó. §7 las cuenta aparte."""
+    tray = _tray([EstadoPaso.OK, EstadoPaso.ERROR_PERMISO])
+    m = metricas_trayectoria(tray)
+    assert m.llamadas_denegadas == 1
+    assert m.llamadas_invalidas == 0
+
+
+def test_metricas_marcan_si_el_bucle_concluyo():
+    from harness_lib import Paso
+
+    sin_responder = Trayectoria(
+        tarea_id="t", pregunta="p", harness="h", motivo_corte=MotivoCorte.MAX_PASOS,
+        pasos=[Paso(indice=0, herramienta="x", argumentos={}, estado=EstadoPaso.OK,
+                    observacion="")],
+    )
+    assert metricas_trayectoria(sin_responder).respondio is False
+
+
+@pytest.mark.parametrize(
+    "cita,esperado",
+    [
+        ("ley-01-dl-825-iva-base.txt#12", "ley-01-dl-825-iva-base.txt"),
+        ("ley-01-dl-825-iva-base.txt", "ley-01-dl-825-iva-base.txt"),
+        ("  circular-01-sii-iva-digital.txt#3  ", "circular-01-sii-iva-digital.txt"),
+    ],
+)
+def test_normalizar_cita_reduce_el_fragmento_al_documento(cita, esperado):
+    assert normalizar_cita(cita) == esperado
 
 
 # --------------------------------------------------------------------------- #

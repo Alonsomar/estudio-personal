@@ -1555,6 +1555,103 @@ def llamadas_redundantes(tray: Trayectoria) -> int:
     return repetidas
 
 
+class MetricasTrayectoria(BaseModel):
+    """Lo que pasó, no lo que se respondió.
+
+    Dos agentes con la misma respuesta final pueden diferir cinco veces en
+    costo, y uno de los dos puede haber acertado sin mirar la evidencia.
+    Ninguna métrica de resultado ve eso.
+    """
+
+    tarea_id: str
+    pasos: int
+    llamadas_invalidas: int
+    llamadas_redundantes: int
+    llamadas_denegadas: int
+    eficiencia: float  # pasos sin error / pasos totales
+    docs_observados: int
+    citas_fundadas: float  # fracción de lo citado que el agente llegó a ver
+    citas_fantasma: int  # citó sin haber visto
+    respondio: bool
+
+
+def normalizar_cita(cita: str) -> str:
+    """Reduce una cita al identificador de documento.
+
+    El agente a veces cita el id del *fragmento* (`archivo.txt#12`) en vez
+    del documento, porque es el formato en que `buscar_corpus` le devuelve
+    los resultados. Es una violación del contrato —el prompt de sistema pide
+    nombres de archivo— pero es una violación de **formato**, no de
+    evidencia: encontró el documento correcto y escribió mal la referencia.
+
+    Esta función no se usa en la métrica principal, que se mantiene estricta
+    y consistente en todo el módulo. Se usa en §7 para medir cuánto de lo que
+    la métrica llama error es en realidad formato.
+    """
+    return cita.split("#", 1)[0].strip()
+
+
+def docs_observados(
+    tray: Trayectoria, subtrayectorias: list[Trayectoria] | None = None
+) -> set[str]:
+    """Identificadores de documento que **efectivamente pasaron por el
+    contexto** del agente en alguna observación.
+
+    Es la base de la única pregunta que el conjunto de documentos citados no
+    puede responder: ¿el agente vio lo que citó, o lo adivinó?
+    """
+    vistos: set[str] = set()
+    for paso in tray.pasos:
+        vistos.update(docs_mencionados(paso.observacion))
+    for sub in subtrayectorias or []:
+        vistos.update(docs_observados(sub))
+    return vistos
+
+
+def metricas_trayectoria(
+    tray: Trayectoria, subtrayectorias: list[Trayectoria] | None = None
+) -> MetricasTrayectoria:
+    """Métricas de proceso sobre una trayectoria, sin necesidad de una
+    trayectoria de referencia anotada a mano.
+
+    Es una decisión de método: anotar la trayectoria "correcta" de cada tarea
+    supone que hay una, y en un bucle agéntico rara vez la hay. Estas
+    métricas miden propiedades verificables del proceso —desperdicio, fallos,
+    fundamento de las citas— que no dependen de esa suposición.
+    """
+    pasos = tray.pasos
+    invalidas = sum(
+        1
+        for p in pasos
+        if p.estado
+        in (
+            EstadoPaso.ERROR_HERRAMIENTA_DESCONOCIDA,
+            EstadoPaso.ERROR_ARGUMENTOS,
+            EstadoPaso.ERROR_EJECUCION,
+        )
+    )
+    denegadas = sum(1 for p in pasos if p.estado is EstadoPaso.ERROR_PERMISO)
+    vistos = docs_observados(tray, subtrayectorias)
+    citados = set(tray.docs_citados)
+    fundadas = len(citados & vistos) / len(citados) if citados else 1.0
+    return MetricasTrayectoria(
+        tarea_id=tray.tarea_id,
+        pasos=len(pasos),
+        llamadas_invalidas=invalidas,
+        llamadas_redundantes=llamadas_redundantes(tray),
+        llamadas_denegadas=denegadas,
+        eficiencia=(
+            sum(1 for p in pasos if p.estado is EstadoPaso.OK) / len(pasos)
+            if pasos
+            else 0.0
+        ),
+        docs_observados=len(vistos),
+        citas_fundadas=fundadas,
+        citas_fantasma=len(citados - vistos),
+        respondio=tray.motivo_corte is MotivoCorte.RESPONDIO,
+    )
+
+
 def evaluar_trayectoria(tray: Trayectoria, tarea: Tarea) -> ResultadoTarea:
     """Puntúa una trayectoria contra su tarea.
 
