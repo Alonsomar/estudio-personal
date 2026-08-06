@@ -1,0 +1,136 @@
+{
+  "metadata": {
+    "nombre": "Auditoría del harness personal — 06-harness §9",
+    "version": 1,
+    "created": "2026-08-06",
+    "descripcion": "Cada regla declarada en AGENTS.md, CLAUDE.md (global y del repo) o en la\nconfiguración del cliente, clasificada por si existe un MECANISMO que la haga\ncumplir sin que nadie se acuerde. 'verificada' = una máquina la chequea y falla\nsi no se cumple; 'parcial' = hay un mecanismo que la cubre a medias o depende\nde una condición; 'aspiracional' = está escrita y sólo se cumple si el agente\nla lee y la respeta. La clasificación es a mano y auditable: cada regla dice\ncuál es su mecanismo o por qué no lo tiene.",
+    "fuentes": [
+      "AGENTS.md",
+      "CLAUDE.md (global de ~/.claude)",
+      ".github/workflows/tests.yml",
+      "~/.claude/settings.json"
+    ]
+  },
+  "reglas": [
+    {
+      "regla": "`uv run pytest` en verde antes de cerrar un cambio mediano o grande",
+      "fuente": "AGENTS.md / CLAUDE.md global",
+      "estado": "verificada",
+      "mecanismo": "`.github/workflows/tests.yml` corre `uv run pytest -q` en cada push a main y en cada PR"
+    },
+    {
+      "regla": "Los tests corren sin API keys ni red",
+      "fuente": "AGENTS.md",
+      "estado": "verificada",
+      "mecanismo": "el job de CI no define ningún secreto, así que un test que llame a un proveedor falla ahí"
+    },
+    {
+      "regla": "No editar ni leer `.env` ni el directorio de secretos",
+      "fuente": "~/.claude/settings.json (permissions.deny)",
+      "estado": "verificada",
+      "mecanismo": "reglas de denegación del cliente: Edit(**/.env), Read(**/.env), Read(~/.secrets/**)"
+    },
+    {
+      "regla": "No usar `git push --force` ni `git reset --hard`",
+      "fuente": "~/.claude/settings.json (permissions.deny)",
+      "estado": "verificada",
+      "mecanismo": "denegación explícita; es la clasificación por irreversibilidad de §6 aplicada a mano"
+    },
+    {
+      "regla": "Toda sesión arranca viendo el estado del sistema meta",
+      "fuente": "~/.claude/settings.json (hooks.SessionStart)",
+      "estado": "verificada",
+      "mecanismo": "`contexto_sessionstart.py` inyecta las últimas entradas del diario; el agente no elige si mirarlas"
+    },
+    {
+      "regla": "Dejar constancia de la sesión en meta/DIARIO.md",
+      "fuente": "CLAUDE.md global",
+      "estado": "verificada",
+      "mecanismo": "hook SessionEnd (`diario_sessionend.py`) escribe la entrada automáticamente"
+    },
+    {
+      "regla": "Leer AGENTS.md y BACKLOG.md al inicio de cada sesión",
+      "fuente": "AGENTS.md",
+      "estado": "parcial",
+      "mecanismo": "el cliente carga `CLAUDE.md` solo, y ese archivo apunta a AGENTS.md; que se siga el puntero depende del agente"
+    },
+    {
+      "regla": "Ejecutar siempre con `uv run`, nunca con `python` directo",
+      "fuente": "AGENTS.md",
+      "estado": "parcial",
+      "mecanismo": "no hay denegación de `Bash(python *)`; en la práctica lo fuerza el entorno, porque las dependencias viven en el .venv de uv"
+    },
+    {
+      "regla": "`uv run ruff check .` en verde",
+      "fuente": "CLAUDE.md global / BACKLOG B12",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno: ruff no está en el job de CI. B12 lo registra como deuda abierta, con 45 errores preexistentes"
+    },
+    {
+      "regla": "Sin `print()` en código de producción; logging con `get_logger`",
+      "fuente": "CLAUDE.md global",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno: la regla T201 de ruff no está habilitada y no hay configuración de ruff en pyproject.toml"
+    },
+    {
+      "regla": "PEP 8 a 100 columnas, type hints",
+      "fuente": "CLAUDE.md global",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno: sin `[tool.ruff]` en pyproject.toml no hay largo de línea configurado ni chequeo de tipos en CI"
+    },
+    {
+      "regla": "Los commits referencian el ID del backlog",
+      "fuente": "AGENTS.md",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno: no hay hook de commit-msg ni chequeo en CI"
+    },
+    {
+      "regla": "Conventional commits (`feat:`, `fix:`, `docs:`)",
+      "fuente": "AGENTS.md",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno: mismo caso que el anterior"
+    },
+    {
+      "regla": "Docs actualizadas en el mismo cambio que el código",
+      "fuente": "CLAUDE.md global (doctrina #4)",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno: es la regla más citada del portfolio y la que menos mecanismo tiene"
+    },
+    {
+      "regla": "Si una tarea cambia de alcance o estado, actualizar BACKLOG.md en el mismo cambio",
+      "fuente": "AGENTS.md",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno"
+    },
+    {
+      "regla": "`data/raw/` es inmutable",
+      "fuente": "CLAUDE.md global (doctrina #3)",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno en este repo: no hay denegación de Edit sobre shared/corpus_chileno/ ni test que verifique hashes"
+    },
+    {
+      "regla": "Llaves canónicas: nunca un nombre libre como identificador",
+      "fuente": "CLAUDE.md global (doctrina #6)",
+      "estado": "parcial",
+      "mecanismo": "no hay chequeo general, pero el servidor MCP de §4 y `leer_norma` validan contra catálogo, con tests"
+    },
+    {
+      "regla": "Sin lógica productiva en notebooks",
+      "fuente": "CLAUDE.md global (doctrina #7)",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno; en la práctica se cumple porque no hay notebooks en el repo"
+    },
+    {
+      "regla": "No fabricar números; marcar lo no verificable",
+      "fuente": "AGENTS.md",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno automatizable. Es la regla más importante del repo y sólo la sostiene la revisión humana — la auditoría de B13 existe por eso"
+    },
+    {
+      "regla": "Naming: kebab-case para archivos, snake_case para Python",
+      "fuente": "AGENTS.md",
+      "estado": "aspiracional",
+      "mecanismo": "ninguno: ruff no chequea nombres de archivo y N8xx no está habilitada"
+    }
+  ]
+}
