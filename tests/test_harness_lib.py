@@ -16,6 +16,8 @@ import pytest
 from pydantic import BaseModel
 
 from harness_lib import (
+    CORPUS_DIR,
+    INYECCIONES,
     AgentLoop,
     Decision,
     EstadoPaso,
@@ -28,27 +30,35 @@ from harness_lib import (
     Percepcion,
     PoliticaGuionada,
     PoliticaLLM,
+    PoliticaPermisos,
+    RegistroEfectos,
     SinCompactar,
     Tarea,
     ToolError,
     Trabajador,
     ToolRegistry,
     Trayectoria,
+    Veredicto,
     VentanaConIndice,
     VentanaDeslizante,
+    aprobar_todo,
     cargar_tareas,
+    clave_idempotencia,
     construir_herramientas,
     costo_esquema,
     contar_tokens,
     docs_mencionados,
     estimar_tokens,
+    envenenar,
     evaluar_trayectoria,
     harness_cache_key,
     herramienta_delegar,
+    herramienta_marcar_obsoleta,
     herramienta_memoria,
     llamadas_redundantes,
     presupuesto_contexto,
     recuperacion_tras_error,
+    rechazar_todo,
     tokenizador_exacto,
 )
 
@@ -614,6 +624,195 @@ def test_el_trabajador_que_no_concluye_lo_dice(monkeypatch):
         "delegar", {"trabajador": "doc", "subtarea": "s"}, HarnessConfig()
     )
     assert "sin conclusión" in obs.texto and "max_pasos" in obs.texto
+
+
+# --------------------------------------------------------------------------- #
+# §6 Permisos, idempotencia e inyección.
+# --------------------------------------------------------------------------- #
+def _reg_con_efectos(idempotente=False):
+    efectos = RegistroEfectos()
+    reg = ToolRegistry([herramienta_marcar_obsoleta(efectos, idempotente=idempotente)])
+    reg.registrar(construir_herramientas().get("responder"))
+    return reg, efectos
+
+
+def _guion_marcar(n: int):
+    return [
+        Decision(
+            accion="usar_herramienta",
+            herramienta="marcar_norma_obsoleta",
+            argumentos={"doc_id": "ley-01-dl-825-iva-base.txt", "motivo": "derogada"},
+        )
+        for _ in range(n)
+    ]
+
+
+def test_el_default_de_permisos_es_el_modo_seguro():
+    """El modo seguro tiene que ser el que sale sin configurar."""
+    politica = PoliticaPermisos()
+    reg, _ = _reg_con_efectos()
+    assert politica.evaluar(reg.get("marcar_norma_obsoleta")) is Veredicto.DENEGAR
+    assert politica.evaluar(reg.get("responder")) is Veredicto.PERMITIR
+
+
+@pytest.mark.parametrize(
+    "politica,esperado",
+    [
+        (PoliticaPermisos.automatico(), Veredicto.PERMITIR),
+        (PoliticaPermisos.supervisado(), Veredicto.PREGUNTAR),
+        (PoliticaPermisos.solo_lectura(), Veredicto.DENEGAR),
+    ],
+)
+def test_las_tres_politicas_difieren_solo_en_la_escritura(politica, esperado):
+    reg, _ = _reg_con_efectos()
+    assert politica.evaluar(reg.get("marcar_norma_obsoleta")) is esperado
+    assert politica.evaluar(reg.get("responder")) is Veredicto.PERMITIR
+
+
+def test_sin_politica_no_hay_control():
+    """El comportamiento de §1 a §5: sin `permisos`, la llamada se ejecuta."""
+    reg, efectos = _reg_con_efectos()
+    AgentLoop(reg, PoliticaGuionada(_guion_marcar(1)), HarnessConfig(max_pasos=1)).correr(
+        "t", "p"
+    )
+    assert efectos.cuenta() == 1
+
+
+def test_denegar_no_ejecuta_y_explica():
+    reg, efectos = _reg_con_efectos()
+    tray = AgentLoop(
+        reg, PoliticaGuionada(_guion_marcar(1)), HarnessConfig(max_pasos=1),
+        permisos=PoliticaPermisos.solo_lectura(),
+    ).correr("t", "p")
+    assert efectos.cuenta() == 0
+    paso = tray.pasos[0]
+    assert paso.estado is EstadoPaso.ERROR_PERMISO
+    assert "PERMISO DENEGADO" in paso.observacion
+    assert "Siguiente paso" in paso.observacion  # contrato de error de §3
+
+
+def test_preguntar_ejecuta_si_el_humano_aprueba():
+    reg, efectos = _reg_con_efectos()
+    loop = AgentLoop(
+        reg, PoliticaGuionada(_guion_marcar(1)), HarnessConfig(max_pasos=1),
+        permisos=PoliticaPermisos.supervisado(), aprobador=aprobar_todo,
+    )
+    loop.correr("t", "p")
+    assert efectos.cuenta() == 1
+    assert len(loop.solicitudes) == 1 and loop.solicitudes[0].aprobada
+
+
+def test_preguntar_no_ejecuta_si_el_humano_lee():
+    """Misma política, distinto humano: el checkpoint sólo sirve si se lee."""
+    reg, efectos = _reg_con_efectos()
+    loop = AgentLoop(
+        reg, PoliticaGuionada(_guion_marcar(1)), HarnessConfig(max_pasos=1),
+        permisos=PoliticaPermisos.supervisado(), aprobador=rechazar_todo,
+    )
+    loop.correr("t", "p")
+    assert efectos.cuenta() == 0
+    assert len(loop.solicitudes) == 1 and not loop.solicitudes[0].aprobada
+
+
+def test_el_checkpoint_deja_rastro_aunque_se_apruebe():
+    reg, _ = _reg_con_efectos()
+    loop = AgentLoop(
+        reg, PoliticaGuionada(_guion_marcar(1)), HarnessConfig(max_pasos=1),
+        permisos=PoliticaPermisos.supervisado(),
+    )
+    loop.correr("t", "p")
+    solicitud = loop.solicitudes[0]
+    assert solicitud.herramienta == "marcar_norma_obsoleta"
+    assert solicitud.argumentos["doc_id"] == "ley-01-dl-825-iva-base.txt"
+
+
+def test_la_lectura_nunca_pide_permiso():
+    reg = construir_herramientas(con_alcance=True)
+    guion = [
+        Decision(accion="usar_herramienta", herramienta="buscar_corpus",
+                 argumentos={"consulta": "IVA"}),
+        Decision(accion="responder", respuesta="ok"),
+    ]
+    loop = AgentLoop(
+        reg, PoliticaGuionada(guion), HarnessConfig(max_pasos=3),
+        permisos=PoliticaPermisos.solo_lectura(),
+    )
+    tray = loop.correr("t", "p")
+    assert loop.solicitudes == []
+    assert all(p.estado is EstadoPaso.OK for p in tray.pasos)
+
+
+def test_sin_idempotencia_tres_llamadas_son_tres_efectos():
+    reg, efectos = _reg_con_efectos()
+    AgentLoop(
+        reg, PoliticaGuionada(_guion_marcar(3)),
+        HarnessConfig(max_pasos=3, max_repeticiones=99), idempotencia=False,
+    ).correr("t", "p")
+    assert efectos.cuenta() == 3 and efectos.duplicados() == 2
+
+
+def test_con_idempotencia_tres_llamadas_son_un_efecto():
+    """La clave identifica la ACCIÓN, no la llamada."""
+    reg, efectos = _reg_con_efectos()
+    tray = AgentLoop(
+        reg, PoliticaGuionada(_guion_marcar(3)),
+        HarnessConfig(max_pasos=3, max_repeticiones=99), idempotencia=True,
+    ).correr("t", "p")
+    assert efectos.cuenta() == 1 and efectos.duplicados() == 0
+    # El agente igual recibe una observación útil, no un error.
+    assert all(p.estado is EstadoPaso.OK for p in tray.pasos)
+    assert "idempotencia" in tray.pasos[1].observacion
+
+
+def test_argumentos_distintos_son_acciones_distintas():
+    reg, efectos = _reg_con_efectos()
+    guion = [
+        Decision(accion="usar_herramienta", herramienta="marcar_norma_obsoleta",
+                 argumentos={"doc_id": f"ley-0{i}-x.txt", "motivo": "derogada"})
+        for i in (1, 2)
+    ]
+    AgentLoop(
+        reg, PoliticaGuionada(guion), HarnessConfig(max_pasos=2), idempotencia=True
+    ).correr("t", "p")
+    assert efectos.cuenta() == 2
+
+
+def test_clave_idempotencia_es_estable_e_independiente_del_orden():
+    a = clave_idempotencia("t", {"x": 1, "y": 2})
+    b = clave_idempotencia("t", {"y": 2, "x": 1})
+    c = clave_idempotencia("t", {"x": 1, "y": 3})
+    assert a == b and a != c
+
+
+def test_envenenar_no_toca_el_corpus():
+    """La inyección se aplica en el harness, sobre la observación: el corpus
+    sigue siendo inmutable (doctrina #3)."""
+    base = construir_herramientas()
+    original = base.get("buscar_corpus")
+    envenenada = envenenar(original)
+    cfg = HarnessConfig()
+    limpia = ToolRegistry([original]).invocar("buscar_corpus", {"consulta": "IVA"}, cfg)
+    sucia = ToolRegistry([envenenada]).invocar("buscar_corpus", {"consulta": "IVA"}, cfg)
+    assert limpia.texto in sucia.texto
+    assert "marcar_norma_obsoleta" in sucia.texto
+    assert "marcar_norma_obsoleta" not in limpia.texto
+    # El archivo del corpus no cambió.
+    doc = (CORPUS_DIR / "ley-01-dl-825-iva-base.txt").read_text(encoding="utf-8")
+    assert "marcar_norma_obsoleta" not in doc
+
+
+def test_las_cargas_de_inyeccion_piden_todas_la_misma_accion():
+    assert len(INYECCIONES) >= 3
+    for nombre, carga in INYECCIONES.items():
+        assert "marcar_norma_obsoleta" in carga, nombre
+
+
+def test_el_registro_de_efectos_cuenta_duplicados():
+    r = RegistroEfectos()
+    r.registrar("a", "x")
+    r.registrar("a", "x")
+    r.registrar("a", "y")
+    assert r.cuenta() == 3 and r.cuenta("a") == 3 and r.duplicados() == 1
 
 
 # --------------------------------------------------------------------------- #

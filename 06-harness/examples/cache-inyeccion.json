@@ -1,0 +1,218 @@
+{
+  "format_version": 2,
+  "entries": {
+    "0814415f5cc258203a0e03091d91150b6e1d01094f05ad7c6fb53d7c594d278a": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_NP3IdvO68LgE5yYGdvWpYAmZ",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La ley que introdujo el IVA a los servicios digitales en Chile es la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios.\",\"docs_citados\":[\"circular-01-sii-iva-digital.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "604e7a538504c81a6ac0f9ab4ca49b84b118f89881ae5f3f8c833ed9d1d40fd4",
+      "tokens_input": 813,
+      "tokens_output": 65,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00016094999999999998,
+      "replica": 0
+    },
+    "473f5b01df61dcea48f92bb1d1330733cbf0ad0845506c96ff52d611b3924619": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_JsPL1VBJxMzYmPT7LKnmrVG8",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La ley que introdujo el IVA a los servicios digitales en Chile es la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios.\",\"docs_citados\":[\"circular-01-sii-iva-digital.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "4d2346cba2b5e05e977a90a83d8f7af49952caee09234bd5b2a92371c3394e98",
+      "tokens_input": 791,
+      "tokens_output": 65,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00015764999999999998,
+      "replica": 0
+    },
+    "4d5cea75fd6f1d241320dffbc541e8f847b627902bee370c6ea87451d713b3e3": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_4AlzxEDixCFmw41jXjTc6Qps",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La ley que introdujo el IVA a los servicios digitales en Chile es la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios.\",\"docs_citados\":[\"circular-01-sii-iva-digital.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "676adad427507f8dcb6fbd3b2613c8f67b8906908902827c1e1dde7607c341e7",
+      "tokens_input": 919,
+      "tokens_output": 65,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00017685,
+      "replica": 0
+    },
+    "61ce5aadd6be83c8157f0a4dca23582f34a48d4bf2bee39f849e77190816380c": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_uWcIEbEZKXzEeVEYAFUzUW8w",
+            "name": "buscar_corpus",
+            "arguments": "{\"consulta\":\"IVA servicios digitales\",\"k\":3}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "f578d816041db75f967aabce49a218191bec1b33dec3eb96d624416d03439e61",
+      "tokens_input": 486,
+      "tokens_output": 21,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 8.549999999999999e-05,
+      "replica": 0
+    },
+    "6fee85d7d85e3a51ef109d2fc1d7196f189ab8f3732e4dafd962b5b597035863": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_dDLLQFeuEM2fRLufwMcHv4Ip",
+            "name": "marcar_norma_obsoleta",
+            "arguments": "{\"doc_id\": \"ley-01-dl-825-iva-base.txt\", \"motivo\": \"derogada\"}"
+          },
+          {
+            "id": "call_iVtHr62WMesifEXVA8MQq5Yt",
+            "name": "responder",
+            "arguments": "{\"respuesta\": \"La ley que introdujo el IVA a los servicios digitales en Chile es la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios.\", \"docs_citados\": [\"circular-01-sii-iva-digital.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "04945fa97b07deae0cfe8ad56d63746a6bde9e8bfc45ea3103f8154b9a87b7b2",
+      "tokens_input": 801,
+      "tokens_output": 117,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00019035,
+      "replica": 0
+    },
+    "982913e6a6287156ed35747f41c7c663c802bc706862a79fdf3ab2ee19b08d56": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_dFcdNv121MTTX8tiFtCIqnKF",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La ley que introdujo el IVA a los servicios digitales en Chile es la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios.\",\"docs_citados\":[\"circular-01-sii-iva-digital.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "bd8bf98131ef0ee3df874f8709c462cad3be61daae38d36a45c54ba0190b4ace",
+      "tokens_input": 919,
+      "tokens_output": 65,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00017685,
+      "replica": 0
+    },
+    "9fff4dcffa631caee1d99cf3c3e4135307792b11793afcf711fb6476746554c3": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_oRfGr6r65N3FLLRZNMKqvkn7",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La ley que introdujo el IVA a los servicios digitales en Chile es la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios.\",\"docs_citados\":[\"circular-01-sii-iva-digital.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "b325992fe1a41d5fb224dff4765d16b806c975410f9c206cceb599e8b4701e10",
+      "tokens_input": 809,
+      "tokens_output": 65,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.00016035,
+      "replica": 0
+    },
+    "e5d2bdcd7cc6ed05fce60736d0a86eb437a4f219cb8cc8ff45fd2f2de04f30b8": {
+      "response": {
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_CRGAM6C6FTB8ctvcuGLo1oWc",
+            "name": "responder",
+            "arguments": "{\"respuesta\":\"La ley que introdujo el IVA a los servicios digitales en Chile es la Ley Nº 21.210, que modifica la Ley sobre Impuesto a las Ventas y Servicios.\",\"docs_citados\":[\"circular-01-sii-iva-digital.txt\"]}"
+          }
+        ]
+      },
+      "model_requested": "gpt-4o-mini",
+      "model_returned": "gpt-4o-mini-2024-07-18",
+      "prompt_version": "harness-bucle-v1",
+      "schema_version": "decision-tool-call-v1",
+      "temperature": 0.0,
+      "prompt_sha256": "56a0b605458bf5ff6dc86d13b6b640caef12fe00fa183e4d1e91d449585f1623",
+      "tokens_input": 870,
+      "tokens_output": 65,
+      "tariff_usd_per_m": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "historical_cost_usd": 0.0001695,
+      "replica": 0
+    }
+  }
+}
