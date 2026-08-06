@@ -1,0 +1,3453 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes de 4 masterclasses: evaluación de sistemas IA, information retrieval, patrones de producción y economía de inferencia.">
+      
+      
+        <meta name="author" content="Alonso Valdés">
+      
+      
+      
+        <link rel="prev" href="../08-costo-del-bucle/">
+      
+      
+        <link rel="next" href="../../../shared/corpus_chileno/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>09 — El harness como práctica personal - Estudio Personal — IA aplicada a corpus regulatorio chileno</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#09-el-harness-como-practica-personal" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-header__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Estudio Personal — IA aplicada a corpus regulatorio chileno
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              09 — El harness como práctica personal
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Estudio Personal — IA aplicada a corpus regulatorio chileno" class="md-nav__button md-logo" aria-label="Estudio Personal — IA aplicada a corpus regulatorio chileno" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Estudio Personal — IA aplicada a corpus regulatorio chileno
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../BACKLOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hoja de ruta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../01-evals/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · Evaluación de sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · Evaluación de sistemas IA
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Evaluación de Sistemas IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/01-por-que-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué evals es la disciplina más subestimada de LLM engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/02-taxonomia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Taxonomía de evaluaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/03-analisis-errores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Análisis de errores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/04-golden-datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Construcción de golden datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/05-metricas-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Métricas de retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/06-metricas-generacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Métricas de generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/07-llm-as-judge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — LLM-as-judge: sesgos, calibración y protocolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/08-estadistica-estocastica/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Estadística para sistemas estocásticos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/09-regresiones-ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Regresiones y CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/10-costo-pareto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo, latencia y frontera de Pareto de evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/11-online-evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Online evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-evals/theory/12-dominios-alto-stake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Bonus: dominios alto-stake (legal/fiscal)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../02-retrieval/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Information Retrieval
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Information Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/01-ir-pre-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — IR pre-LLM: BM25 y TF-IDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/02-embeddings-densos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Embeddings densos: geometría y sus fallos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/03-hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Hybrid search: sparse + dense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/04-chunking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Chunking serio para documentos legales largos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/05-query-rewriting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Query rewriting: HyDE, multi-query, decomposition, step-back
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/06-reranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reranking: cross-encoders, ColBERT y LLM-as-reranker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/07-metadata-estructurado/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Metadata filtering y retrieval estructurado: cuándo SQL gana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/08-evaluacion-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluación de retrieval aislada de la generación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-retrieval/theory/09-casos-limite-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Casos límite del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../03-produccion/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Patrones de producción
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Patrones de producción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Patrones de Producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/01-salto-a-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Por qué producción es una disciplina distinta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/02-arquitectura-servicio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Arquitectura de servicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/03-gestion-prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Gestión de prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/04-caching-multinivel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Caching multinivel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/05-observabilidad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Observabilidad y tracing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/06-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Reliability: rate limit, retries, circuit breakers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/07-despliegue-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Despliegue y configuración
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/08-versionado-modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Versionado de modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/09-online-evals-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Online evals y loop de feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/10-costo-produccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Costo en producción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/11-seguridad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Seguridad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-produccion/theory/12-incidentes-postmortems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Incidentes y postmortems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../04-economia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Economía de inferencia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Economía de inferencia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-economia/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Economía de Inferencia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-economia/theory/01-prefill-decode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Mecánica de la inferencia: prefill, decode y KV cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-economia/theory/02-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Batching, throughput y la latencia que no controlás
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-economia/theory/03-cuantizacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Cuantización y destilación: cambiar el modelo, no el uso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-economia/theory/04-self-hosting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Self-hosting vs. API: la escala mínima eficiente
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-economia/theory/05-deriva-precios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Deriva de precios: escribir un modelo de costos que no caduque
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-economia/theory/06-unit-economics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Unit economics de un SaaS regulatorio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../05-ontologias/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Ontologías y representación
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Ontologías y representación
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Ontologías y Representación del Conocimiento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/01-que-es-una-ontologia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Qué es una ontología y por qué ya construiste varias
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/02-modelado-del-dominio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Modelado del dominio regulatorio chileno
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/03-cuanto-formalismo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Cuánto formalismo comprar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/04-identidad-y-llaves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Identidad y llaves canónicas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/05-extraccion-llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Extraer la ontología del corpus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/06-vigencia-temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Vigencia temporal y versionado normativo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/07-graphrag-economia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Del grafo al retrieval: GraphRAG y su economía
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/08-evaluar-con-ontologia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Evaluar un sistema con ontología
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-ontologias/theory/09-la-ontologia-como-foso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Ontología curada, competency questions y ventaja de dominio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Harness agéntico
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Harness agéntico
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 — Plan Maestro: Harness Agéntico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-que-es-un-harness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Qué es un harness y por qué decide más que el modelo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-contexto-escaso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Context engineering: el contexto como problema de asignación
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-tool-como-contrato/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Diseño de herramientas: la tool como contrato
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-mcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — MCP como estándar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-multiagente/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Arquitecturas multiagente: cuándo gana un solo agente
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-permisos-y-control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Control, permisos y sandboxing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-evaluar-trayectorias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Evaluar agentes: se evalúan trayectorias, no respuestas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-costo-del-bucle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Costo y latencia del bucle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — El harness como práctica personal
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — El harness como práctica personal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#el-harness-mejor-calibrado-de-este-repo-no-es-el-del-modulo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El harness mejor calibrado de este repo no es el del módulo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-presupuesto-el-harness-personal-es-barato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El presupuesto: el harness personal es barato
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="El presupuesto: el harness personal es barato">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backlogmd-no-es-contexto-es-memoria-externa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BACKLOG.md no es contexto, es memoria externa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#la-auditoria-incomoda-6-reglas-de-20-tienen-mecanismo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La auditoría incómoda: 6 reglas de 20 tienen mecanismo
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="La auditoría incómoda: 6 reglas de 20 tienen mecanismo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#la-excepcion-que-importa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La excepción que importa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-mapa-completo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El mapa completo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agentsmd-dejo-de-ser-una-convencion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AGENTS.md dejó de ser una convención
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#que-delegar-y-que-no" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué delegar y qué no
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lo-que-queda-en-pie-de-las-seis-masterclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo que queda en pie de las seis masterclasses
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte (2026)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limites-de-esta-seccion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Límites de esta sección
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../shared/corpus_chileno/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material compartido
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Material compartido
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog-drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog drafts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#el-harness-mejor-calibrado-de-este-repo-no-es-el-del-modulo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El harness mejor calibrado de este repo no es el del módulo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-presupuesto-el-harness-personal-es-barato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El presupuesto: el harness personal es barato
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="El presupuesto: el harness personal es barato">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backlogmd-no-es-contexto-es-memoria-externa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BACKLOG.md no es contexto, es memoria externa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#la-auditoria-incomoda-6-reglas-de-20-tienen-mecanismo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La auditoría incómoda: 6 reglas de 20 tienen mecanismo
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="La auditoría incómoda: 6 reglas de 20 tienen mecanismo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#la-excepcion-que-importa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La excepción que importa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#el-mapa-completo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El mapa completo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agentsmd-dejo-de-ser-una-convencion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AGENTS.md dejó de ser una convención
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#que-delegar-y-que-no" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué delegar y qué no
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lo-que-queda-en-pie-de-las-seis-masterclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo que queda en pie de las seis masterclasses
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estado-del-arte-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estado del arte (2026)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limites-de-esta-seccion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Límites de esta sección
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conexiones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conexiones
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="09-el-harness-como-practica-personal">09 — El harness como práctica personal<a class="headerlink" href="#09-el-harness-como-practica-personal" title="Permanent link">&para;</a></h1>
+<h2 id="el-harness-mejor-calibrado-de-este-repo-no-es-el-del-modulo">El harness mejor calibrado de este repo no es el del módulo<a class="headerlink" href="#el-harness-mejor-calibrado-de-este-repo-no-es-el-del-modulo" title="Permanent link">&para;</a></h2>
+<p>Ocho secciones midiendo el entorno de un agente sobre corpus regulatorio chileno. La
+última cambia de objeto, porque hay un harness más importante y con mucho más uso:
+<strong>este repositorio como entorno de trabajo de un humano que delega en agentes</strong>.
+<code>AGENTS.md</code>, <code>BACKLOG.md</code>, los hooks de sesión, las skills, los permisos. Todo eso
+es exactamente lo mismo que el módulo estuvo estudiando —reglas del entorno que
+determinan qué percibe el agente, qué puede hacer y qué observa después— sólo que
+aplicado a un decisor cuyo bucle dura semanas.</p>
+<p>Y como es un harness, se le puede aplicar el mismo marco. Incluida la parte
+incómoda.</p>
+<h2 id="el-presupuesto-el-harness-personal-es-barato">El presupuesto: el harness personal es barato<a class="headerlink" href="#el-presupuesto-el-harness-personal-es-barato" title="Permanent link">&para;</a></h2>
+<p>Con el mismo tokenizador de §2:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>archivo            líneas   tokens   qué es
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>--------------------------------------------------------------------------
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>AGENTS.md             153     1607   convenciones del repo
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>CLAUDE.md               1       13   puntero a AGENTS.md
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>BACKLOG.md            345     5222   cola de trabajo con IDs estables
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>README.md              80      946   portada y marco de capas
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>--------------------------------------------------------------------------
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>TOTAL                         7788
+</code></pre></div>
+<p>7.788 tokens: aproximadamente lo que el agente de §1 gasta en <strong>una sola tarea</strong>
+(7.138 tokens de entrada por tarea). Leer el harness personal entero al empezar una
+sesión cuesta lo mismo que hacerle una consulta al agente.</p>
+<p>Es un número que vale la pena tener a mano cuando aparece la tentación de recortar
+las instrucciones "porque ocupan contexto". El harness personal es barato; lo caro
+es no tenerlo. <code>CLAUDE.md</code> con 13 tokens —una línea que apunta a <code>AGENTS.md</code>— es la
+pieza mejor diseñada del conjunto: un puntero en vez de una copia.</p>
+<p><img alt="El harness personal, medido y auditado" src="../../diagrams/harness-personal.png" /></p>
+<h3 id="backlogmd-no-es-contexto-es-memoria-externa"><code>BACKLOG.md</code> no es contexto, es memoria externa<a class="headerlink" href="#backlogmd-no-es-contexto-es-memoria-externa" title="Permanent link">&para;</a></h3>
+<p>5.222 tokens y creciendo con cada tarea cerrada. Si fuera contexto, sería
+insostenible. No lo es: es <strong>memoria externa direccionable</strong>, exactamente el patrón
+que §2 midió.</p>
+<p>Los IDs estables —<code>B1</code>, <code>B7</code>, <code>B13</code>— son las claves. El agente recupera la tarea que
+necesita en vez de arrastrar el historial completo, y los commits los referencian
+para que la trazabilidad vaya en las dos direcciones. Un backlog sin IDs sería un
+historial sin índice: la <code>VentanaDeslizante</code> pelada que §2 midió perdiendo el 20% de
+la evidencia.</p>
+<p>La regla de §2 se traslada literalmente: <strong>lo que se compacta tiene que dejar una
+dirección</strong>. Una tarea cerrada no se borra del backlog, se marca cerrada y conserva
+su ID.</p>
+<h2 id="la-auditoria-incomoda-6-reglas-de-20-tienen-mecanismo">La auditoría incómoda: 6 reglas de 20 tienen mecanismo<a class="headerlink" href="#la-auditoria-incomoda-6-reglas-de-20-tienen-mecanismo" title="Permanent link">&para;</a></h2>
+<p>Acá es donde aplicar el marco al propio proceso deja de ser cómodo. Cada regla
+declarada en <code>AGENTS.md</code>, en el <code>CLAUDE.md</code> global o en la configuración del
+cliente, clasificada por si <strong>existe un mecanismo que la haga cumplir sin que nadie
+se acuerde</strong>. La clasificación está congelada y anotada a mano en
+<a href="../../examples/reglas-harness.json"><code>examples/reglas-harness.json</code></a>, con el mecanismo
+de cada una.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>verificada     6 de 20
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>parcial        3 de 20
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>aspiracional  11 de 20
+</code></pre></div>
+<p><strong>Verificadas</strong> — una máquina falla si no se cumplen:</p>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Mecanismo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uv run pytest</code> en verde</td>
+<td>CI en cada push y PR</td>
+</tr>
+<tr>
+<td>Los tests corren sin API keys ni red</td>
+<td>El job de CI no define secretos: un test que llame a un proveedor falla ahí</td>
+</tr>
+<tr>
+<td>No leer ni editar <code>.env</code> ni secretos</td>
+<td><code>permissions.deny</code> del cliente</td>
+</tr>
+<tr>
+<td>No <code>git push --force</code> ni <code>git reset --hard</code></td>
+<td><code>permissions.deny</code></td>
+</tr>
+<tr>
+<td>Toda sesión arranca viendo el estado del sistema meta</td>
+<td>Hook <code>SessionStart</code></td>
+</tr>
+<tr>
+<td>Dejar constancia en <code>meta/DIARIO.md</code></td>
+<td>Hook <code>SessionEnd</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Aspiracionales</strong> — están escritas y sólo se cumplen si el agente las lee y las
+respeta. Entre ellas:</p>
+<ul>
+<li><code>uv run ruff check .</code> en verde — <strong>no está en CI</strong>, y <code>B12</code> registra 45 errores
+  preexistentes. La regla existe hace meses y la deuda también.</li>
+<li>Sin <code>print()</code> en producción — la regla <code>T201</code> de ruff no está habilitada.</li>
+<li>PEP 8 a 100 columnas — no hay <code>[tool.ruff]</code> en <code>pyproject.toml</code>, así que no hay
+  largo de línea configurado.</li>
+<li>Commits que referencian el ID del backlog, y conventional commits — sin hook de
+  <code>commit-msg</code>.</li>
+<li><strong>Docs actualizadas en el mismo cambio</strong> — la doctrina #4, la regla más citada del
+  portfolio y la que menos mecanismo tiene.</li>
+<li><strong><code>data/raw/</code> es inmutable</strong> — la doctrina #3, sin denegación de escritura ni test
+  de hashes que la respalde.</li>
+</ul>
+<p>La conclusión no es que las reglas aspiracionales estén mal escritas. Es que:</p>
+<blockquote>
+<p>Una regla sin mecanismo es una intención, y su tasa de cumplimiento es una
+propiedad del agente que la lee, no del harness. Las que sobreviven a un agente
+distraído, a un modelo nuevo o a una sesión larga son las que tienen alguien —una
+máquina— que las chequea.</p>
+</blockquote>
+<p>Es el hallazgo de §1 a escala de proceso de trabajo, y el de §5 también: un
+<code>siguiente paso</code> que el destinatario no puede o no va a ejecutar es un consejo
+irrealizable, se lo des a un subagente o a vos mismo dentro de tres semanas.</p>
+<h3 id="la-excepcion-que-importa">La excepción que importa<a class="headerlink" href="#la-excepcion-que-importa" title="Permanent link">&para;</a></h3>
+<p>Hay una regla aspiracional que <strong>no se puede automatizar</strong> y es la más importante
+del repo: <em>"no fabricar números; marcar lo no verificable"</em>. No hay CI que la
+verifique. Sólo la sostiene la revisión humana — y la auditoría de <code>B13</code> sobre <code>05</code>,
+que encontró veinte errores después de dar el módulo por cerrado, existe justamente
+porque esa regla no tenía mecanismo.</p>
+<p>Eso sugiere la división correcta del trabajo:</p>
+<ul>
+<li><strong>Lo mecanizable, mecanizalo.</strong> Cada regla que se puede convertir en un test o en
+  una denegación deja de consumir atención para siempre.</li>
+<li><strong>La atención humana se reserva para lo que ninguna máquina puede chequear</strong>: si
+  el número es real, si el argumento se sostiene, si el experimento mide lo que dice
+  medir.</li>
+</ul>
+<p>Poner atención humana en verificar el formato de un commit es gastarla donde una
+máquina alcanza, y no tenerla disponible donde no.</p>
+<h2 id="el-mapa-completo">El mapa completo<a class="headerlink" href="#el-mapa-completo" title="Permanent link">&para;</a></h2>
+<p>Cada pieza de la práctica personal es una categoría que el módulo ya construyó:</p>
+<table>
+<thead>
+<tr>
+<th>Pieza de la práctica</th>
+<th>Qué es en el módulo</th>
+<th>Dónde</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLAUDE.md</code> global + <code>AGENTS.md</code></td>
+<td>Prompt de sistema</td>
+<td>§2: partida fija, se paga en cada sesión</td>
+</tr>
+<tr>
+<td><code>BACKLOG.md</code> con IDs estables</td>
+<td>Memoria externa direccionable</td>
+<td>§2: recuperar por clave</td>
+</tr>
+<tr>
+<td>Hook <code>SessionStart</code></td>
+<td>El paso "percibir", automatizado</td>
+<td>§1: el agente no elige si mirar, recibe</td>
+</tr>
+<tr>
+<td>Hook <code>SessionEnd</code> (<code>DIARIO.md</code>)</td>
+<td>Registro de trayectoria</td>
+<td>§7: se evalúa el proceso</td>
+</tr>
+<tr>
+<td>Skills (<code>/cierre</code>, <code>/nuevo-repo</code>)</td>
+<td>Herramientas de grano grueso</td>
+<td>§3: una llamada por intención</td>
+</tr>
+<tr>
+<td><code>permissions</code> allow/deny</td>
+<td>Política de permisos por riesgo</td>
+<td>§6: default seguro</td>
+</tr>
+<tr>
+<td>Subagentes</td>
+<td>Aislamiento de contexto</td>
+<td>§5: contexto propio, resumen al volver</td>
+</tr>
+<tr>
+<td>Claude Code + Codex</td>
+<td>Orquestador / trabajador</td>
+<td>§5: la frontera no corta una dependencia</td>
+</tr>
+</tbody>
+</table>
+<p>Dos observaciones que salen de leer la tabla completa:</p>
+<p><strong>El hook <code>SessionStart</code> es la pieza más subestimada.</strong> Convierte el paso "percibir"
+de una decisión del agente en una propiedad del entorno. Un agente que <em>puede</em>
+consultar el estado del proyecto a veces no lo hace; uno que lo <em>recibe</em> siempre
+opera con él. Es la diferencia entre una herramienta disponible y una observación
+garantizada, y §2 mostró el costo de confiar en la primera: el agente usó la memoria
+externa <strong>una sola vez en doce tareas</strong> aunque el puntero estuviera en contexto.</p>
+<p><strong>Las skills son herramientas de grano grueso, y §3 explica por qué funcionan.</strong>
+<code>/cierre</code> no es un atajo de escritura: es la unidad de delegación correcta para la
+intención "terminar bien una sesión de trabajo". Sin ella, esa intención son ocho o
+diez pasos que hay que acordarse de pedir en orden — el mismo problema de
+granularidad que hacía irresoluble a <code>t-08</code>.</p>
+<h2 id="agentsmd-dejo-de-ser-una-convencion"><code>AGENTS.md</code> dejó de ser una convención<a class="headerlink" href="#agentsmd-dejo-de-ser-una-convencion" title="Permanent link">&para;</a></h2>
+<p>Un cierre que conecta con §4: <code>AGENTS.md</code> —el archivo que este repo usa desde el
+principio— entró en diciembre de 2025 a la <strong>Agentic AI Foundation</strong> como proyecto
+fundador, junto a MCP y a <code>goose</code>
+(<a href="https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation">Linux Foundation</a>).</p>
+<p>Dejó de ser una costumbre de un vendor para volverse un artefacto gobernado, con la
+misma política de deprecación de doce meses que el protocolo. El harness personal y
+el estándar de la industria resultaron ser el mismo objeto a dos escalas — y la
+apuesta de escribir las convenciones en un archivo plano, versionado junto al
+código, envejeció bien.</p>
+<h2 id="que-delegar-y-que-no">Qué delegar y qué no<a class="headerlink" href="#que-delegar-y-que-no" title="Permanent link">&para;</a></h2>
+<p>El criterio que sale de las nueve secciones, en tres preguntas y en este orden:</p>
+<p><strong>1. ¿Es reversible?</strong> (§6) Si deshacerlo es barato, delegalo y revisá después. Si
+no —un push forzado, un borrado, una migración—, el agente propone y un humano
+aplica. La denegación explícita de <code>git push --force</code> y <code>git reset --hard</code> en la
+configuración es esta regla ya implementada.</p>
+<p><strong>2. ¿Cuánto cuesta verificarlo?</strong> Si verificar el trabajo cuesta más que hacerlo,
+delegar no ahorró nada: movió el trabajo de producir a revisar. Es el costo de
+monitoreo de §6, y es la razón por la que conviene delegar tareas cuyo resultado
+tenga un chequeo barato — un test que pasa, un número que se reproduce, un script
+que corre.</p>
+<p><strong>3. ¿El error se detecta o se acumula en silencio?</strong> La más importante y la menos
+obvia. Un agente que rompe un test avisa solo. Un agente que introduce un número mal
+derivado en un documento de teoría <strong>no avisa</strong>, y el error se cita en la sección
+siguiente, y en la otra. <code>B13</code> es esa acumulación medida: veinte errores encontrados
+después del cierre de <code>05</code>.</p>
+<p>De las tres, la tercera es la que decide. <strong>Lo que no conviene delegar sin
+supervisión no es lo difícil: es lo que falla en silencio.</strong> Escribir un experimento
+completo es delegable porque el experimento corre o no corre. Escribir la conclusión
+del experimento no lo es, porque una conclusión mal sacada se lee igual de bien que
+una buena.</p>
+<h2 id="lo-que-queda-en-pie-de-las-seis-masterclasses">Lo que queda en pie de las seis masterclasses<a class="headerlink" href="#lo-que-queda-en-pie-de-las-seis-masterclasses" title="Permanent link">&para;</a></h2>
+<p>Este es el último documento del repo, así que corresponde el balance.</p>
+<p>Lo que <strong>se construyó y funciona</strong>: un corpus de 40 documentos con cadenas de citas
+verificadas, un pipeline de retrieval evaluado con IC, una librería de patrones de
+producción, un modelo de costos de inferencia, un grafo normativo auditado con cita
+literal por arista, y un servidor MCP que expone todo eso por un protocolo estándar.
+Seis librerías reutilizables y 197 tests que corren sin red.</p>
+<p>Lo que <strong>salió negativo y se publicó igual</strong>: self-hosting pierde contra la API
+(<code>04 §4</code>); expandir el grafo <em>a priori</em> no mejora retrieval (<code>05 §8</code>); compactar el
+contexto por debajo del punto de equilibrio cuesta plata (§2); ninguna intervención
+de harness movió el resultado de forma detectable con n=12 (§7). Cuatro resultados
+que un portfolio optimizado para impresionar no incluiría, y que son la parte del
+repo en la que más confío.</p>
+<p>Lo que <strong>queda abierto</strong>, sin maquillarlo:</p>
+<ul>
+<li>El <code>n</code> es chico en todos lados. 12 tareas acá, 30 queries en <code>02</code>, 18 competency
+  questions en <code>05</code>. Es la limitación estructural del repo y no se arregla
+  escribiendo otro módulo: se arregla anotando más datos.</li>
+<li>El corpus es sintético. Todo lo construido es transferible; ninguno de los números
+  lo es.</li>
+<li><code>B12</code> sigue abierta: la regla de lint que este mismo documento acaba de clasificar
+  como aspiracional.</li>
+</ul>
+<p>La próxima frontera honesta no es un módulo 07. Es cualquiera de estas tres, en este
+orden: poner el servidor MCP de §4 a trabajar contra un corpus real y no sintético;
+agrandar los goldens hasta que los intervalos de confianza digan algo; y cerrar el
+único mecanismo que falta para que la regla más importante del repo —no fabricar
+números— tenga alguien que la chequee.</p>
+<h2 id="estado-del-arte-2026">Estado del arte (2026)<a class="headerlink" href="#estado-del-arte-2026" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Estado</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Archivos de instrucciones para agentes</td>
+<td>✅ Estándar gobernado</td>
+<td><code>AGENTS.md</code> es proyecto fundador de la AAIF desde dic-2025</td>
+</tr>
+<tr>
+<td>Hooks de ciclo de vida</td>
+<td>🟢 Disponibles</td>
+<td>Presentes en los clientes de codificación; poco usados para cerrar el bucle de aprendizaje</td>
+</tr>
+<tr>
+<td>Skills / comandos reutilizables</td>
+<td>🟢 En adopción</td>
+<td>La unidad de delegación correcta para intenciones repetidas</td>
+</tr>
+<tr>
+<td>Reglas verificables vs. aspiracionales</td>
+<td>🔴 No tratado</td>
+<td>Casi nadie audita cuántas de sus reglas tienen mecanismo</td>
+</tr>
+<tr>
+<td>Orquestación entre clientes distintos</td>
+<td>🟡 Artesanal</td>
+<td>El patrón planificador/implementador funciona y no está estandarizado</td>
+</tr>
+<tr>
+<td>Memoria de proyecto entre sesiones</td>
+<td>🟡 En disputa</td>
+<td>Convive el archivo plano versionado con la memoria propietaria del cliente</td>
+</tr>
+</tbody>
+</table>
+<h2 id="limites-de-esta-seccion">Límites de esta sección<a class="headerlink" href="#limites-de-esta-seccion" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>La clasificación de las 20 reglas es mía y es discutible.</strong> Está anotada una por
+  una con su mecanismo justamente para que se pueda discutir: el archivo dice por
+  qué cada regla quedó donde quedó.</li>
+<li><strong>"Verificada" significa que existe un mecanismo, no que sea infalible.</strong> El CI
+  corre los tests que hay; una regla puede estar verificada por un test que no cubre
+  el caso que importa.</li>
+<li><strong>No se midió el cumplimiento efectivo.</strong> Lo honesto sería revisar N commits y
+  contar cuántos respetan cada regla. Eso mediría el cumplimiento; esto mide el
+  mecanismo, que es la variable de diseño.</li>
+<li><strong>Un solo repo y un solo autor.</strong> Nada de esto dice cómo escala a un equipo, donde
+  el problema del harness es de coordinación y no sólo de memoria.</li>
+</ul>
+<h2 id="conexiones">Conexiones<a class="headerlink" href="#conexiones" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>§1</strong>: el hook <code>SessionStart</code> es el paso "percibir" convertido en propiedad del
+  entorno en vez de decisión del agente.</li>
+<li><strong>§2</strong>: <code>BACKLOG.md</code> es memoria externa con índice; los archivos de instrucciones
+  son la partida fija del presupuesto.</li>
+<li><strong>§3</strong>: las skills son herramientas de grano grueso, y las reglas verificables son
+  contratos que una máquina puede chequear.</li>
+<li><strong>§4</strong>: <code>AGENTS.md</code> y MCP son proyectos hermanos de la misma fundación — el harness
+  personal y el estándar de la industria, a dos escalas.</li>
+<li><strong>§5</strong>: Claude Code planificador + Codex implementador funciona porque el plan es
+  autocontenido y la frontera no corta una dependencia.</li>
+<li><strong>§6</strong>: las denegaciones de <code>git push --force</code> y <code>.env</code> son la política de permisos
+  por irreversibilidad, ya implementada.</li>
+<li><strong>§7</strong>: el <code>DIARIO.md</code> que escribe el hook de cierre es un registro de trayectoria;
+  evaluar el proceso y no sólo el resultado.</li>
+<li><strong><code>05 §9</code> / <code>B13</code></strong>: la auditoría posterior al cierre es lo que pasa cuando la
+  regla más importante no tiene mecanismo.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

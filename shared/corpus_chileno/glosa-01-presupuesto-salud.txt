@@ -1,0 +1,62 @@
+LEY DE PRESUPUESTOS DEL SECTOR PÚBLICO AÑO 2024
+PARTIDA 16: MINISTERIO DE SALUD
+
+CAPÍTULO 01: SECRETARÍA Y ADMINISTRACIÓN GENERAL
+
+Programa 01: Subsecretaría de Salud Pública
+
+  Subtítulo 24 - Transferencias Corrientes
+  Ítem 01 - Al Sector Privado
+  Asignación 104 - Programa Nacional de Inmunizaciones
+
+  Monto: $198.547.320 miles
+
+  Glosa 05: Con cargo a estos recursos se financiará la adquisición
+  de vacunas del Programa Nacional de Inmunizaciones, incluyendo las
+  vacunas contra SARS-CoV-2, Influenza, y las contempladas en el
+  calendario de vacunación infantil. El Ministerio de Salud deberá
+  informar trimestralmente a la Comisión Especial Mixta de Presupuestos
+  sobre: (i) el número de dosis adquiridas por tipo de vacuna; (ii) el
+  costo unitario promedio por dosis; (iii) la cobertura alcanzada por
+  grupo etario; y (iv) el inventario de vacunas en stock.
+
+  Asignación 112 - Programa de Reparación y Atención Integral de Salud (PRAIS)
+
+  Monto: $27.834.560 miles
+
+  Glosa 06: Estos recursos se destinarán a financiar prestaciones de
+  salud para los beneficiarios del Programa PRAIS, conforme a lo
+  establecido en la Ley Nº 19.123 y sus modificaciones. Se incluyen
+  atenciones de salud mental, rehabilitación y prestaciones médicas
+  especializadas.
+
+CAPÍTULO 02: FONDO NACIONAL DE SALUD
+
+Programa 01: FONASA
+
+  Subtítulo 24 - Transferencias Corrientes
+  Ítem 03 - A Otras Entidades Públicas
+  Asignación 001 - Aporte Fiscal Libre
+
+  Monto: $4.892.157.000 miles
+
+  Glosa 09: El Fondo Nacional de Salud deberá destinar al menos el 5%
+  de los recursos del Aporte Fiscal Libre a financiar la modalidad de
+  libre elección para prestaciones de baja complejidad en comunas con
+  déficit de oferta pública. Se entenderá como comuna con déficit aquella
+  donde la razón entre beneficiarios FONASA y camas hospitalarias
+  públicas supere las 1.000 personas por cama.
+
+  Subtítulo 25 - Transferencias de Capital
+  Ítem 01 - Al Sector Privado
+  Asignación 205 - Equipamiento Hospitalario Red FONASA
+
+  Monto: $156.789.000 miles
+
+  Glosa 12: Los recursos deberán destinarse prioritariamente a la
+  reposición de equipamiento crítico en establecimientos de alta
+  complejidad. Se define como equipamiento crítico aquel cuya vida
+  útil residual sea inferior a 2 años o cuya tasa de falla supere
+  el 15% mensual. La Subsecretaría de Redes Asistenciales elaborará
+  un ranking de priorización basado en criterios técnicos y sanitarios,
+  el cual deberá ser informado a la Dirección de Presupuestos.

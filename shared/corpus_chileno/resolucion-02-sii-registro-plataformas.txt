@@ -1,0 +1,68 @@
+SERVICIO DE IMPUESTOS INTERNOS
+
+RESOLUCIÓN EXENTA Nº 55, DE 2020
+
+ESTABLECE PROCEDIMIENTO DE REGISTRO Y DECLARACIÓN SIMPLIFICADA PARA
+CONTRIBUYENTES NO DOMICILIADOS NI RESIDENTES EN CHILE QUE PRESTEN
+SERVICIOS REMOTOS GRAVADOS
+
+VISTOS: Lo dispuesto en el artículo 8º letra n) del Decreto Ley Nº 825,
+de 1974, incorporado por la Ley Nº 21.210; en el artículo 35 A y
+siguientes del mismo cuerpo legal; y en las instrucciones impartidas
+mediante Circular Nº 42, de 2020.
+
+CONSIDERANDO:
+
+1.- Que la Ley Nº 21.210 gravó con Impuesto al Valor Agregado los
+servicios remotos prestados por contribuyentes sin domicilio ni
+residencia en Chile y utilizados en territorio nacional.
+
+2.- Que dicha ley estableció un régimen de tributación simplificado
+para tales prestadores, cuya operatoria corresponde regular a este
+Servicio.
+
+RESUELVO:
+
+I. DEL REGISTRO
+
+Los contribuyentes sin domicilio ni residencia en Chile que presten
+servicios remotos gravados a personas naturales que no sean
+contribuyentes de IVA deberán inscribirse en el Registro de
+Contribuyentes No Residentes Prestadores de Servicios Digitales,
+disponible en el sitio web de este Servicio.
+
+La inscripción requerirá: identificación tributaria en el país de
+residencia, denominación o razón social, dirección de correo
+electrónico de contacto, y descripción de los servicios prestados
+conforme a las categorías del artículo 8º letra n).
+
+II. DE LA DECLARACIÓN Y PAGO
+
+La declaración se presentará en forma trimestral, dentro del mes
+siguiente al término de cada trimestre calendario. Podrá efectuarse
+en dólares de los Estados Unidos de América o en pesos chilenos, a
+elección del contribuyente manifestada al momento del registro.
+
+La tasa aplicable es la general del 19% establecida en el artículo 14º
+del Decreto Ley Nº 825.
+
+III. DE LAS OBLIGACIONES EXCLUIDAS
+
+Los contribuyentes acogidos a este régimen NO estarán obligados a:
+emitir documentos tributarios electrónicos; llevar el Registro de
+Compras y Ventas; ni presentar declaraciones mensuales de IVA en el
+Formulario 29.
+
+Tampoco tendrán derecho a crédito fiscal por las adquisiciones o
+utilización de servicios que efectúen.
+
+IV. DE LA REGLA DE PRESUNCIÓN DE UTILIZACIÓN EN CHILE
+
+Se presumirá que el servicio es utilizado en Chile cuando concurran al
+menos dos de los siguientes elementos: dirección IP del usuario en
+territorio nacional; medio de pago emitido en Chile; domicilio de
+facturación en Chile; o tarjeta SIM con código de país chileno.
+
+V. VIGENCIA
+
+La presente resolución rige a contar del 1 de junio de 2020.

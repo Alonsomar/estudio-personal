@@ -1,0 +1,53 @@
+SERVICIO DE IMPUESTOS INTERNOS
+SUBDIRECCIÓN NORMATIVA
+DEPARTAMENTO DE TÉCNICA TRIBUTARIA
+
+OFICIO Nº 1.984, DE 2024
+
+MATERIA: Absuelve consulta sobre el tratamiento tributario aplicable a
+una plataforma de intermediación de servicios de transporte cuyo
+operador tiene domicilio en el extranjero, y sobre el sujeto obligado
+al pago del Impuesto al Valor Agregado.
+
+ANTECEDENTES:
+
+Se consulta por el régimen aplicable a una plataforma que intermedia
+entre conductores residentes en Chile y usuarios finales también
+residentes en Chile, cobrando una comisión sobre cada viaje. El
+operador de la plataforma no tiene domicilio ni residencia en Chile.
+
+ANÁLISIS:
+
+1.- El artículo 8º letra n) del Decreto Ley Nº 825, de 1974,
+incorporado por la Ley Nº 21.210, grava con Impuesto al Valor Agregado
+"la intermediación de servicios prestados en Chile, cualquiera sea su
+naturaleza, o de ventas realizadas en Chile o en el extranjero siempre
+que estas últimas den origen a una importación".
+
+2.- Conforme se instruyó en la Circular Nº 42, de 2020, el hecho
+gravado recae sobre el SERVICIO DE INTERMEDIACIÓN, y no sobre el
+servicio subyacente intermediado. En la especie, el servicio gravado
+por la letra n) es la comisión que percibe el operador de la
+plataforma, no el transporte que presta el conductor.
+
+3.- El servicio de transporte de pasajeros se encuentra exento del
+Impuesto al Valor Agregado en virtud del artículo 13º Nº 3 del Decreto
+Ley Nº 825. Esta exención no se comunica a la comisión de
+intermediación, la cual constituye un hecho gravado autónomo.
+
+4.- Respecto del sujeto obligado, corresponde al operador extranjero
+inscribirse y declarar conforme al procedimiento simplificado
+establecido en la Resolución Exenta Nº 55, de 2020, en tanto los
+usuarios finales no sean contribuyentes de IVA.
+
+5.- Si el usuario del servicio de intermediación fuere un contribuyente
+de IVA, opera el cambio de sujeto y será éste quien deba retener,
+declarar y enterar el impuesto, conforme a las reglas generales.
+
+CONCLUSIÓN:
+
+La comisión percibida por el operador extranjero de la plataforma se
+encuentra gravada con Impuesto al Valor Agregado conforme al artículo
+8º letra n) del Decreto Ley Nº 825. El servicio de transporte
+subyacente permanece exento en virtud del artículo 13º Nº 3, sin que
+dicha exención alcance a la intermediación.
