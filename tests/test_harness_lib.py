@@ -17,6 +17,7 @@ from pydantic import BaseModel
 
 from harness_lib import (
     CORPUS_DIR,
+    REGLAS_CORTE,
     INYECCIONES,
     AgentLoop,
     Decision,
@@ -59,6 +60,9 @@ from harness_lib import (
     llamadas_redundantes,
     metricas_trayectoria,
     normalizar_cita,
+    paso_de_corte_racha_errores,
+    paso_de_corte_repeticion,
+    paso_de_corte_sin_evidencia,
     presupuesto_contexto,
     recuperacion_tras_error,
     rechazar_todo,
@@ -909,6 +913,71 @@ def test_metricas_marcan_si_el_bucle_concluyo():
 )
 def test_normalizar_cita_reduce_el_fragmento_al_documento(cita, esperado):
     assert normalizar_cita(cita) == esperado
+
+
+# --------------------------------------------------------------------------- #
+# §8 Reglas de corte.
+# --------------------------------------------------------------------------- #
+def test_corte_por_repeticion_exacta_detecta_la_llamada_identica():
+    from harness_lib import Paso
+
+    pasos = [
+        Paso(indice=i, herramienta="buscar_corpus", argumentos={"consulta": "x"},
+             estado=EstadoPaso.OK, observacion="nada")
+        for i in range(4)
+    ]
+    tray = Trayectoria(tarea_id="t", pregunta="p", harness="h", pasos=pasos)
+    assert paso_de_corte_repeticion(tray, k=3) == 2
+
+
+def test_corte_por_repeticion_no_ve_los_argumentos_variados():
+    """El límite que §5 encontró y §8 confirma: si el agente varía un
+    argumento, la regla de §1 no dispara nunca."""
+    from harness_lib import Paso
+
+    pasos = [
+        Paso(indice=i, herramienta="vecinos_grafo",
+             argumentos={"doc_id": "ds-250", "tipo_relacion": t},
+             estado=EstadoPaso.ERROR_EJECUCION, observacion="ERROR")
+        for i, t in enumerate(["aplica", "cita", "deroga", "modifica", "reglamenta"])
+    ]
+    tray = Trayectoria(tarea_id="t", pregunta="p", harness="h", pasos=pasos)
+    assert paso_de_corte_repeticion(tray, k=3) is None
+    # 'sin evidencia nueva' sí lo captura: ninguna observación trae un doc.
+    assert paso_de_corte_sin_evidencia(tray, k=3) == 2
+
+
+def test_sin_evidencia_nueva_se_reinicia_cuando_aparece_un_documento():
+    tray = _tray_con_observaciones(
+        ["nada", "nada", "ahora sí ley-01-dl-825-iva-base.txt", "nada", "nada"], []
+    )
+    # El contador se reinicia en el paso 2, así que con k=3 no alcanza a
+    # dispararse antes del final.
+    assert paso_de_corte_sin_evidencia(tray, k=3) is None
+    assert paso_de_corte_sin_evidencia(tray, k=2) == 1
+
+
+def test_corte_por_racha_de_errores():
+    tray = _tray(
+        [EstadoPaso.OK, EstadoPaso.ERROR_EJECUCION, EstadoPaso.ERROR_ARGUMENTOS,
+         EstadoPaso.ERROR_EJECUCION]
+    )
+    assert paso_de_corte_racha_errores(tray, k=3) == 3
+    assert paso_de_corte_racha_errores(tray, k=5) is None
+
+
+def test_las_reglas_de_corte_no_disparan_en_una_trayectoria_sana():
+    tray = _tray_con_observaciones(
+        ["ley-01-dl-825-iva-base.txt", "circular-01-sii-iva-digital.txt"], []
+    )
+    for regla in REGLAS_CORTE.values():
+        assert regla(tray) is None
+
+
+def test_el_catalogo_de_reglas_esta_completo():
+    assert set(REGLAS_CORTE) == {
+        "repetición exacta", "sin evidencia nueva", "racha de errores"
+    }
 
 
 # --------------------------------------------------------------------------- #

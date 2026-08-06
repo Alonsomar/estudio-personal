@@ -1652,6 +1652,74 @@ def metricas_trayectoria(
     )
 
 
+# --------------------------------------------------------------------------- #
+# §8 Reglas de corte.
+#
+# Un bucle que no converge no avisa. El criterio para cortarlo tiene que ser
+# **observable desde adentro del bucle** — con lo que el harness ya tiene, sin
+# saber la respuesta correcta. Una regla que necesite el golden para dispararse
+# sirve para el análisis y no para producción.
+# --------------------------------------------------------------------------- #
+def paso_de_corte_repeticion(tray: Trayectoria, k: int = 3) -> int | None:
+    """Índice del paso en que la misma llamada exacta se repite `k` veces.
+
+    Es la regla del `AgentLoop` de §1, aislada para poder evaluarla. §5 mostró
+    su límite: el orquestador reformulaba la subtarea cada vez, así que las
+    llamadas nunca eran idénticas y la regla no disparó nunca.
+    """
+    conteo: dict[str, int] = {}
+    for paso in tray.pasos:
+        firma = f"{paso.herramienta}:{json.dumps(paso.argumentos, sort_keys=True, ensure_ascii=False)}"
+        conteo[firma] = conteo.get(firma, 0) + 1
+        if conteo[firma] >= k:
+            return paso.indice
+    return None
+
+
+def paso_de_corte_sin_evidencia(tray: Trayectoria, k: int = 3) -> int | None:
+    """Índice del paso tras el cual pasaron `k` pasos seguidos sin que
+    apareciera **ningún identificador de documento nuevo** en las
+    observaciones.
+
+    Es más general que la repetición exacta: no exige que la llamada sea la
+    misma, sólo que no traiga información nueva. Cubre el caso de §5 —ocho
+    paráfrasis distintas de la misma pregunta— que la regla de repetición
+    dejaba pasar.
+    """
+    vistos: set[str] = set()
+    seco = 0
+    for paso in tray.pasos:
+        nuevos = docs_mencionados(paso.observacion)
+        if set(nuevos) - vistos:
+            vistos.update(nuevos)
+            seco = 0
+        else:
+            seco += 1
+            if seco >= k:
+                return paso.indice
+    return None
+
+
+def paso_de_corte_racha_errores(tray: Trayectoria, k: int = 3) -> int | None:
+    """Índice del paso en que se completan `k` errores consecutivos."""
+    racha = 0
+    for paso in tray.pasos:
+        if paso.estado is EstadoPaso.OK:
+            racha = 0
+        else:
+            racha += 1
+            if racha >= k:
+                return paso.indice
+    return None
+
+
+REGLAS_CORTE = {
+    "repetición exacta": paso_de_corte_repeticion,
+    "sin evidencia nueva": paso_de_corte_sin_evidencia,
+    "racha de errores": paso_de_corte_racha_errores,
+}
+
+
 def evaluar_trayectoria(tray: Trayectoria, tarea: Tarea) -> ResultadoTarea:
     """Puntúa una trayectoria contra su tarea.
 
