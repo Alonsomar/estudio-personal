@@ -5,7 +5,7 @@ de aceptación verificables. Los commits referencian el ID (`feat(ontologias): B
 sección 3`). Si una tarea cambia de alcance o estado, se actualiza aquí en el mismo
 cambio.
 
-Última revisión: **2026-08-04**.
+Última revisión: **2026-08-06**.
 
 ---
 
@@ -17,15 +17,18 @@ cambio.
 | 02 | Information Retrieval     | 9/9       | Terminado   |
 | 03 | Patrones de producción    | 12/12     | Terminado   |
 | 04 | Economía de inferencia    | 6/6       | Terminado   |
-| 05 | Ontologías y representación del conocimiento | 9/9 | **En revisión** |
-| 06 | Harness agéntico          | 0/9       | Planificado |
+| 05 | Ontologías y representación del conocimiento | 9/9 | Terminado |
+| 06 | Harness agéntico          | 9/9       | Terminado   |
+
+Los seis módulos están cerrados. Lo que queda abierto son tareas transversales
+(`B10`, `B11`, `B12`, `B14`), no módulos nuevos.
 
 ---
 
 ## Hoja de ruta
 
-El orden es **secuencial**, no paralelo (doctrina: completar un módulo antes de
-abrir el siguiente).
+El orden fue **secuencial**, no paralelo (doctrina: completar un módulo antes de
+abrir el siguiente). Las cinco fases están cerradas.
 
 ```mermaid
 graph LR
@@ -35,7 +38,7 @@ graph LR
     F3 --> F4["Fase 4<br/>06-harness"]
 
     style F0 fill:#cfc,stroke:#333,color:#1a1a1a
-    style F4 fill:#fd9,stroke:#333,color:#1a1a1a
+    style F4 fill:#cfc,stroke:#333,color:#1a1a1a
 ```
 
 | Fase | Contenido | Tareas | Estado |
@@ -44,7 +47,7 @@ graph LR
 | 1 | Cerrar 04-economia (re-especificado a 6 secciones) | B5 | ✅ Hecha |
 | 2 | Expandir corpus 16 → 40 documentos | B6 | ✅ Hecha |
 | 3 | 05-ontologias | B7 + B13 | ✅ Terminada |
-| 4 | 06-harness | B8 | Siguiente fase |
+| 4 | 06-harness | B8 | ✅ Terminada |
 
 ---
 
@@ -250,10 +253,64 @@ Cubre el tema #7 del inventario (orquestación Claude Code + Codex).
    perfiles de Codex. Qué delegar y qué no.
 
 **Criterios de aceptación:**
-- [ ] `00-plan.md` + 9 secciones con el template de 01–03.
-- [ ] **Servidor MCP funcional sobre el corpus chileno** como entregable de §4
-      (artefacto de portfolio, no ejercicio).
-- [ ] Un agente evaluado con métricas de trayectoria sobre una tarea del dominio.
+- [x] `00-plan.md` + 9 secciones con el template de 01–03.
+- [x] **Servidor MCP funcional sobre el corpus chileno** como entregable de §4:
+      [`mcp_corpus_server.py`](06-harness/code/mcp_corpus_server.py) con el SDK
+      oficial (`mcp` 2.0, protocolo `2026-07-28`), verificado por stdio y por
+      transporte en memoria. Cuatro tools, dos resources y un prompt; 19 tests
+      de integración que hablan el protocolo real sin red.
+- [x] Un agente evaluado con métricas de trayectoria sobre una tarea del dominio
+      (§7): cuatro sistemas sobre 12 tareas congeladas, con bootstrap e IC de
+      `01 §8`.
+
+**Resultado principal (negativo, y por eso útil).** Cuatro intervenciones de
+harness —contrato de error (§1), compactación (§2), granularidad de la
+herramienta (§3), orquestación y sus dos arreglos (§5)— y **ninguna movió el
+acierto de forma detectable con n=12**; ningún IC de resultado excluye cero.
+Las cuatro movieron el proceso, y todos los IC de proceso sí excluyen cero. El
+harness ataca el desperdicio, y el desperdicio no aparece en la respuesta:
+cuatro sistemas con acierto 0,500–0,583 gastan entre 48 y 176 llamadas al
+modelo para lo mismo.
+
+**Números vigentes por sección:**
+
+- §1 · Factorial 2×2 (estilo de error × tamaño de observación). El contrato de
+  error lleva la recuperación tras fallo de 0,222 a 1,000 y los pasos perdidos
+  de 10 a 3, con delta de acierto 0,000. Acotar la observación cuesta −0,083 con
+  8 pasos y +0,000 con 16, al precio de 47% más tokens.
+- §2 · El 51,2% del gasto de entrada es prefijo idéntico reenviado;
+  multiplicador de reenvío 3,32×. Compactar tiene punto de equilibrio medido:
+  N\* ≈ 6,4 pasos (P=757, h=311, s=225) y estas trayectorias promedian 4,8, así
+  que la corrida real costó +12% en vez de ahorrar 10%.
+- §3 · La herramienta de grano grueso baja pasos 4,83 → 4,00 y tokens −25% sin
+  mover el acierto. `alcance_normativo` cobra 9.552 tokens de peaje y ahorra
+  17.480: se recupera 1,8 veces.
+- §4 · Servidor MCP funcional. Cuatro esquemas = 618 tokens que viajan en cada
+  iteración; un servidor de 40 tools costaría ~6.180 de prefijo.
+- §5 · El orquestador procesa contextos de la mitad (1.684 → 798) y gasta 3,5×
+  más (48 → 192 llamadas) para acertar una tarea más. La frontera departamental
+  cortó la dependencia de entity resolution y el subagente degeneró
+  (`ds-250` → `ds-250-ds` → `ds-250-ds-250`) porque el error le recomendaba una
+  herramienta que no estaba en su menú.
+- §6 · 1 de 4 cargas de inyección logró la acción irreversible, y fue la que se
+  hace pasar por el usuario. El agente respondió **correctamente** en los cuatro
+  escenarios de permisos: la salida no contiene evidencia del incidente.
+  Idempotencia: 3 llamadas → 3 efectos sin clave, 1 con clave.
+- §7 · Métricas de trayectoria sin golden de referencia (`citas_fundadas`,
+  eficiencia, redundancia). "Acierto sin mirar" = 0 en los cuatro sistemas.
+- §8 · Costo por tarea máx/mediana de 5,5× en el orquestado. Del 51,2% de
+  prefijo quedan 14,6% de ahorro real con caché (descuento 50%, umbral 1.024
+  tokens). La regla de corte "sin evidencia nueva" ahorra 4 pasos sin daño en el
+  agente único y **rompe una respuesta correcta** en el orquestado: el criterio
+  se calibra por arquitectura.
+- §9 · De 20 reglas del harness personal de este repo, 6 tienen mecanismo que
+  las verifica, 3 parcial y 11 son aspiracionales — incluidas la doctrina #4
+  (docs en el mismo cambio) y la #3 (`data/raw` inmutable), y el lint de `B12`.
+
+**Costo total de API del módulo:** USD 0,1034 en 537 respuestas cacheadas.
+Todos los scripts corren offline por defecto; un *cache miss* es error explícito.
+
+**Deuda registrada durante el módulo:** ver `B14`.
 
 ### B9 · P2 · Documento de governance / EU AI Act — ✅ Cerrado (2026-08-04, dentro de B7/§9)
 Material de alto valor para entrevista y **perecedero**. Vive como documento dentro
@@ -308,6 +365,39 @@ siguiente fase.
       de su conclusión; retirar el titular 100% vs. 50%.
 - [x] Sincronizar teoría, scripts, diagramas, README y BACKLOG con los resultados
       finales; `uv run pytest` debe permanecer en verde.
+
+### B14 · P1 · Mecanismos para las reglas aspiracionales del harness
+
+Sale de la auditoría de `06 §9`, que clasificó las 20 reglas declaradas en
+`AGENTS.md` y el `CLAUDE.md` global según si existe un mecanismo que las haga
+cumplir. Resultado: **6 verificadas, 3 parciales, 11 aspiracionales** — y entre
+las aspiracionales están dos doctrinas centrales del portfolio. La clasificación
+está congelada y anotada en
+[`06-harness/examples/reglas-harness.json`](06-harness/examples/reglas-harness.json).
+
+El hallazgo que justifica la tarea: *una regla sin mecanismo es una intención, y
+su tasa de cumplimiento es una propiedad del agente que la lee, no del harness*.
+
+Ordenadas por relación entre valor y esfuerzo:
+
+- [ ] **`[tool.ruff]` en `pyproject.toml`** con `line-length = 100` y la regla
+      `T201` (sin `print()`). Hoy no hay configuración, así que dos reglas
+      escritas del `CLAUDE.md` global no las chequea nadie. Se combina con `B12`,
+      que ya pide `ruff check` en CI.
+- [ ] **Test de inmutabilidad del corpus**: hashes de `shared/corpus_chileno/`
+      congelados en un archivo, verificados por `pytest`. Da mecanismo a la
+      doctrina #3 (`data/raw` es inmutable), que hoy no tiene ninguno.
+- [ ] **Hook de `commit-msg`** que valide conventional commits y la referencia al
+      ID del backlog. Dos reglas de `AGENTS.md` con el mismo mecanismo.
+- [ ] Decidir explícitamente qué hacer con la doctrina #4 (docs en el mismo
+      cambio): o se le da un mecanismo verificable, o se acepta por escrito que
+      depende de revisión humana. Hoy es la regla más citada y la que menos
+      soporte tiene.
+
+**Fuera de alcance de esta tarea:** "no fabricar números". `06 §9` argumenta que
+no es automatizable y que la revisión humana es el mecanismo correcto — es
+justamente la clase de trabajo para el que conviene liberar atención mecanizando
+lo demás.
 
 ---
 

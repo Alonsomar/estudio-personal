@@ -42,11 +42,10 @@ las citas verificables. Ese es el hilo que atraviesa los seis módulos.
 | 03 | Patrones de producción      | [03-produccion/](03-produccion/README.md) | 12/12 | Terminado |
 | 04 | Economía de inferencia      | [04-economia/](04-economia/README.md)   | 6/6   | Terminado |
 | 05 | Ontologías y representación | [05-ontologias/](05-ontologias/README.md) | 9/9 | Terminado |
-| 06 | Harness agéntico            | —                                        | 0/9   | Planificado |
+| 06 | Harness agéntico            | [06-harness/](06-harness/README.md)     | 9/9   | Terminado |
 
-Los módulos se hacen **en orden**, uno cerrado antes de abrir el siguiente. La cola
-de trabajo vigente, con temarios y criterios de aceptación, está en
-[BACKLOG.md](BACKLOG.md).
+Los seis módulos están cerrados. La cola de trabajo vigente, con lo que queda
+abierto, está en [BACKLOG.md](BACKLOG.md).
 
 ## Cómo se lee
 
@@ -66,8 +65,9 @@ git clone <repo-url> && cd estudio-personal
 uv sync
 cp .env.example .env   # completar con API keys reales
 
-uv run pytest                                        # tests
+uv run pytest                                        # 197 tests, sin red ni API keys
 uv run python 02-retrieval/code/01-ir-clasico.py     # cualquier demo
+uv run python 06-harness/code/mcp_corpus_server.py   # servidor MCP sobre el corpus
 uv run mkdocs serve                                  # sitio en local
 ```
 

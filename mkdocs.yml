@@ -143,6 +143,18 @@ nav:
       - 05-ontologias/theory/07-graphrag-economia.md
       - 05-ontologias/theory/08-evaluar-con-ontologia.md
       - 05-ontologias/theory/09-la-ontologia-como-foso.md
+  - 06 · Harness agéntico:
+      - 06-harness/README.md
+      - 06-harness/theory/00-plan.md
+      - 06-harness/theory/01-que-es-un-harness.md
+      - 06-harness/theory/02-contexto-escaso.md
+      - 06-harness/theory/03-tool-como-contrato.md
+      - 06-harness/theory/04-mcp.md
+      - 06-harness/theory/05-multiagente.md
+      - 06-harness/theory/06-permisos-y-control.md
+      - 06-harness/theory/07-evaluar-trayectorias.md
+      - 06-harness/theory/08-costo-del-bucle.md
+      - 06-harness/theory/09-harness-personal.md
   - Material compartido:
       - Corpus chileno: shared/corpus_chileno/README.md
   - Blog drafts: blog-drafts/README.md
