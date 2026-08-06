@@ -31,6 +31,7 @@ from harness_lib import (
     SinCompactar,
     Tarea,
     ToolError,
+    Trabajador,
     ToolRegistry,
     Trayectoria,
     VentanaConIndice,
@@ -43,6 +44,7 @@ from harness_lib import (
     estimar_tokens,
     evaluar_trayectoria,
     harness_cache_key,
+    herramienta_delegar,
     herramienta_memoria,
     llamadas_redundantes,
     presupuesto_contexto,
@@ -486,6 +488,132 @@ def test_el_bucle_aplica_el_compactador_al_enviar_y_conserva_la_historia():
 def test_contar_tokens_degrada_sin_romperse():
     assert contar_tokens("una frase corta") > 0
     assert isinstance(tokenizador_exacto(), bool)
+
+
+# --------------------------------------------------------------------------- #
+# §5 Orquestador y trabajadores.
+# --------------------------------------------------------------------------- #
+def test_subconjunto_recorta_el_menu_sin_duplicar_herramientas():
+    base = construir_herramientas(con_alcance=True)
+    chico = base.subconjunto(["buscar_corpus", "responder"])
+    assert chico.nombres == ["buscar_corpus", "responder"]
+    assert chico.get("buscar_corpus") is base.get("buscar_corpus")
+    with pytest.raises(KeyError):
+        base.subconjunto(["no_existe"])
+
+
+def test_el_error_avisa_cuando_recomienda_una_tool_ausente():
+    """El fallo que §5 documenta: `vecinos_grafo` recomienda 'buscar_corpus'
+    y el trabajador estructural no lo tiene. Sin el aviso, se le está
+    pidiendo algo imposible."""
+    base = construir_herramientas(con_alcance=True)
+    sin_buscar = base.subconjunto(["vecinos_grafo", "responder"])
+    args = {"doc_id": "ds-250", "tipo_relacion": "modifica"}
+
+    ingenuo = sin_buscar.invocar(
+        "vecinos_grafo", args,
+        HarnessConfig(estilo_error="contrato", avisar_herramienta_ausente=False),
+    ).texto
+    consciente = sin_buscar.invocar(
+        "vecinos_grafo", args,
+        HarnessConfig(estilo_error="contrato", avisar_herramienta_ausente=True),
+    ).texto
+
+    assert "buscar_corpus" in ingenuo and "ATENCIÓN" not in ingenuo
+    assert "ATENCIÓN" in consciente and "no está" in consciente
+
+
+def test_sin_herramientas_ausentes_el_aviso_no_aparece():
+    """El registro completo sí tiene 'buscar_corpus': el texto no cambia, y
+    por eso los cachés de §1 y §3 siguen siendo válidos."""
+    completo = construir_herramientas(con_alcance=True)
+    texto = completo.invocar(
+        "vecinos_grafo", {"doc_id": "ds-250", "tipo_relacion": "modifica"},
+        HarnessConfig(estilo_error="contrato"),
+    ).texto
+    assert "ATENCIÓN" not in texto
+
+
+def test_delegar_corre_un_bucle_anidado_y_devuelve_solo_el_resumen():
+    base = construir_herramientas()
+    trabajador = Trabajador(
+        nombre="documental",
+        descripcion="lee el corpus",
+        registry=base.subconjunto(["buscar_corpus", "responder"]),
+        config=HarnessConfig(max_pasos=3),
+    )
+    guion = [
+        Decision(accion="usar_herramienta", herramienta="buscar_corpus",
+                 argumentos={"consulta": "IVA digital"}),
+        Decision(accion="responder", respuesta="La Ley 21.210.",
+                 docs_citados=["circular-01-sii-iva-digital.txt"]),
+    ]
+    registro: list[Trayectoria] = []
+    tool = herramienta_delegar([trabajador], PoliticaGuionada(guion), registro)
+    obs = ToolRegistry([tool]).invocar(
+        "delegar", {"trabajador": "documental", "subtarea": "¿qué ley?"},
+        HarnessConfig(),
+    )
+    assert obs.ok
+    assert "La Ley 21.210." in obs.texto
+    assert "circular-01-sii-iva-digital.txt" in obs.texto
+    # Lo que el trabajador observó NO cruza la frontera: eso es el aislamiento.
+    assert "score" not in obs.texto
+    assert len(registro) == 1 and registro[0].n_pasos == 2
+
+
+def test_delegar_registra_la_subtrayectoria_para_que_el_costo_sea_visible():
+    """Sin registro, el costo de un sistema multiagente es invisible — que es
+    exactamente cómo se subestima en la práctica."""
+    base = construir_herramientas()
+    trabajador = Trabajador(
+        nombre="doc", descripcion="", config=HarnessConfig(max_pasos=2),
+        registry=base.subconjunto(["buscar_corpus", "responder"]),
+    )
+    registro: list[Trayectoria] = []
+    guion = [
+        Decision(accion="usar_herramienta", herramienta="buscar_corpus",
+                 argumentos={"consulta": "x"})
+    ] * 3
+    tool = herramienta_delegar([trabajador], PoliticaGuionada(guion), registro)
+    ToolRegistry([tool]).invocar(
+        "delegar", {"trabajador": "doc", "subtarea": "s"}, HarnessConfig()
+    )
+    assert len(registro) == 1
+    assert registro[0].motivo_corte is MotivoCorte.MAX_PASOS
+
+
+def test_delegar_a_un_trabajador_inexistente_lista_los_disponibles():
+    base = construir_herramientas()
+    trabajador = Trabajador(
+        nombre="doc", descripcion="", config=HarnessConfig(),
+        registry=base.subconjunto(["responder"]),
+    )
+    tool = herramienta_delegar([trabajador], PoliticaGuionada([]), None)
+    obs = ToolRegistry([tool]).invocar(
+        "delegar", {"trabajador": "fantasma", "subtarea": "s"},
+        HarnessConfig(estilo_error="contrato"),
+    )
+    assert not obs.ok and "doc" in obs.texto
+
+
+def test_el_trabajador_que_no_concluye_lo_dice(monkeypatch):
+    """Un resumen que oculta el fracaso es peor que uno que lo declara: el
+    orquestador no puede diagnosticar lo que no ve."""
+    base = construir_herramientas()
+    trabajador = Trabajador(
+        nombre="doc", descripcion="", config=HarnessConfig(max_pasos=1),
+        registry=base.subconjunto(["buscar_corpus", "responder"]),
+    )
+    guion = [
+        Decision(accion="usar_herramienta", herramienta="buscar_corpus",
+                 argumentos={"consulta": "x"})
+    ]
+    tool = herramienta_delegar([trabajador], PoliticaGuionada(guion), None)
+    obs = ToolRegistry([tool]).invocar(
+        "delegar", {"trabajador": "doc", "subtarea": "s"}, HarnessConfig()
+    )
+    assert "sin conclusión" in obs.texto and "max_pasos" in obs.texto
 
 
 # --------------------------------------------------------------------------- #

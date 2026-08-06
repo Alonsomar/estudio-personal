@@ -202,6 +202,10 @@ class HarnessConfig(BaseModel):
     estilo_error: Literal["opaco", "contrato"] = "opaco"
     #: Corta el bucle si el agente repite la misma llamada N veces.
     max_repeticiones: int = 3
+    #: Si el `siguiente_paso` de un error nombra una herramienta que este
+    #: registro no tiene, avisarlo. Es `False` sólo para reproducir el fallo
+    #: que §5 documenta; en cualquier sistema real va en `True`.
+    avisar_herramienta_ausente: bool = True
     instrucciones_extra: str = ""
 
 
@@ -326,6 +330,15 @@ class ToolRegistry:
     def specs_openai(self) -> list[dict[str, Any]]:
         return [self._tools[n].spec_openai() for n in self.nombres]
 
+    def subconjunto(self, nombres: list[str]) -> "ToolRegistry":
+        """Un registro con sólo estas herramientas. Es lo que le da a cada
+        trabajador de §5 un menú chico —y por lo tanto un prefijo barato—
+        sin duplicar la definición de las herramientas."""
+        faltantes = [n for n in nombres if n not in self._tools]
+        if faltantes:
+            raise KeyError(f"herramientas no registradas: {faltantes}")
+        return ToolRegistry([self._tools[n] for n in nombres])
+
     def invocar(
         self, nombre: str, argumentos: dict[str, Any], config: HarnessConfig
     ) -> Observacion:
@@ -384,7 +397,8 @@ class ToolRegistry:
         except ToolError as exc:
             texto = (
                 f"ERROR en '{nombre}'. Esperado: {exc.esperado}. "
-                f"Recibido: {exc.recibido}. Siguiente paso: {exc.siguiente_paso}"
+                f"Recibido: {exc.recibido}. "
+                f"Siguiente paso: {self._ajustar_siguiente_paso(exc.siguiente_paso, config)}"
                 if contrato
                 else f"Error: {type(exc).__name__}"
             )
@@ -409,6 +423,36 @@ class ToolRegistry:
             )
 
         return self._acotar(salida, config)
+
+    def _ajustar_siguiente_paso(
+        self, siguiente_paso: str, config: HarnessConfig
+    ) -> str:
+        """Un consejo que manda a usar una herramienta que no está en el menú
+        es peor que no dar consejo.
+
+        La herramienta escribe su `siguiente_paso` sin saber en qué registro
+        la van a montar. Cuando §5 partió las herramientas entre dos
+        trabajadores, el error de `vecinos_grafo` seguía diciendo "usá
+        'buscar_corpus' para ubicar el documento" — y el trabajador
+        estructural no tenía `buscar_corpus`. El resultado observado fue un
+        agente degenerando (`ds-250` → `ds-250-ds` → `ds-250-ds-250`) porque
+        se le pidió algo imposible en su contexto.
+
+        El contrato de error, entonces, no es una propiedad de la
+        herramienta: es una propiedad de la herramienta **en su registro**.
+        """
+        if not config.avisar_herramienta_ausente:
+            return siguiente_paso
+        referidas = set(re.findall(r"'([a-z_]+)'", siguiente_paso))
+        ausentes = sorted(r for r in referidas if r not in self._tools)
+        if not ausentes:
+            return siguiente_paso
+        return (
+            f"{siguiente_paso} (ATENCIÓN: {', '.join(ausentes)} no está "
+            f"disponible en este contexto. Herramientas disponibles: "
+            f"{', '.join(self.nombres)}. Si ninguna alcanza, respondé "
+            "explicando qué te falta.)"
+        )
 
     @staticmethod
     def _acotar(salida: str, config: HarnessConfig) -> Observacion:
@@ -1035,6 +1079,96 @@ def herramienta_memoria(memoria: MemoriaExterna) -> Herramienta:
         ),
         args_model=ArgsMemoria,
         fn=lambda args: memoria.recuperar(args.clave),
+    )
+
+
+# --------------------------------------------------------------------------- #
+# §5 Orquestador y trabajadores.
+#
+# Un subagente no es un modelo más listo: es un contexto separado. Todo lo
+# que el trabajador ve —sus observaciones, sus errores, sus rodeos— muere en
+# su propio bucle, y al orquestador le vuelve un resumen. Eso es aislamiento
+# de información, con la misma lógica de una estructura departamental: la
+# ganancia es que el jefe no tiene que leer todo, y el costo es que lo que no
+# leyó puede ser justo lo que hacía falta.
+# --------------------------------------------------------------------------- #
+@dataclass
+class Trabajador:
+    """Un subagente: nombre, un menú de herramientas propio y su configuración.
+
+    Que cada trabajador tenga su `ToolRegistry` es el punto entero — el menú
+    chico es lo que hace barato el prefijo de su bucle (§3, §4).
+    """
+
+    nombre: str
+    descripcion: str
+    registry: ToolRegistry
+    config: HarnessConfig
+    instrucciones: str = ""
+
+
+class ArgsDelegar(BaseModel):
+    trabajador: str
+    subtarea: str
+
+
+def herramienta_delegar(
+    trabajadores: list[Trabajador],
+    politica: "Politica",
+    registro: list[Trayectoria] | None = None,
+) -> Herramienta:
+    """La herramienta que convierte a un agente en orquestador.
+
+    Cada llamada corre un bucle anidado completo y devuelve **sólo** la
+    respuesta del trabajador y los documentos que citó. Las observaciones
+    intermedias no cruzan la frontera: ahí está el ahorro de contexto y ahí
+    está la pérdida de información.
+
+    `registro`, si se pasa, acumula las trayectorias de los trabajadores —
+    sin eso, el costo del sistema multiagente sería invisible, que es
+    exactamente cómo se subestima en la práctica.
+    """
+    por_nombre = {t.nombre: t for t in trabajadores}
+    catalogo = "; ".join(f"'{t.nombre}': {t.descripcion}" for t in trabajadores)
+
+    def delegar(args: ArgsDelegar) -> str:
+        if args.trabajador not in por_nombre:
+            raise ToolError(
+                esperado=f"un trabajador en {sorted(por_nombre)}",
+                recibido=args.trabajador,
+                siguiente_paso=f"volvé a llamar usando uno de: {', '.join(sorted(por_nombre))}",
+            )
+        t = por_nombre[args.trabajador]
+        config = t.config.model_copy(update={"instrucciones_extra": t.instrucciones})
+        sub = AgentLoop(t.registry, politica, config)
+        tray = sub.correr(f"sub:{t.nombre}", args.subtarea)
+        if registro is not None:
+            registro.append(tray)
+
+        if tray.motivo_corte is not MotivoCorte.RESPONDIO:
+            return (
+                f"[trabajador '{t.nombre}' — {tray.n_pasos} pasos, sin conclusión: "
+                f"{tray.motivo_corte.value}]\nNo alcanzó a responder la subtarea. "
+                "Probá con una subtarea más acotada o con otro trabajador."
+            )
+        citados = ", ".join(tray.docs_citados) if tray.docs_citados else "(ninguno)"
+        return (
+            f"[trabajador '{t.nombre}' — {tray.n_pasos} pasos]\n"
+            f"{tray.respuesta_final}\n"
+            f"documentos citados: {citados}"
+        )
+
+    return Herramienta(
+        nombre="delegar",
+        descripcion=(
+            "Delega una subtarea acotada a un trabajador especializado, que la "
+            "resuelve por su cuenta y devuelve su conclusión con los documentos "
+            f"que la sustentan. Trabajadores disponibles — {catalogo}. "
+            "Formulá la subtarea como una pregunta completa: el trabajador no ve "
+            "esta conversación."
+        ),
+        args_model=ArgsDelegar,
+        fn=delegar,
     )
 
 
